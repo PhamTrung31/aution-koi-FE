@@ -1,0 +1,67 @@
+.table-container {
+  width: 100%;
+  margin: auto;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  background-color: #f5f5f5;
+}
+
+th,
+td {
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  border-bottom: 2px solid #ddd;
+}
+
+td {
+  border-bottom: 1px solid #ddd;
+}
+
+.status {
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-weight: bold;
+}
+
+.active {
+  color: #00cc88;
+  border: 1px solid #00cc88;
+  background-color: #f0fff5;
+}
+
+.action-btn {
+  background: none;
+  border: none;
+  margin-right: 10px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.action-btn:hover {
+  opacity: 0.7;
+}
+
+.edit-btn {
+  color: #00bfff;
+}
+
+.lock-btn {
+  color: #888;
+}
+
+.delete-btn {
+  color: #ff4c4c;
+}
