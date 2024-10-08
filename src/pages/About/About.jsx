@@ -37,13 +37,13 @@ function About() {
         </div>
       </div>
 
-      <div
-        onClick={() => toggleFAQ(1)}
-        style={{ cursor: "pointer" }}
-        className="my-3 p-3 bg-body rounded shadow-sm border-bottom"
-      >
+      <div className="my-3 p-3 bg-body rounded shadow-sm border-bottom">
         <h6 className="border-bottom pb-2 mb-0">Frequently Asked Questions</h6>
-        <div className="d-flex text-body-secondary pt-3 border-bottom">
+        <div
+          onClick={() => toggleFAQ(1)}
+          style={{ cursor: "pointer" }}
+          className="d-flex text-body-secondary pt-3 border-bottom"
+        >
           <svg
             className="bd-placeholder-img flex-shrink-0 me-2 rounded"
             width="32"

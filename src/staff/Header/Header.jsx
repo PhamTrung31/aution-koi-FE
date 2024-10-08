@@ -16,14 +16,23 @@ function Header() {
             <Nav.Link as={Link} to="/home">
               Home
             </Nav.Link>
-            <Nav.Link as={Link} to="/user">
-              User
+            <Nav.Link as={Link} to="/member">
+              ManagerMember
             </Nav.Link>
             <Nav.Link as={Link} to="/request">
               Request
             </Nav.Link>
             <Nav.Link as={Link} to="/auction">
               Auction
+            </Nav.Link>
+            <Nav.Link as={Link} to="/manageStaff">
+              ManageStaff
+            </Nav.Link>
+            <Nav.Link as={Link} to="/mrequest">
+              ManagerRequest
+            </Nav.Link>
+            <Nav.Link as={Link} to="/breeder">
+              ManagerBreeder
             </Nav.Link>
           </Nav>
         </Navbar.Collapse>
