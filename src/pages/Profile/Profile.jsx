@@ -1,10 +1,10 @@
 import { useSelector } from 'react-redux'
 import './Profile.css'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import Forbidden403 from '../Forbidden403/Forbidden403'
 
 function Profile({ userRole }) {
-const navigate = useNavigate()
+  const navigate = useNavigate()
 
   return (
     <body>
@@ -127,65 +127,66 @@ const MemberProfile = () => {
               </div>
             </div>
 
-            <div className="row">
-              <div className="col-md-6">
-                <div className="card mb-4 mb-md-0">
-                  <div className="card-body">
-                    <p className="mb-4 fs-4">
-                      Account <span className="text-success me-1 fw-bold">Balance</span>
-                    </p>
-                    <p className="mb-1" style={{ fontSize: '.77rem' }}>Web Design</p>
-                    <div className="progress rounded" style={{ height: '5px' }}>
-                      <div className="progress-bar" role="progressbar" style={{ width: '80%' }} aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                    <p className="mt-4 mb-1" style={{ fontSize: '.77rem' }}>Website Markup</p>
-                    <div className="progress rounded" style={{ height: '5px' }}>
-                      <div className="progress-bar" role="progressbar" style={{ width: '72%' }} aria-valuenow="72" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                    <p className="mt-4 mb-1" style={{ fontSize: '.77rem' }}>One Page</p>
-                    <div className="progress rounded" style={{ height: '5px' }}>
-                      <div className="progress-bar" role="progressbar" style={{ width: '89%' }} aria-valuenow="89" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                    <p className="mt-4 mb-1" style={{ fontSize: '.77rem' }}>Mobile Template</p>
-                    <div className="progress rounded" style={{ height: '5px' }}>
-                      <div className="progress-bar" role="progressbar" style={{ width: '55%' }} aria-valuenow="55" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                    <p className="mt-4 mb-1" style={{ fontSize: '.77rem' }}>Backend API</p>
-                    <div className="progress rounded mb-2" style={{ height: '5px' }}>
-                      <div className="progress-bar" role="progressbar" style={{ width: '66%' }} aria-valuenow="66" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="col-md-6">
-                <div className="card mb-4 mb-md-0">
-                  <div className="card-body">
-                    <p className="mb-4 fs-4">
-                      <span className="text-primary me-1 fw-bold">Payment History</span>
-                    </p>
-                    <p className="mb-1" style={{ fontSize: '.77rem' }}>Web Design</p>
-                    <div className="progress rounded" style={{ height: '5px' }}>
-                      <div className="progress-bar" role="progressbar" style={{ width: '80%' }} aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                    <p className="mt-4 mb-1" style={{ fontSize: '.77rem' }}>Website Markup</p>
-                    <div className="progress rounded" style={{ height: '5px' }}>
-                      <div className="progress-bar" role="progressbar" style={{ width: '72%' }} aria-valuenow="72" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                    <p className="mt-4 mb-1" style={{ fontSize: '.77rem' }}>One Page</p>
-                    <div className="progress rounded" style={{ height: '5px' }}>
-                      <div className="progress-bar" role="progressbar" style={{ width: '89%' }} aria-valuenow="89" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                    <p className="mt-4 mb-1" style={{ fontSize: '.77rem' }}>Mobile Template</p>
-                    <div className="progress rounded" style={{ height: '5px' }}>
-                      <div className="progress-bar" role="progressbar" style={{ width: '55%' }} aria-valuenow="55" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                    <p className="mt-4 mb-1" style={{ fontSize: '.77rem' }}>Backend API</p>
-                    <div className="progress rounded mb-2" style={{ height: '5px' }}>
-                      <div className="progress-bar" role="progressbar" style={{ width: '66%' }} aria-valuenow="66" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                  </div>
-                </div>
+            <div className="card mb-4">
+              <div className="card-body">
+                <p className="mb-1 fs-4">
+                  <span className="text-primary me-1 fw-bold">Participated Auction</span>
+                </p>
+                <ul className="list-group list-group-flush rounded-3" style={{ height: '210px', maxHeight: '210px', overflowY: 'auto' }}>
+                  <li className="list-group-item justify-content-between align-items-center p-3">
+                    <a href="#" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
+                      <div class="d-flex gap-2 w-100 justify-content-between row">
+                        <div className="col-sm-5">
+                          <h6 className="mb-0">Auction #10 - End date: 12/3/2024</h6>
+                        </div>
+                        <div className='col-sm-4'>Winner: {user.fullname}</div>
+                        <div className="col-sm-2">
+                          {/* <p className="text-muted mb-0">{user.fullname}</p> */}
+                          <Link to='/'>View Detail</Link>
+                        </div>
+                      </div>
+                    </a>
+                  </li>
+                  <li className="list-group-item justify-content-between align-items-center p-3">
+                    <a href="#" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
+                      <div class="d-flex gap-2 w-100 justify-content-between row">
+                        <div className="col-sm-5">
+                          <h6 className="mb-0">Auction #10 - End date: 12/3/2024</h6>
+                        </div>
+                        <div className='col-sm-4'>Winner: {user.fullname}</div>
+                        <div className="col-sm-2">
+                          {/* <p className="text-muted mb-0">{user.fullname}</p> */}
+                          <Link to='/'>View Detail</Link>
+                        </div>
+                      </div>
+                    </a>
+                  </li>
+                  <li className="list-group-item justify-content-between align-items-center p-3">
+                    <a href="#" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
+                      <div class="d-flex gap-2 w-100 justify-content-between row">
+                        <div className="col-sm-5">
+                          <h6 className="mb-0">Auction #10 - End date: 12/3/2024</h6>
+                        </div>
+                        <div className='col-sm-4'>Winner: {user.fullname}</div>
+                        <div className="col-sm-2">
+                          {/* <p className="text-muted mb-0">{user.fullname}</p> */}
+                          <Link to='/'>View Detail</Link>
+                        </div>
+                      </div>
+                    </a>
+                  </li>
+                  <li className="list-group-item justify-content-between align-items-center p-3 auction">
+                    <a href="#" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
+                      <img src="https://github.com/twbs.png" alt="twbs" width="32" height="32" class="rounded-circle flex-shrink-0" />
+                      <div class="d-flex gap-2 w-100 justify-content-between">
+                        <div>
+                          <h6 class="mb-0">Third heading</h6>
+                          <p class="mb-0 opacity-75">Some placeholder content in a paragraph.</p>
+                        </div>
+                      </div>
+                    </a>
+                  </li>
+                </ul>
               </div>
             </div>
           </div>

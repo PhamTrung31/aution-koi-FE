@@ -11,6 +11,7 @@ import Profile from './pages/Profile/Profile.jsx'
 import Register from './pages/Register/Register.jsx'
 import CurrentAuction from './pages/CurrentAuction/CurrentAuction.jsx'
 import PastAuction from './pages/PastAuction/PastAuction.jsx'
+import AuctionView from './pages/AuctionView/AuctionView.jsx';
 import Forbidden403 from './pages/Forbidden403/Forbidden403.jsx'
 import DemoAxios from './components/DemoAxios.jsx'
 import Footer from './components/Footer/Footer.jsx'
@@ -67,6 +68,7 @@ function App() {
             <Route path='/profile' element={<PublicElement><Profile userRole={CURRENT_USER_ROLE}/></PublicElement>}/>
 
             <Route path="/currentAuction" element={<MemberElement><CurrentAuction /></MemberElement>} />
+            <Route path='/auctionView' element={<MemberElement><AuctionView /></MemberElement>}/>
 
             <Route path='/manager' element={<ManagerElement><Manager /></ManagerElement>} />
 

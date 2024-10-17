@@ -20,11 +20,14 @@ function Header({ userRole }) {
 }
 
 const MemberHeader = () => {
+
     const user = useSelector((state) => state.auth.profile?.currentUser)
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const [userTitle, setUserTitle] = useState(user ? user.fullname : null)
     const [auctionTitle, setAuctionTitle] = useState("Auction")
+    const [wallet, setWallet] = useState(100000000)
+    const formatWallet = new Intl.NumberFormat('de-DE').format(wallet);
 
     const handleUserTitle = (title) => {
         setUserTitle(title)
@@ -59,6 +62,7 @@ const MemberHeader = () => {
                         {user?.fullname ? (
                             <>
                                 <Navbar.Collapse id="navbar-white-example">
+                                    <Nav.Link className="fw-bold">Wallet: {formatWallet} vnd</Nav.Link>
                                     <Nav>
                                         <NavDropdown
                                             id="nav-dropdown-dark-example"
@@ -209,5 +213,6 @@ const BreederNavbar = () => {
         </Navbar >
     );
 }
+
 
 export default Header
