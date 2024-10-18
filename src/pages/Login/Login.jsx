@@ -33,7 +33,7 @@ function Login() {
                         <div className="modal-body p-5 pt-0">
                             <div className="form-floating mb-3">
                                 <input
-                                    type="email"
+                                    type="text"
                                     className="form-control rounded-3"
                                     id="floatingInput"
                                     placeholder="name@example.com"
