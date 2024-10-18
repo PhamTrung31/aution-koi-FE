@@ -1,5 +1,7 @@
 import React from "react";
-import "./Request.css"; // Add this for styling
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import "./Request.css";
 
 const requests = [
   {
@@ -62,12 +64,7 @@ const requests = [
 
 function Request() {
   return (
-    <div className="requests-container">
-      <h2>Requests</h2>
-      <div className="search-bar">
-        <input type="text" placeholder="Search requests..." />
-        <button>🔍</button>
-      </div>
+    <div className="table-container">
       <table>
         <thead>
           <tr>
@@ -94,8 +91,7 @@ function Request() {
               <td>{request.buyoutPrice}</td>
               <td>{request.time}</td>
               <td className="action-icons">
-                <span>✔</span>
-                <span>✖</span>
+                <FontAwesomeIcon icon={faArrowRight} />
               </td>
             </tr>
           ))}
