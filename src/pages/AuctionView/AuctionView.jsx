@@ -12,6 +12,7 @@ function AuctionView() {
     const [timerHours, setTimerHours] = useState('00');
     const [timerMinutes, setTimerMinutes] = useState('00');
     const [timerSeconds, setTimerSeconds] = useState('00');
+    const [autoBid, setAutoBid] = useState(0);
 
     let interval = useRef();
 
@@ -46,6 +47,13 @@ function AuctionView() {
             clearInterval(interval.current);
         }
     })
+
+    const handleAutoBid = (e) => {
+        e.preventDefault();
+        if(autoBid === 0) setAutoBid(1)
+            else setAutoBid(0)
+    }
+
 
     return (
         <div className="container" style={{ marginBottom: '28.5px' }}>
@@ -110,27 +118,38 @@ function AuctionView() {
                             </li>
                         </ul>
 
-                        <div type="button" className="card p-2 btn btn-success btn-lg">
+                        <div type="button" className="p-2 btn btn-outline-success btn-lg w-100">
                             <div><span className='fw-bold'>Buy Out</span>: {formatBuyOut} vnd</div>
                         </div><br />
 
                         <div>
-                            <h4 className="mb-3">Put Your Bid Here</h4>
+                            <h4 className="mt-4">Put Your Bid Here</h4>
                             <form className="needs-validation" noValidate>
                                 <div className="row g-3">
-                                    <div className="col-md-6">
-                                        <label htmlFor="country" className="form-label">
-                                            Your Bid
-                                        </label>
-                                        <input className="form-control" id="country" required />
-                                        <div className="invalid-feedback">Please select a valid country.</div>
+                                    <div className="col-md-6 form-floating mt-4">
+                                        {/* <input
+                                            type="number"
+                                            className="form-control rounded-3"
+                                            id="floatingBid"
+                                            placeholder="name@example.com"
+                                        // onChange={e => setUsername(e.target.value)}
+                                        />
+                                        <label for="floatingBid form-label">Your Bid</label> */}
+                                        <div className="form-floating">
+                                            <input
+                                                type="number"
+                                                className="form-control rounded-3"
+                                                id="floatingBid"
+                                                placeholder="name@example.com"
+                                            // onChange={e => setUsername(e.target.value)}
+                                            />
+                                            <label for="floatingBid">Your Bid</label>
+                                        </div>
                                     </div>
 
-                                    <div className="col-md-3">
-                                        <label htmlFor="state" className="form-label">
-                                            Increment
-                                        </label>
-                                        <select className="form-select" id="state" required>
+                                    <div className="col-md-4">
+                                        <label for="form-label">Increment</label>
+                                        <select className="form-select" id="floatingIncrement" required>
                                             <option value=""></option>
                                             <option>10%</option>
                                             <option>20%</option>
@@ -138,28 +157,38 @@ function AuctionView() {
                                         </select>
                                         <div className="invalid-feedback">Please provide a valid state.</div>
                                     </div>
+                                    {autoBid === 0 ? (
+                                        <>
+                                            <div className="col-md-4">
+                                                <button className='btn btn-danger w-100' onClick={handleAutoBid}>Auto Bid</button>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="col-md-5">
+                                                <button className='btn btn-warning w-100' onClick={handleAutoBid}> Cancel Auto Bid</button>
+                                            </div>
 
-                                    <div className="col-md-3">
-                                        <label htmlFor="zip" className="form-label">
-                                            Auto
-                                        </label>
-                                        <div className="form-check">
-                                            <input
-                                                type="checkbox"
-                                                className="form-check-input"
-                                                id="same-address"
-                                            />
-                                            <label className="form-check-label" htmlFor="same-address">
-                                                Auto Bid
-                                            </label>
-                                        </div>
-                                        <div className="invalid-feedback">Zip code required.</div>
-                                    </div>
+                                            <div className="col-md-6 form-floating">
+                                                <div className="form-floating">
+                                                    <input
+                                                        type="number"
+                                                        className="form-control rounded-3"
+                                                        id="floatingInput"
+                                                        placeholder="name@example.com"
+                                                        onChange={e => setUsername(e.target.value)}
+                                                    />
+                                                    <label for="floatingInput">Maximum Auto Bid</label>
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
+
                                 </div>
 
                                 <hr className="my-4" />
 
-                                <button className="w-100 btn btn-primary btn-lg" type="submit">
+                                <button className="w-100 btn btn-success btn-lg" type="submit">
                                     Continue to bid
                                 </button>
                             </form>

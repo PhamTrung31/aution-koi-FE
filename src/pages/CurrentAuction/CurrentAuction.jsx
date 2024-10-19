@@ -12,7 +12,7 @@ function CurrentAuction() {
     let interval = useRef();
 
     const startTimer = () => {
-      const countdownDate = new Date('October 16 2024 00:00:00').getTime();
+      const countdownDate = new Date('10-21-2024 00:00:00').getTime();
 
       interval = setInterval(() => {
         const now =  new Date().getTime();
@@ -48,7 +48,7 @@ function CurrentAuction() {
             <h1 className="display-4 fw-bold text-center">Auction will be start in</h1>
             <div className="col-lg-6 mx-auto">
                 <p className="lead mb-4 fs-1">
-                    Countdown {timerDays == 1 ? (timerDays+' day') : timerDays == 0 ? ("") : timerDays+' days'} {timerHours < 10 ? '0'+timerHours : timerHours}
+                    {timerDays == 1 ? (timerDays+' day') : timerDays == 0 ? ("") : timerDays+' days'} {timerHours < 10 ? '0'+timerHours : timerHours}
                     :{timerMinutes < 10 ? '0'+timerMinutes : timerMinutes}
                     :{timerSeconds < 10 ? '0'+timerSeconds : timerSeconds}
                 </p>
