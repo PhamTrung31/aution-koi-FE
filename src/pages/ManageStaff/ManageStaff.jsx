@@ -89,7 +89,7 @@ function ManageStaff() {
   };
 
   return (
-    <div>
+    <div className="container py-3 table">
       <div className={styles.tableContainer}>
         <table className={styles.table}>
           <thead>

@@ -22,7 +22,7 @@ import DemoAxios from "./components/DemoAxios.jsx";
 import Footer from "./components/Footer/Footer.jsx";
 import Member from "./pages/Member/Member.jsx";
 import Breeder from "./pages/Breeder/Breeder.jsx";
-import Staff from "./pages/Staff/ManageStaff.jsx";
+import ManageStaff from "./pages/ManageStaff/ManageStaff.jsx";
 import Request from "./pages/Request/MRequest.jsx";
 import StaffRequest from "./pages/StaffRequest/Request.jsx";
 import Auction from "./pages/Auction/Auction.jsx";
@@ -82,134 +82,28 @@ function App() {
         <Header userRole={CURRENT_USER_ROLE} />
         <div className="main">
           <Routes>
-            <Route
-              path="/"
-              element={
-                <PublicElement>
-                  <Home userRole={CURRENT_USER_ROLE} />
-                </PublicElement>
-              }
-            />
-            <Route
-              path="/about"
-              element={
-                <PublicElement>
-                  <About />
-                </PublicElement>
-              }
-            />
-            <Route
-              path="/pastAuction"
-              element={
-                <PublicElement>
-                  <PastAuction />
-                </PublicElement>
-              }
-            />
-            <Route
-              path="/login"
-              element={
-                <PublicElement>
-                  <Login />
-                </PublicElement>
-              }
-            />
-            <Route
-              path="/register"
-              element={
-                <PublicElement>
-                  <Register />
-                </PublicElement>
-              }
-            />
-            <Route
-              path="/profile"
-              element={
-                <PublicElement>
-                  <Profile userRole={CURRENT_USER_ROLE} />
-                </PublicElement>
-              }
-            />
+            <Route path="/" element={<PublicElement><Home userRole={CURRENT_USER_ROLE} /></PublicElement>}/>
+            <Route path="/about" element={<PublicElement><About /></PublicElement>}/>
+            <Route path="/pastAuction" element={<PublicElement><PastAuction /></PublicElement>}/>
+            <Route path="/login" element={<PublicElement><Login /></PublicElement>}/>
+            <Route path="/register" element={<PublicElement><Register /></PublicElement>}/>
+            <Route path="/profile" element={<PublicElement><Profile userRole={CURRENT_USER_ROLE} /></PublicElement>}/>
 
-            <Route
-              path="/currentAuction"
-              element={
-                <MemberElement>
-                  <CurrentAuction />
-                </MemberElement>
-              }
-            />
-            <Route
-              path="/auctionView"
-              element={
-                <MemberElement>
-                  <AuctionView />
-                </MemberElement>
-              }
-            />
 
-            <Route
-              path="/member"
-              element={
-                <ManagerElement>
-                  <Member />
-                </ManagerElement>
-              }
-            />
+            <Route path="/currentAuction" element={<MemberElement><CurrentAuction /></MemberElement>}/>
+            <Route path="/auctionView" element={<MemberElement><AuctionView /></MemberElement>}/>
 
-            <Route
-              path="/breeder"
-              element={
-                <ManagerElement>
-                  <Breeder />
-                </ManagerElement>
-              }
-            />
 
-            <Route
-              path="/staff"
-              element={
-                <ManagerElement>
-                  <Staff />
-                </ManagerElement>
-              }
-            />
+            {/* <Route path="/member" element={<ManagerElement><Member /></ManagerElement>}/>
+            <Route path="/breeder" element={<ManagerElement><Breeder /></ManagerElement>}/> */}
+            <Route path="/manageStaff" element={<ManagerElement><ManageStaff /></ManagerElement>}/>
+            <Route path="/request" element={<ManagerElement><Request /></ManagerElement>}/>
 
-            <Route
-              path="/request"
-              element={
-                <ManagerElement>
-                  <Request />
-                </ManagerElement>
-              }
-            />
 
-            <Route
-              path="/staffrequest"
-              element={
-                <StaffElement>
-                  <StaffRequest />
-                </StaffElement>
-              }
-            />
+            <Route path="/staffrequest" element={<StaffElement><StaffRequest /></StaffElement>}/>
+            <Route path="/auction" element={<StaffElement><Auction /></StaffElement>}/>
+            <Route path="/createrequest" element={<BreederElement><CreateRequest /></BreederElement>}/>
 
-            <Route
-              path="/auction"
-              element={
-                <StaffElement>
-                  <Auction />
-                </StaffElement>
-              }
-            />
-
-            <Route
-              path="/createrequest"
-              element={
-                <BreederElement>
-                  <CreateRequest />
-                </BreederElement>
-              }
-            />
 
             <Route path="/forbidden403" element={<Forbidden403 />} />
             <Route path="*" element={<div>Page Not Found!</div>} />

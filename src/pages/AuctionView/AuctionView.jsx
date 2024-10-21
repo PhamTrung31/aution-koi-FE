@@ -6,13 +6,16 @@ import { Button } from 'bootstrap';
 function AuctionView() {
 
     const [buyOut, setBuyOut] = useState(6000000);
-    const formatBuyOut = new Intl.NumberFormat('de-DE').format(buyOut);
+    const [highestBid, setHigestBid] = useState(3000000);
+    const [bid, setBid] = useState(highestBid + highestBid * 0.1);
+    const [autoBid, setAutoBid] = useState(0);
+    const [maxBid, setMaxBid] = useState(0);
+    const [incre, setIncre] = useState(0);
 
     const [timerDays, setTimerDays] = useState('00');
     const [timerHours, setTimerHours] = useState('00');
     const [timerMinutes, setTimerMinutes] = useState('00');
     const [timerSeconds, setTimerSeconds] = useState('00');
-    const [autoBid, setAutoBid] = useState(0);
 
     let interval = useRef();
 
@@ -50,8 +53,9 @@ function AuctionView() {
 
     const handleAutoBid = (e) => {
         e.preventDefault();
-        if(autoBid === 0) setAutoBid(1)
-            else setAutoBid(0)
+        if (autoBid === 0) setAutoBid(1)
+        else setAutoBid(0)
+        setBid(highestBid + highestBid * 0.1)
     }
 
 
@@ -73,101 +77,126 @@ function AuctionView() {
                             <span className="text-primary">Leaderboard</span>
                             <span className="badge bg-primary rounded-pill">3</span>
                         </h4>
+
+                        {/* Leaderboard */}
                         <ul className="list-group list-group-flush mb-3 leaderboard" style={{ maxHeight: '320px', overflowY: 'auto' }}>
                             <li className="list-group-item d-flex justify-content-between lh-sm" >
                                 <div>
                                     <h6 className="my-0">User #5</h6>
                                     <small className="text-body-secondary">30 minutes ago</small>
                                 </div>
-                                <span>$12</span>
+                                <span>{highestBid} vnd</span>
                             </li>
                             <li className="list-group-item d-flex justify-content-between lh-sm">
                                 <div>
                                     <h6 className="my-0">User #8</h6>
                                     <small className="text-body-secondary">2 hours ago</small>
                                 </div>
-                                <span className="text-body-secondary">$8</span>
+                                <span className="text-body-secondary">2500000 vnd</span>
                             </li>
                             <li className="list-group-item d-flex justify-content-between lh-sm">
                                 <div>
                                     <h6 className="my-0">User #3</h6>
                                     <small className="text-body-secondary">1 day ago</small>
                                 </div>
-                                <span className="text-body-secondary">$5</span>
+                                <span className="text-body-secondary">2000000 vnd</span>
                             </li>
                             <li className="list-group-item d-flex justify-content-between lh-sm">
                                 <div>
                                     <h6 className="my-0">User #3</h6>
                                     <small className="text-body-secondary">1 day ago</small>
                                 </div>
-                                <span className="text-body-secondary">$5</span>
+                                <span className="text-body-secondary">1500000 vnd</span>
                             </li>
                             <li className="list-group-item d-flex justify-content-between lh-sm">
                                 <div>
                                     <h6 className="my-0">User #3</h6>
                                     <small className="text-body-secondary">1 day ago</small>
                                 </div>
-                                <span className="text-body-secondary">$5</span>
+                                <span className="text-body-secondary">1000000 vnd</span>
                             </li>
                             <li className="list-group-item d-flex justify-content-between lh-sm">
                                 <div>
                                     <h6 className="my-0">User #3</h6>
                                     <small className="text-body-secondary">1 day ago</small>
                                 </div>
-                                <span className="text-body-secondary">$5</span>
+                                <span className="text-body-secondary">500000 vnd</span>
                             </li>
                         </ul>
 
                         <div type="button" className="p-2 btn btn-outline-success btn-lg w-100">
-                            <div><span className='fw-bold'>Buy Out</span>: {formatBuyOut} vnd</div>
+                            <div><span className='fw-bold'>Buy Out</span>: {buyOut} vnd</div>
                         </div><br />
 
+                        {/* Bid Area */}
                         <div>
                             <h4 className="mt-4">Put Your Bid Here</h4>
                             <form className="needs-validation" noValidate>
                                 <div className="row g-3">
-                                    <div className="col-md-6 form-floating mt-4">
-                                        {/* <input
-                                            type="number"
-                                            className="form-control rounded-3"
-                                            id="floatingBid"
-                                            placeholder="name@example.com"
-                                        // onChange={e => setUsername(e.target.value)}
-                                        />
-                                        <label for="floatingBid form-label">Your Bid</label> */}
-                                        <div className="form-floating">
-                                            <input
-                                                type="number"
-                                                className="form-control rounded-3"
-                                                id="floatingBid"
-                                                placeholder="name@example.com"
-                                            // onChange={e => setUsername(e.target.value)}
-                                            />
-                                            <label for="floatingBid">Your Bid</label>
-                                        </div>
-                                    </div>
-
-                                    <div className="col-md-4">
-                                        <label for="form-label">Increment</label>
-                                        <select className="form-select" id="floatingIncrement" required>
-                                            <option value=""></option>
-                                            <option>10%</option>
-                                            <option>20%</option>
-                                            <option>50%</option>
-                                        </select>
-                                        <div className="invalid-feedback">Please provide a valid state.</div>
-                                    </div>
                                     {autoBid === 0 ? (
-                                        <>
+                                        <> {/* Manual Bid */}
+                                            <div className="col-md-6 form-floating mt-4">
+                                                <div className="form-floating">
+                                                    <input
+                                                        type="number"
+                                                        className="form-control rounded-3"
+                                                        id="floatingBid"
+                                                        placeholder="name@example.com"
+                                                        value={bid}
+                                                        onChange={e => { setBid(e.target.value) }}
+                                                        onClick={() => setIncre(0)}
+                                                    />
+                                                    <label for="floatingBid" >Your Bid ( vnd )</label>
+                                                </div>
+                                            </div>
+
+                                            <div className="col-md-4">
+                                                <label for="form-label">Increment</label>
+                                                <select
+                                                    className="form-select"
+                                                    id="form-label"
+                                                    value={incre}
+                                                    required
+                                                    onChange={(e) => {
+                                                        setBid(highestBid + highestBid * e.target.value)
+                                                        setIncre(e.target.value)
+                                                    }}>
+                                                    <option value={0}> </option>
+                                                    <option value={0.1}>10%</option>
+                                                    <option value={0.2}>20%</option>
+                                                    <option value={0.5}>50%</option>
+                                                </select>
+                                            </div>
                                             <div className="col-md-4">
                                                 <button className='btn btn-danger w-100' onClick={handleAutoBid}>Auto Bid</button>
                                             </div>
+
+                                            <hr className="my-4" />
+
+                                            <button className="w-100 btn btn-success btn-lg" type="submit">
+                                                Continue to bid
+                                            </button>
                                         </>
                                     ) : (
-                                        <>
+                                        <>  {/* Auto Bid */}
+                                            <div className="col-md-8 form-floating mt-4">
+                                                <div className="form-floating">
+                                                    <input
+                                                        type="number"
+                                                        className="form-control rounded-3 text-secondary"
+                                                        id="floatingBid"
+                                                        placeholder="name@example.com"
+                                                        value={bid}
+                                                    />
+                                                    <label for="floatingBid">Your Bid ( vnd ) - View Only</label>
+                                                </div>
+                                            </div>
+
                                             <div className="col-md-5">
                                                 <button className='btn btn-warning w-100' onClick={handleAutoBid}> Cancel Auto Bid</button>
                                             </div>
+
+                                            <div className='col-md-7'></div>
 
                                             <div className="col-md-6 form-floating">
                                                 <div className="form-floating">
@@ -176,21 +205,32 @@ function AuctionView() {
                                                         className="form-control rounded-3"
                                                         id="floatingInput"
                                                         placeholder="name@example.com"
-                                                        onChange={e => setUsername(e.target.value)}
+                                                        onChange={e => setMaxBid(e.target.value)}
                                                     />
-                                                    <label for="floatingInput">Maximum Auto Bid</label>
+                                                    <label for="floatingInput">Maximum ( vnd )</label>
                                                 </div>
                                             </div>
+
+                                            <div className="col-md-4 mt-2">
+                                                <label for="form-label">Increment</label>
+                                                <select className="form-select" id="form-label" required onChange={(e) => setBid(highestBid + highestBid * e.target.value)}>
+                                                    <option value={0.1}>10%</option>
+                                                    <option value={0.2}>20%</option>
+                                                    <option value={0.5}>50%</option>
+                                                </select>
+                                            </div>
+
+                                            <hr className="my-4" />
+
+                                            <button className="w-100 btn btn-success btn-lg" type="submit">
+                                                Start Auto Bid
+                                            </button>
                                         </>
                                     )}
 
                                 </div>
 
-                                <hr className="my-4" />
 
-                                <button className="w-100 btn btn-success btn-lg" type="submit">
-                                    Continue to bid
-                                </button>
                             </form>
                         </div>
 
@@ -199,7 +239,7 @@ function AuctionView() {
                         <div className="container py-4">
 
                             <div className="row align-items-md-stretch mb-5">
-                                <div className="col-md-6">
+                                <div className="col-md-6"> {/* Koi Image */}
                                     <div className="h-100 w-100 p-5 rounded-3 koi-image shadow"
                                         style={{
                                             backgroundImage: 'url(https://gatwickkoi.com/wp-content/uploads/2023/10/A1048-1-scaled.jpg)',
@@ -222,7 +262,7 @@ function AuctionView() {
                                         <span className='fs-2 fw-bold'> Showa</span>
                                     </div>
                                 </div>
-                                <div className="col-md-6">
+                                <div className="col-md-6"> {/* Koi Information */}
                                     <div className="h-100 p-5 rounded-3 bg-transparent">
                                         <div class="list-group shadow">
                                             <a href="#" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
@@ -266,6 +306,7 @@ function AuctionView() {
                                 </div>
                             </div>
 
+                            {/* Koi Video */}
                             <div className="p-6 rounded-3" >
                                 <div className="container px-1">
                                     <video

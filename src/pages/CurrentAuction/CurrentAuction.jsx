@@ -45,7 +45,7 @@ function CurrentAuction() {
 
     return (
         <div className="px-4 pt-5 my-5 text-center border-bottom">
-            <h1 className="display-4 fw-bold text-center">Auction will be start in</h1>
+            <h1 className="display-5 fw-bold text-center">Auction will be start in</h1>
             <div className="col-lg-6 mx-auto">
                 <p className="lead mb-4 fs-1">
                     {timerDays == 1 ? (timerDays+' day') : timerDays == 0 ? ("") : timerDays+' days'} {timerHours < 10 ? '0'+timerHours : timerHours}

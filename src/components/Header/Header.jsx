@@ -4,6 +4,7 @@ import "./Header.css";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { logOut } from "../../redux/apiRequest";
+import { FaUsers } from "react-icons/fa";
 
 function Header({ userRole }) {
   return (
@@ -167,25 +168,13 @@ const ManagerNavbar = () => {
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto">
-            <NavDropdown
-              title="Manage"
-              id="collapsible-nav-dropdown"
-              menuVariant="dark"
-            >
-              <NavDropdown.Item as={Link} to="/member">
-                Manage Member
-              </NavDropdown.Item>
-              <NavDropdown.Item as={Link} to="/breeder">
-                Manage Breeder
-              </NavDropdown.Item>
-              <NavDropdown.Item as={Link} to="/staff">
-                Manage Staff
-              </NavDropdown.Item>
-            </NavDropdown>
-            <Nav.Link as={Link} to="/request">
+            <Nav.Link as={Link} to="/manageStaff">
+            <FaUsers /> Manage Staff
+            </Nav.Link>
+            <Nav.Link as={Link} to="#">
               Auction Request
             </Nav.Link>
-            <Nav.Link as={Link} to="/#">
+            <Nav.Link as={Link} to="#">
               Dashboard
             </Nav.Link>
           </Nav>
