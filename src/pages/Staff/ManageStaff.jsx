@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark, faPen } from "@fortawesome/free-solid-svg-icons";
-import { getAllStaff } from "../../redux/apiRequest";
+import { getAllStaff, addStaff } from "../../redux/apiRequest";
 import styles from "./ManageStaff.module.css";
 
 const Modal = ({ show, onClose, children }) => {
@@ -22,21 +22,21 @@ const Modal = ({ show, onClose, children }) => {
 };
 
 function ManageStaff() {
+  const [username, setUsername] = useState("");
+  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullname, setFullname] = useState("");
+  const [address, setAddress] = useState("");
   const dispatch = useDispatch();
   const staffList = useSelector((state) => state.staff.staffs.allStaffs);
-  console.log(staffList);
-  useEffect(() => {
-    getAllStaff(dispatch);
-  }, []);
+  const accessToken = useSelector((state) => state.auth.login.currentToken);
 
-  const handleAdd = async (e) => {
-    e.preventDefault();
-    const staffData = {
-      name: name,
-      phone: "",
-      address: "",
-    };
-  };
+  console.log(accessToken);
+  console.log(staffList);
+
+  useEffect(() => {
+    getAllStaff(dispatch, accessToken);
+  }, [dispatch, accessToken]);
 
   const [editForm, setEditForm] = useState({
     name: "",
@@ -59,13 +59,6 @@ function ManageStaff() {
     setShowEditModal(false);
   };
 
-  const [newStaff, setNewStaff] = useState({
-    id: "",
-    name: "",
-    phone: "",
-    address: "",
-  });
-
   const handleAddInputChange = (e) => {
     const { name, value } = e.target;
     setNewStaff((prevState) => ({
@@ -73,19 +66,29 @@ function ManageStaff() {
       [name]: value,
     }));
   };
+  const handleAddStaff = async (e) => {
+    e.preventDefault();
+    const staffData = {
+      username: username,
+      phone: phone,
+      password: password,
+      fullname: fullname,
+      address: address,
+    };
+    await addStaff(dispatch, staffData);
 
-  const handleAddStaff = () => {
-    setNewStaff({
-      name: "",
-      phone: "",
-      address: "",
-    });
+    setUsername("");
+    setPhone("");
+    setPassword("");
+    setFullname("");
+    setAddress("");
     setShowAddModal(false);
   };
 
-  const handleDeleteStaff = (id) => {
-    const updatedStaffList = staffList.filter((member) => member.id !== id);
-    // Dispatch an action to remove the staff from the Redux state
+  const handleDeleteStaff = async (staffId) => {
+    if (window.confirm("Are you sure you want to delete this staff member?")) {
+      deleteStaff(dispatch, staffId);
+    }
   };
 
   return (
@@ -133,6 +136,7 @@ function ManageStaff() {
           </tbody>
         </table>
       </div>
+
       <button
         className={styles.buttonkoi + " btn btn-danger"}
         onClick={() => setShowAddModal(true)}
@@ -141,37 +145,52 @@ function ManageStaff() {
       </button>
 
       <Modal show={showAddModal} onClose={() => setShowAddModal(false)}>
-        <h2>Add New Staff</h2>
-        <input
-          type="text"
-          name="name"
-          value={newStaff.name}
-          onChange={handleAddInputChange}
-          placeholder="Name"
-          className={styles.roundedInput}
-        />
-        <input
-          type="text"
-          name="phone"
-          value={newStaff.phone}
-          onChange={handleAddInputChange}
-          placeholder="Phone"
-          className={styles.roundedInput}
-        />
-        <input
-          type="text"
-          name="address"
-          value={newStaff.address}
-          onChange={handleAddInputChange}
-          placeholder="Address"
-          className={styles.roundedInput}
-        />
-        <button className="btn btn-danger" onClick={handleAddStaff}>
-          Add Staff
-        </button>
+        <div>
+          <form onSubmit={handleAddStaff}>
+            <h2>Add New Staff</h2>
+            <input
+              type="text"
+              name="name"
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Name"
+              className={styles.roundedInput}
+            />
+            <input
+              type="text"
+              name="phone"
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="Phone"
+              className={styles.roundedInput}
+            />
+            <input
+              type="text"
+              name="password"
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="password"
+              className={styles.roundedInput}
+            />
+            <input
+              type="text"
+              name="fullname"
+              onChange={(e) => setFullname(e.target.value)}
+              placeholder="fullname"
+              className={styles.roundedInput}
+            />
+            <input
+              type="text"
+              name="address"
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="Address"
+              className={styles.roundedInput}
+            />
+            <button type="submit" className="btn btn-danger">
+              Add Staff
+            </button>
+          </form>
+        </div>
       </Modal>
 
-      <Modal show={showEditModal} onClose={() => setShowEditModal(false)}>
+      {/* <Modal show={showEditModal} onClose={() => setShowEditModal(false)}>
         <h2>Edit Staff</h2>
         <input
           type="text"
@@ -202,7 +221,7 @@ function ManageStaff() {
         <button className="btn btn-danger" onClick={handleSaveChanges}>
           Save Changes
         </button>
-      </Modal>
+      </Modal> */}
     </div>
   );
 }

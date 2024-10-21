@@ -24,7 +24,7 @@ const staffSlice = createSlice({
     },
     getStaffFailed: (state) => {
       state.staffs.isFetching = false;
-      state.getStaff.error = true;
+      state.staffs.error = true;
     },
 
     addStaffStart: (state) => {
@@ -32,7 +32,7 @@ const staffSlice = createSlice({
     },
     addStaffSuccess: (state) => {
       state.staffs.isFetching = false;
-      state.staffs.addStaffs.push(action.payload);
+      state.staffs.allStaffs.push(action.payload);
     },
     addStaffFailed: (state) => {
       state.staffs.isFetching = false;

@@ -89,14 +89,20 @@ export const logOut = async (dispatch, navigate) => {
     dispatch(logoutFailed());
   }
 };
-export const getAllStaff = async (dispatch) => {
+export const getAllStaff = async (dispatch, accessToken) => {
   dispatch(getStaffStart());
   try {
+    console.log("Access Token:", accessToken);
     const res = await axios.get(
-      "http://localhost:8081/auctionkoi/manager/allstaff"
+      "http://localhost:8081/auctionkoi/manager/allstaff",
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
     );
     dispatch(getStaffSuccess(res.data.result));
+    console.log(res.data.result);
   } catch (err) {
+    console.error("Error fetching staff:", err.response || err.message);
     dispatch(getStaffFailed());
   }
 };
@@ -108,8 +114,19 @@ export const addStaff = async (dispatch, staffData) => {
       "http://localhost:8081/auctionkoi/manager",
       staffData
     );
-    dispatch(addStaffSuccess());
+    dispatch(addStaffSuccess(res.data));
   } catch (err) {
     dispatch(addStaffFailed());
+  }
+};
+export const deleteStaff = async (dispatch, staffId) => {
+  dispatch(deleteStaffStart());
+  try {
+    const res = await axios.delete(
+      "http://localhost:8081/auctionkoi/manager/${staffId}"
+    );
+    dispatch(deleteStaffSuccess(res.data));
+  } catch {
+    dispatch(deleteStaffFailed());
   }
 };
