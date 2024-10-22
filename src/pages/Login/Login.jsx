@@ -15,7 +15,7 @@ function Login() {
     const [password, setPassword] = useState("");
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const notify = () => toast.error("Your username or password is incorrect");
+    const notify = () => toast.error(error.message);
 
     const handleLogin = (e) => {
         e.preventDefault();
@@ -34,9 +34,11 @@ function Login() {
 
     useEffect(() => {
         console.log(error);
-        if(error !== null) notify();
-        dispatch(loginInitial());
-    },[error])
+        if (error !== null) {
+            notify();
+            dispatch(loginInitial());
+        }
+    }, [error])
 
 
     return (
