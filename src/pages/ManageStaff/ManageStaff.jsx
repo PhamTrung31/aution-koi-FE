@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPen, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { useDispatch, useSelector } from "react-redux";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faXmark, faPen } from "@fortawesome/free-solid-svg-icons";
-import { getAllStaff } from "../../redux/apiRequest";
 import styles from "./ManageStaff.module.css";
+import { getAllStaffs } from "../../redux/apiRequest";
 
 const Modal = ({ show, onClose, children }) => {
   if (!show) {
@@ -22,12 +22,15 @@ const Modal = ({ show, onClose, children }) => {
 };
 
 function ManageStaff() {
+  const token = useSelector((state) => state.auth.login?.currentToken.result.token);
+  const staffList = useSelector((state) => state.staff.staffs?.allStaffs);
   const dispatch = useDispatch();
-  const staffList = useSelector((state) => state.staff.staffs.allStaffs);
-  console.log(staffList);
+  console.log(token);
+
   useEffect(() => {
-    getAllStaff(dispatch);
-  }, []);
+    getAllStaffs(token, dispatch)
+    console.log(staffList)
+  }, [])
 
   const handleAdd = async (e) => {
     e.preventDefault();
@@ -89,47 +92,44 @@ function ManageStaff() {
   };
 
   return (
-    <div className="container py-3 table">
+    <div className="container py-3 table table-primary">
       <div className={styles.tableContainer}>
         <table className={styles.table}>
           <thead>
             <tr>
               <th>ID</th>
               <th>Name</th>
-              <th>Phone</th>
+              <th>Contact</th>
               <th>Address</th>
+              <th>Hire Date</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
-            {staffList && Object.keys(staffList).length > 0 ? (
-              Object.values(staffList).map((staff) => (
-                <tr key={staff.id}>
-                  <td>{staff.id}</td>
-                  <td>{staff.username}</td>
-                  <td>{staff.phone}</td>
-                  <td>{staff.address}</td>
-                  <td>
-                    <button
-                      className={styles.actionBtn + " " + styles.editBtn}
-                      onClick={() => handleEditStaff(staff)}
-                    >
-                      <FontAwesomeIcon icon={faPen} />
-                    </button>
-                    <button
-                      className={styles.actionBtn + " " + styles.deleteBtn}
-                      onClick={() => handleDeleteStaff(staff.id)}
-                    >
-                      <FontAwesomeIcon icon={faXmark} />
-                    </button>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="5">No staff available</td>
-              </tr>
-            )}
+            {staffList?.map((staff) => {
+              return (
+              <tr key={staff.id}>
+                <td>{staff.id}</td>
+                <td>{staff.fullname}</td>
+                <td>{staff.phone}</td>
+                <td>{staff.userCreatedDate}</td>
+                <td>{staff.address}</td>
+                <td>
+                  <button
+                    className={styles.actionBtn + " " + styles.editBtn}
+                    onClick={() => handleEditStaff(staff)}
+                  >
+                    <FontAwesomeIcon icon={faPen} />
+                  </button>
+                  <button
+                    className={styles.actionBtn + " " + styles.deleteBtn}
+                    onClick={() => handleDeleteStaff(staff.id)}
+                  >
+                    <FontAwesomeIcon icon={faXmark} />
+                  </button>
+                </td>
+              </tr>)
+            })}
           </tbody>
         </table>
       </div>

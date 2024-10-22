@@ -27,6 +27,7 @@ import Request from "./pages/Request/MRequest.jsx";
 import StaffRequest from "./pages/StaffRequest/Request.jsx";
 import Auction from "./pages/Auction/Auction.jsx";
 import CreateRequest from "./pages/CreateRequest/CreateRequest.jsx";
+import FirebaseImageUpload from "./pages/FirebaseImageUpload/FirebaseImageUpload.jsx";
 
 function App() {
   const CURRENT_USER_ROLE = useSelector((state) =>
@@ -88,6 +89,7 @@ function App() {
             <Route path="/login" element={<PublicElement><Login /></PublicElement>}/>
             <Route path="/register" element={<PublicElement><Register /></PublicElement>}/>
             <Route path="/profile" element={<PublicElement><Profile userRole={CURRENT_USER_ROLE} /></PublicElement>}/>
+            <Route path="/uploadImage" element={<PublicElement><FirebaseImageUpload /></PublicElement>}/>
 
 
             <Route path="/currentAuction" element={<MemberElement><CurrentAuction /></MemberElement>}/>

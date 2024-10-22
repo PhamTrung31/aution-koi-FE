@@ -19,12 +19,9 @@ import {
   getCategoriesFailed,
 } from "./categorySlice";
 import {
-  getStaffStart,
-  getStaffSuccess,
-  getStaffFailed,
-  addStaffStart,
-  addStaffSuccess,
-  addStaffFailed,
+  getStaffsStart,
+  getStaffsSuccess,
+  getStaffsFailed,
 } from "./staffSlice";
 
 export const loginPayload = async (payload, dispatch, navigate) => {
@@ -89,27 +86,20 @@ export const logOut = async (dispatch, navigate) => {
     dispatch(logoutFailed());
   }
 };
-export const getAllStaff = async (dispatch) => {
-  dispatch(getStaffStart());
+
+export const getAllStaffs = async (accessToken, dispatch) => {
+  dispatch(getStaffsStart());
   try {
     const res = await axios.get(
-      "http://localhost:8081/auctionkoi/manager/allstaff"
+      "http://localhost:8081/auctionkoi/manager/allstaff",
+      {
+        headers: {Authorization: `Bearer ${accessToken}` },
+      }
     );
-    dispatch(getStaffSuccess(res.data.result));
+    dispatch(getStaffsSuccess(res.data.result));    
   } catch (err) {
-    dispatch(getStaffFailed());
+    dispatch(getStaffsFailed());
   }
-};
+}
 
-export const addStaff = async (dispatch, staffData) => {
-  dispatch(addStaffStart());
-  try {
-    const res = await axios.post(
-      "http://localhost:8081/auctionkoi/manager",
-      staffData
-    );
-    dispatch(addStaffSuccess());
-  } catch (err) {
-    dispatch(addStaffFailed());
-  }
-};
+

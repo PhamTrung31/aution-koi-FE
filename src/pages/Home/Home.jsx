@@ -37,6 +37,7 @@ const MemberHome = () => {
 
     useEffect(() => {
         getAllCategories(dispatch)
+        console.log(categoryList)
     },[])
 
     return (
@@ -71,7 +72,7 @@ const MemberHome = () => {
             <div className="row flex-lg-row align-items-center g-5 py-5">
                 {categoryList?.map((catag) => {
                     return (
-                        <div className="col-lg-4" style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: "3vh" }}>
+                        <div className="col-lg-4" style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: "3vh" }} key={catag.id}>
                             <svg
                                 className="bd-placeholder-img rounded-circle"
                                 width="140"
