@@ -1,31 +1,43 @@
 import axios from "axios";
-import {GoogleLogin} from "react-google-login"; 
-import { useState } from "react";
+import { GoogleLogin } from "react-google-login";
+import { useEffect, useState } from "react";
 import { FaGoogle } from "react-icons/fa";
 import { getUserProfile, loginPayload } from "../../redux/apiRequest";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { loginInitial } from "../../redux/authSlice";
 
 function Login() {
+    const error = useSelector((state) => state.auth.login.error);
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const notify = () => toast.error("Your username or password is incorrect");
 
     const handleLogin = (e) => {
         e.preventDefault();
         const payload = {
             username: username,
             password: password
-        }
-        
-        loginPayload(payload, dispatch, navigate)
+        };
+
+        loginPayload(payload, dispatch, navigate);
+        console.log(error);
     }
 
     async function handleGoogleLogin() {
-        
+
     }
-    
+
+    useEffect(() => {
+        console.log(error);
+        if(error !== null) notify();
+        dispatch(loginInitial());
+    },[error])
+
 
     return (
         <div className="modal modal-sheet position-static d-block bg-body-secondary p-4 py-md-5" tabindex="-1" role="dialog" id="modalSignin">
@@ -76,7 +88,20 @@ function Login() {
                     </form>
                 </div>
             </div>
-        </div>
+            <ToastContainer
+                position="top-center"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+                transition:Bounce
+            />
+        </div >
     );
 }
 

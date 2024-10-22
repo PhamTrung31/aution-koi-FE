@@ -23,6 +23,7 @@ import {
   getStaffsSuccess,
   getStaffsFailed,
 } from "./staffSlice";
+import { isRejectedWithValue } from "@reduxjs/toolkit";
 
 export const loginPayload = async (payload, dispatch, navigate) => {
   dispatch(loginStart());
@@ -35,7 +36,9 @@ export const loginPayload = async (payload, dispatch, navigate) => {
     console.log(res.data.result.token);
     getUserProfile(res.data.result.token, dispatch, navigate);
   } catch (err) {
-    dispatch(loginFailed());
+    const error = err.response?.data ||'An error occured';
+    dispatch(loginFailed(error));
+    navigate("/login");
   }
 };
 
@@ -93,10 +96,10 @@ export const getAllStaffs = async (accessToken, dispatch) => {
     const res = await axios.get(
       "http://localhost:8081/auctionkoi/manager/allstaff",
       {
-        headers: {Authorization: `Bearer ${accessToken}` },
+        headers: { Authorization: `Bearer ${accessToken}` },
       }
     );
-    dispatch(getStaffsSuccess(res.data.result));    
+    dispatch(getStaffsSuccess(res.data.result));
   } catch (err) {
     dispatch(getStaffsFailed());
   }
