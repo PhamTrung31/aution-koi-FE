@@ -169,9 +169,9 @@ const ManagerNavbar = () => {
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto">
             <Nav.Link as={Link} to="/manageStaff">
-            <FaUsers /> Manage Staff
+              <FaUsers /> Manage Staff
             </Nav.Link>
-            <Nav.Link as={Link} to="#">
+            <Nav.Link as={Link} to="/request">
               Auction Request
             </Nav.Link>
             <Nav.Link as={Link} to="#">
@@ -341,6 +341,22 @@ const StaffNavbar = () => {
               onClick={() => handleUserTitle(user?.fullname)}
             >
               Request
+            </Nav.Link>
+
+            <Nav.Link
+              as={Link}
+              to="/member"
+              onClick={() => handleUserTitle(user?.fullname)}
+            >
+              member
+            </Nav.Link>
+
+            <Nav.Link
+              as={Link}
+              to="/breeder"
+              onClick={() => handleUserTitle(user?.fullname)}
+            >
+              breeder
             </Nav.Link>
           </Nav>
           <Nav>

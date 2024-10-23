@@ -9,9 +9,7 @@ const Modal = ({ show, children }) => {
   }
   return (
     <div className={styles.modalOverlay}>
-      <div className={styles.modalsContent}>
-        {children}
-      </div>
+      <div className={styles.modalsContent}>{children}</div>
     </div>
   );
 };
@@ -152,8 +150,8 @@ function CreateRequest() {
   return (
     <div className="container py-3 table">
       <h2 className="mb-5 text-center">Your Auction Request</h2>
-      <table class="table table-light table-bordered border border-danger shadow p-3 mb-5 rounded-4">
-        <tr className="table-danger">
+      <table class="table table-light table-bordered border border-primary shadow p-3 mb-5 rounded-4">
+        <tr className="table-primary">
           <th>ID</th>
           <th>Fish Name</th>
           <th>Method</th>
@@ -191,7 +189,7 @@ function CreateRequest() {
       </table>
 
       <button
-        className={styles.buttonkoi + " btn btn-outline-danger"}
+        className={styles.buttonkoi + " btn btn-outline-primary"}
         onClick={() => setShowAddModal(true)}
       >
         Create New Request
@@ -199,7 +197,12 @@ function CreateRequest() {
 
       <Modal show={showAddModal}>
         <div class="position-relative p-2 text-center text-muted bg-body border border-dashed rounded-5">
-          <button type="button" class="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill" aria-label="Close" onClick={() => setShowAddModal(false)}></button>
+          <button
+            type="button"
+            class="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill"
+            aria-label="Close"
+            onClick={() => setShowAddModal(false)}
+          ></button>
           <h1 class="text-body-emphasis">Create New Request</h1>
           <div className={styles.formContainer}>
             <div className={styles.leftColumn}>
@@ -279,12 +282,21 @@ function CreateRequest() {
       </Modal>
       <Modal show={showEditModal}>
         <div class="position-relative p-2 text-center text-muted bg-body border border-dashed rounded-5">
-          <button type="button" class="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill" aria-label="Close" onClick={() => setShowEditModal(false)}></button>
+          <button
+            type="button"
+            class="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill"
+            aria-label="Close"
+            onClick={() => setShowEditModal(false)}
+          ></button>
           <h1 class="text-body-emphasis">Edit Request</h1>
           <div className={styles.formContainer}>
             <div className={styles.leftColumn}>
               <div className={styles.importBox}>
-              <img src="https://www.acaquarium.com/wp-content/uploads/2023/02/ammonia-poisoning-in-goldfish.jpg" class="img-thumbnail" alt="..."/>
+                <img
+                  src="https://www.acaquarium.com/wp-content/uploads/2023/02/ammonia-poisoning-in-goldfish.jpg"
+                  class="img-thumbnail"
+                  alt="..."
+                />
               </div>
               <div className={styles.importBox}>
                 <label htmlFor="importVideo">Import Video</label>
@@ -297,7 +309,9 @@ function CreateRequest() {
                 type="text"
                 name="id"
                 value={editForm.id}
-                onChange={(e) => setEditForm({ ...editForm, id: e.target.value })}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, id: e.target.value })
+                }
                 placeholder="ID"
                 className={styles.roundedInput}
               />
@@ -315,7 +329,9 @@ function CreateRequest() {
                 type="text"
                 name="method"
                 value={editForm.method}
-                onChange={(e) => setEditForm({ ...editForm, method: e.target.value })}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, method: e.target.value })
+                }
                 placeholder="Method"
                 className={styles.roundedInput}
               />

@@ -83,29 +83,138 @@ function App() {
         <Header userRole={CURRENT_USER_ROLE} />
         <div className="main">
           <Routes>
-            <Route path="/" element={<PublicElement><Home userRole={CURRENT_USER_ROLE} /></PublicElement>}/>
-            <Route path="/about" element={<PublicElement><About /></PublicElement>}/>
-            <Route path="/pastAuction" element={<PublicElement><PastAuction /></PublicElement>}/>
-            <Route path="/login" element={<PublicElement><Login /></PublicElement>}/>
-            <Route path="/register" element={<PublicElement><Register /></PublicElement>}/>
-            <Route path="/profile" element={<PublicElement><Profile userRole={CURRENT_USER_ROLE} /></PublicElement>}/>
-            <Route path="/uploadImage" element={<PublicElement><FirebaseImageUpload /></PublicElement>}/>
+            <Route
+              path="/"
+              element={
+                <PublicElement>
+                  <Home userRole={CURRENT_USER_ROLE} />
+                </PublicElement>
+              }
+            />
+            <Route
+              path="/about"
+              element={
+                <PublicElement>
+                  <About />
+                </PublicElement>
+              }
+            />
+            <Route
+              path="/pastAuction"
+              element={
+                <PublicElement>
+                  <PastAuction />
+                </PublicElement>
+              }
+            />
+            <Route
+              path="/login"
+              element={
+                <PublicElement>
+                  <Login />
+                </PublicElement>
+              }
+            />
+            <Route
+              path="/register"
+              element={
+                <PublicElement>
+                  <Register />
+                </PublicElement>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <PublicElement>
+                  <Profile userRole={CURRENT_USER_ROLE} />
+                </PublicElement>
+              }
+            />
+            <Route
+              path="/uploadImage"
+              element={
+                <PublicElement>
+                  <FirebaseImageUpload />
+                </PublicElement>
+              }
+            />
 
+            <Route
+              path="/currentAuction"
+              element={
+                <MemberElement>
+                  <CurrentAuction />
+                </MemberElement>
+              }
+            />
+            <Route
+              path="/auctionView"
+              element={
+                <MemberElement>
+                  <AuctionView />
+                </MemberElement>
+              }
+            />
 
-            <Route path="/currentAuction" element={<MemberElement><CurrentAuction /></MemberElement>}/>
-            <Route path="/auctionView" element={<MemberElement><AuctionView /></MemberElement>}/>
+            <Route
+              path="/manageStaff"
+              element={
+                <ManagerElement>
+                  <ManageStaff />
+                </ManagerElement>
+              }
+            />
+            <Route
+              path="/request"
+              element={
+                <ManagerElement>
+                  <Request />
+                </ManagerElement>
+              }
+            />
 
+            <Route
+              path="/staffrequest"
+              element={
+                <StaffElement>
+                  <StaffRequest />
+                </StaffElement>
+              }
+            />
+            <Route
+              path="/auction"
+              element={
+                <StaffElement>
+                  <Auction />
+                </StaffElement>
+              }
+            />
+            <Route
+              path="/member"
+              element={
+                <StaffElement>
+                  <Member />
+                </StaffElement>
+              }
+            />
+            <Route
+              path="/breeder"
+              element={
+                <StaffElement>
+                  <Breeder />
+                </StaffElement>
+              }
+            />
 
-            {/* <Route path="/member" element={<ManagerElement><Member /></ManagerElement>}/>
-            <Route path="/breeder" element={<ManagerElement><Breeder /></ManagerElement>}/> */}
-            <Route path="/manageStaff" element={<ManagerElement><ManageStaff /></ManagerElement>}/>
-            <Route path="/request" element={<ManagerElement><Request /></ManagerElement>}/>
-
-
-            <Route path="/staffrequest" element={<StaffElement><StaffRequest /></StaffElement>}/>
-            <Route path="/auction" element={<StaffElement><Auction /></StaffElement>}/>
-            <Route path="/createrequest" element={<BreederElement><CreateRequest /></BreederElement>}/>
-
+            <Route
+              path="/createrequest"
+              element={
+                <BreederElement>
+                  <CreateRequest />
+                </BreederElement>
+              }
+            />
 
             <Route path="/forbidden403" element={<Forbidden403 />} />
             <Route path="*" element={<div>Page Not Found!</div>} />
