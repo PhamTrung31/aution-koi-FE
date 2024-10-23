@@ -67,6 +67,7 @@ function ManageStaff() {
     e.preventDefault();
     const staffData = {
       username: username,
+      password: password,
       phone: phone,
       fullname: fullname,
       address: address,
@@ -80,6 +81,8 @@ function ManageStaff() {
   };
   const openEditModal = (staff) => {
     setSelectedStaff(staff);
+    setUsername(staff.username);
+    setPassword(staff.password);
     setPhone(staff.phone);
     setFullname(staff.fullname);
     setAddress(staff.address);
@@ -195,7 +198,22 @@ function ManageStaff() {
         <div>
           <form onSubmit={handleUpdateStaff}>
             <h2>Edit Staff</h2>
-
+            <input
+              type="text"
+              name="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="UserName"
+              className={styles.roundedInput}
+            />
+            <input
+              type="text"
+              name="password"
+              value={fullname}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+              className={styles.roundedInput}
+            />
             <input
               type="text"
               name="fullname"
