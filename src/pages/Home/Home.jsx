@@ -37,7 +37,6 @@ const MemberHome = () => {
 
     useEffect(() => {
         getAllCategories(dispatch)
-        console.log(categoryList)
     },[])
 
     return (

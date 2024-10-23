@@ -33,7 +33,6 @@ export const loginPayload = async (payload, dispatch, navigate) => {
       payload
     );
     dispatch(loginSuccess(res.data));
-    console.log(res.data.result.token);
     getUserProfile(res.data.result.token, dispatch, navigate);
   } catch (err) {
     const error = err.response?.data ||'An error occured';
