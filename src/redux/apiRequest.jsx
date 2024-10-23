@@ -32,6 +32,20 @@ import {
   updateStaffSuccess,
   updateStaffFailed,
 } from "./staffSlice";
+import {
+  getUserStart,
+  getUserSuccess,
+  getUserFailed,
+  addUserStart,
+  addUserSuccess,
+  addUserFailed,
+  deleteUserStart,
+  deleteUserSuccess,
+  deleteUserFailed,
+  updateUserStart,
+  updateUserSuccess,
+  updateUserFailed,
+} from "./userSlice";
 import { isRejectedWithValue } from "@reduxjs/toolkit";
 
 export const loginPayload = async (payload, dispatch, navigate) => {
@@ -113,6 +127,7 @@ export const getAllStaffs = async (accessToken, dispatch) => {
     dispatch(getStaffFailed());
   }
 };
+
 export const addStaff = async (dispatch, staffData, accessToken) => {
   dispatch(addStaffStart());
   try {
@@ -128,6 +143,7 @@ export const addStaff = async (dispatch, staffData, accessToken) => {
     dispatch(addStaffFailed());
   }
 };
+
 export const deleteStaff = async (dispatch, staffId, accessToken) => {
   dispatch(deleteStaffStart());
   try {
@@ -142,6 +158,7 @@ export const deleteStaff = async (dispatch, staffId, accessToken) => {
     dispatch(deleteStaffFailed());
   }
 };
+
 export const updateStaff = async (
   dispatch,
   staffId,
@@ -160,5 +177,64 @@ export const updateStaff = async (
     dispatch(updateStaffSuccess(res.data));
   } catch {
     dispatch(updateStaffFailed());
+  }
+};
+
+export const getAllUser = async (accessToken, dispatch) => {
+  dispatch(getUserStart());
+  try {
+    const res = await axios.get("http://localhost:8081/auctionkoi/staffs/all", {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    dispatch(getUserSuccess(res.data.result));
+  } catch (err) {
+    dispatch(getUserFailed());
+  }
+};
+
+export const addUser = async (dispatch, staffData, accessToken) => {
+  dispatch(addUserStart());
+  try {
+    const res = await axios.post(
+      "http://localhost:8081/auctionkoi/staffs/create",
+      staffData,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+    dispatch(addUserSuccess(res.data));
+  } catch (err) {
+    dispatch(addUserFailed());
+  }
+};
+
+export const deleteUser = async (dispatch, userId, accessToken) => {
+  dispatch(deleteUserStart());
+  try {
+    const res = await axios.delete(
+      `http://localhost:8081/auctionkoi/staffs/${userId}/delete`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+    dispatch(deleteUserSuccess(res.data));
+  } catch {
+    dispatch(deleteUserFailed());
+  }
+};
+
+export const updateUser = async (dispatch, userId, updatedata, accessToken) => {
+  dispatch(updateStaffStart());
+  try {
+    const res = await axios.put(
+      `http://localhost:8081/auctionkoi/staffs/${userId}/status`,
+      updatedata,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+    dispatch(updateUserSuccess(res.data));
+  } catch {
+    dispatch(updateUserFailed());
   }
 };
