@@ -34,13 +34,31 @@ const MemberProfile = () => {
             <div className="card mb-4">
               <div className="card-body text-center">
                 <img
-                  src="https://www.redmond.gov/ImageRepository/Document?documentId=15106"
+                  src={user.avatarUrl ? user.avatarUrl : "https://www.redmond.gov/ImageRepository/Document?documentId=15106"}
                   alt="avatar"
                   className="rounded-circle img-fluid"
-                  style={{ width: '150px' }}
+                  style={{ width: '150px', height: '150px' }}
                 />
                 <h5 className="my-3 fs-3">{user.fullname}</h5>
-                <button className='btn btn-primary mt-3'>Change Avatar</button>
+                <button className='btn btn-primary mt-3' data-bs-toggle="modal" data-bs-target="#exampleModal">Change avatar</button>
+                {/* Model */}
+                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true"> 
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Upload Avatar</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        Upload Avatar Content
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Save changes</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
             <div className="card mb-4 mb-lg-0">
