@@ -16,13 +16,13 @@ a.navbar-brand {
 }
 
 a.navbar-brand:focus {
-    color: white;
+    color: black;
     font-weight: bolder;
     font-size: xx-large;
 }
 
 a.nav-link {
-    color: white;
+    color: black;
     font-size: large;
 }
 
@@ -36,11 +36,11 @@ a.nav-link:focus {
 }
 
 a#regis {
-    color: #D93D04;
+    color: red;
 }
 
 a#regis:hover {
-    color: #D93D04;
+    color: #eb1c24;
 }
 
 div.dropdown-menu.show {
@@ -49,28 +49,28 @@ div.dropdown-menu.show {
 
 
 
-.dropdown-item {
-    color: white !important; 
+/* .dropdown-item {
+    color: black !important; 
 }
 
 .dropdown-item:hover {
     background-color: #D93D04 !important;
-    color: white !important;
+    color: black !important;
 }
 
 .dropdown-item:focus {
     background-color: #D93D04 !important;
-    color: white !important;
+    color: black !important;
 }
 
 .navbar-dark .dropdown-toggle {
-    color: white !important; 
+    color: black !important; 
 }
 
 .navbar-dark .dropdown-toggle:hover {
-    color: white !important;
+    color: black !important;
 }
 
 .navbar-dark .dropdown-toggle:focus {
-    color: white !important;
-}
+    color: black !important;
+} */

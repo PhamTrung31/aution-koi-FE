@@ -74,7 +74,7 @@ const MemberHeader = () => {
               About
             </Nav.Link>
             <NavDropdown
-              title={auctionTitle}
+              title="Auction"
               id="collapsible-nav-dropdown"
               menuVariant="dark"
             >
@@ -98,7 +98,7 @@ const MemberHeader = () => {
             {user?.fullname ? (
               <>
                 <Navbar.Collapse id="navbar-white-example">
-                  <Nav.Link className="fw-bold">
+                  <Nav.Link className="fw-bold" style={{color: "#eb1c24"}}>
                     Wallet: {formatWallet} vnd
                   </Nav.Link>
                   <Nav>
