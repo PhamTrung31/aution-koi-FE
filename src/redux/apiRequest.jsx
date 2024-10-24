@@ -23,6 +23,11 @@ import {
   getStaffsSuccess,
   getStaffsFailed,
 } from "./staffSlice";
+import { 
+  changeAvatarStart,
+  changeAvatarSuccess,
+  changeAvatarFailed
+ } from "./userSlice";
 import { isRejectedWithValue } from "@reduxjs/toolkit";
 
 export const loginPayload = async (payload, dispatch, navigate) => {
@@ -32,8 +37,9 @@ export const loginPayload = async (payload, dispatch, navigate) => {
       "http://localhost:8081/auctionkoi/auth/token",
       payload
     );
-    dispatch(loginSuccess(res.data));
+    dispatch(loginSuccess(res.data.result));
     getUserProfile(res.data.result.token, dispatch, navigate);
+    navigate("/");
   } catch (err) {
     const error = err.response?.data ||'An error occured';
     dispatch(loginFailed(error));
@@ -52,7 +58,7 @@ export const registerUser = async (user, dispatch, navigate) => {
   }
 };
 
-export const getUserProfile = async (accessToken, dispatch, navigate) => {
+export const getUserProfile = async (accessToken, dispatch) => {
   dispatch(getProfileStart());
   try {
     const res = await axios.get(
@@ -62,7 +68,6 @@ export const getUserProfile = async (accessToken, dispatch, navigate) => {
       }
     );
     dispatch(getProfileSuccess(res.data));
-    navigate("/");
   } catch (err) {
     dispatch(getProfileFailed());
   }
@@ -101,6 +106,25 @@ export const getAllStaffs = async (accessToken, dispatch) => {
     dispatch(getStaffsSuccess(res.data.result));
   } catch (err) {
     dispatch(getStaffsFailed());
+  }
+}
+
+export const changeAvatarImage = async (accessToken, userid, payload, dispatch, navigate) => {
+  dispatch(changeAvatarStart());
+  try {
+    const res = await axios.put(
+      `http://localhost:8081/auctionkoi/users/${userid}/avatar`,
+      payload,
+      {
+        headers: {Authorization: `Bearer ${accessToken}`}
+      }
+    );
+    dispatch(changeAvatarSuccess(res.data));
+    getUserProfile(accessToken, dispatch, navigate);
+  } catch (err) {
+    const error = err.response?.data ||'An error occured';
+    dispatch(changeAvatarFailed(error));
+    navigate("/profile");
   }
 }
 
