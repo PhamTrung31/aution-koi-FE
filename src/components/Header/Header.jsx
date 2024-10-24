@@ -115,6 +115,8 @@ const MemberHeader = () => {
                         Profile
                       </NavDropdown.Item>
                       <NavDropdown.Item
+                        as={Link}
+                        to="/profile"
                         onClick={() => handleUserTitle("Your Balance")}
                       >
                         Your Balance
@@ -169,7 +171,7 @@ const ManagerNavbar = () => {
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto">
             <Nav.Link as={Link} to="/manageStaff">
-            <FaUsers /> Manage Staff
+              <FaUsers /> Manage Staff
             </Nav.Link>
             <Nav.Link as={Link} to="#">
               Auction Request

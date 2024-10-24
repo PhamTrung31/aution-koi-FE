@@ -1,5 +1,5 @@
 nav {
-    background-color: black;
+    background-color: #F29F05;
     position: fixed;
     top: 0;
 }
@@ -52,4 +52,32 @@ a#regis:hover {
 
 div.dropdown-menu.show {
     z-index: 999;
+}
+
+
+
+.dropdown-item {
+    color: white !important; 
+}
+
+.dropdown-item:hover {
+    background-color: #D93D04 !important;
+    color: white !important;
+}
+
+.dropdown-item:focus {
+    background-color: #D93D04 !important;
+    color: white !important;
+}
+
+.navbar-dark .dropdown-toggle {
+    color: white !important; 
+}
+
+.navbar-dark .dropdown-toggle:hover {
+    color: white !important;
+}
+
+.navbar-dark .dropdown-toggle:focus {
+    color: white !important;
 }
