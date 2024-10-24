@@ -74,7 +74,7 @@ const MemberHeader = () => {
               About
             </Nav.Link>
             <NavDropdown
-              title={auctionTitle}
+              title="Auction"
               id="collapsible-nav-dropdown"
               menuVariant="dark"
             >
@@ -98,12 +98,14 @@ const MemberHeader = () => {
             {user?.fullname ? (
               <>
                 <Navbar.Collapse id="navbar-white-example">
-                  <Nav.Link className="fw-bold">
+                  <Nav.Link className="fw-bold" style={{ color: "#eb1c24" }}>
                     Wallet: {formatWallet} vnd
-                  </Nav.Link>
+                  </Nav.Link>                
+                  
                   <Nav>
                     <NavDropdown
                       id="nav-dropdown-dark-example"
+                      className="fw-bold"
                       title={userTitle ? userTitle : user.fullname}
                       menuVariant="dark"
                     >
@@ -115,21 +117,35 @@ const MemberHeader = () => {
                         Profile
                       </NavDropdown.Item>
                       <NavDropdown.Item
-                        onClick={() => handleUserTitle("Your Balance")}
+                        as={Link}
+                        to="/profile"
+                      // onClick={() => handleUserTitle("Your Balance")}
                       >
-                        Your Balance
+                        Top-Up Wallet
                       </NavDropdown.Item>
                       <NavDropdown.Item
-                        onClick={() => handleUserTitle("Payment History")}
+                      // onClick={() => handleUserTitle("Payment History")}
                       >
                         Payment History
                       </NavDropdown.Item>
+                      <NavDropdown.Item onClick={handleLogout}>
+                        Log out
+                      </NavDropdown.Item>
                     </NavDropdown>
                   </Nav>
+
+                  <Nav.Link>
+                    <img
+                      src={user.avatarUrl}
+                      onClick={() => handleUserTitle(user?.fullname)}
+                      height={"50px"}
+                      width={"50px"}
+                    />         
+                  </Nav.Link>
                 </Navbar.Collapse>
-                <Nav.Link id="regis" onClick={handleLogout}>
+                {/* <Nav.Link id="regis">
                   Log out
-                </Nav.Link>
+                </Nav.Link> */}
               </>
             ) : (
               <>
@@ -169,7 +185,7 @@ const ManagerNavbar = () => {
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto">
             <Nav.Link as={Link} to="/manageStaff">
-            <FaUsers /> Manage Staff
+              <FaUsers /> Manage Staff
             </Nav.Link>
             <Nav.Link as={Link} to="#">
               Auction Request

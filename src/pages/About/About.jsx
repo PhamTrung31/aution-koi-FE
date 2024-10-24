@@ -46,8 +46,8 @@ function About() {
         >
           <svg
             className="bd-placeholder-img flex-shrink-0 me-2 rounded"
-            width="32"
-            height="32"
+            width="15"
+            height="15"
             xmlns="http://www.w3.org/2000/svg"
             role="img"
             aria-label="Placeholder: 32x32"
@@ -85,8 +85,8 @@ function About() {
         >
           <svg
             className="bd-placeholder-img flex-shrink-0 me-2 rounded"
-            width="32"
-            height="32"
+            width="15"
+            height="15"
             xmlns="http://www.w3.org/2000/svg"
             role="img"
             aria-label="Placeholder: 32x32"
@@ -126,8 +126,8 @@ function About() {
         >
           <svg
             className="bd-placeholder-img flex-shrink-0 me-2 rounded"
-            width="32"
-            height="32"
+            width="15"
+            height="15"
             xmlns="http://www.w3.org/2000/svg"
             role="img"
             aria-label="Placeholder: 32x32"
@@ -164,8 +164,8 @@ function About() {
         >
           <svg
             className="bd-placeholder-img flex-shrink-0 me-2 rounded"
-            width="32"
-            height="32"
+            width="15"
+            height="15"
             xmlns="http://www.w3.org/2000/svg"
             role="img"
             aria-label="Placeholder: 32x32"
@@ -202,8 +202,8 @@ function About() {
         >
           <svg
             className="bd-placeholder-img flex-shrink-0 me-2 rounded"
-            width="32"
-            height="32"
+            width="15"
+            height="15"
             xmlns="http://www.w3.org/2000/svg"
             role="img"
             aria-label="Placeholder: 32x32"
@@ -242,8 +242,8 @@ function About() {
         >
           <svg
             className="bd-placeholder-img flex-shrink-0 me-2 rounded"
-            width="32"
-            height="32"
+            width="15"
+            height="15"
             xmlns="http://www.w3.org/2000/svg"
             role="img"
             aria-label="Placeholder: 32x32"
@@ -281,8 +281,8 @@ function About() {
         >
           <svg
             className="bd-placeholder-img flex-shrink-0 me-2 rounded"
-            width="32"
-            height="32"
+            width="15"
+            height="15"
             xmlns="http://www.w3.org/2000/svg"
             role="img"
             aria-label="Placeholder: 32x32"
@@ -315,8 +315,8 @@ function About() {
         >
           <svg
             className="bd-placeholder-img flex-shrink-0 me-2 rounded"
-            width="32"
-            height="32"
+            width="15"
+            height="15"
             xmlns="http://www.w3.org/2000/svg"
             role="img"
             aria-label="Placeholder: 32x32"

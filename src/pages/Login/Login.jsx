@@ -25,7 +25,6 @@ function Login() {
         };
 
         loginPayload(payload, dispatch, navigate);
-        console.log(error);
     }
 
     async function handleGoogleLogin() {
@@ -33,7 +32,6 @@ function Login() {
     }
 
     useEffect(() => {
-        console.log(error);
         if (error !== null) {
             notify();
             dispatch(loginInitial());

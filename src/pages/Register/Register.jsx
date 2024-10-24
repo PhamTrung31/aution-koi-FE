@@ -51,7 +51,6 @@ function Register() {
                             </div>
                             <div class="form-floating mb-3">
                                 <input
-                                    type="password"
                                     class="form-control rounded-3"
                                     id="floatingPassword"
                                     placeholder="Password"
