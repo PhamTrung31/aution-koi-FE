@@ -1,5 +1,5 @@
 footer {
-    background-color: #eb1c24;
+    background-color: black;
     box-shadow: none;
     bottom: 0;
     position: relative;
@@ -12,7 +12,7 @@ div.col-md-6.col-lg-3.mb-4.mb-md-0 {
 
 h5.text-uppercase {
     text-align: left;
-    background-color: black;
+    background-color: #D93D04;
     font-size: 1.1rem;
     border-radius: 30px;
     padding-left: 10px;

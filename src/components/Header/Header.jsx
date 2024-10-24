@@ -100,15 +100,8 @@ const MemberHeader = () => {
                 <Navbar.Collapse id="navbar-white-example">
                   <Nav.Link className="fw-bold" style={{ color: "#eb1c24" }}>
                     Wallet: {formatWallet} vnd
-                  </Nav.Link>
-                  <Nav.Link>
-                    <img
-                      src={user.avatarUrl}
-                      onClick={() => handleUserTitle(user?.fullname)}
-                      height={"50px"}
-                      width={"50px"}
-                    />                    
-                  </Nav.Link>
+                  </Nav.Link>                
+                  
                   <Nav>
                     <NavDropdown
                       id="nav-dropdown-dark-example"
@@ -140,6 +133,15 @@ const MemberHeader = () => {
                       </NavDropdown.Item>
                     </NavDropdown>
                   </Nav>
+
+                  <Nav.Link>
+                    <img
+                      src={user.avatarUrl}
+                      onClick={() => handleUserTitle(user?.fullname)}
+                      height={"50px"}
+                      width={"50px"}
+                    />         
+                  </Nav.Link>
                 </Navbar.Collapse>
                 {/* <Nav.Link id="regis">
                   Log out
