@@ -1,0 +1,7 @@
+.leaderboard > li:first-child > div{
+    color: orange;
+}
+
+.leaderboard > li:first-child > span {
+    color: orange;
+}

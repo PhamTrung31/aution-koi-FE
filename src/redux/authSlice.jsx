@@ -6,7 +6,7 @@ const authSlice = createSlice ({
         login: {
             currentToken: null,
             isFetching: false,
-            error: false
+            error: null,
         },
         register: {
             isFetching: false,
@@ -24,17 +24,21 @@ const authSlice = createSlice ({
         }
     },
     reducers: {
+        loginInitial: (state) => {
+            state.login.isFetching = false,
+            state.login.currentToken = null,
+            state.login.error = null
+        },
         loginStart: (state) => {
             state.login.isFetching = true
         },
         loginSuccess: (state, action) => {
             state.login.isFetching = false,
-            state.login.currentToken = action.payload,
-            state.login.error = false
+            state.login.currentToken = action.payload
         },
-        loginFailed: (state) => {
+        loginFailed: (state,action) => {
             state.login.isFetching = false,
-            state.login.error = true
+            state.login.error = action.payload
         },
 
         registerStart: (state) => {
@@ -64,11 +68,12 @@ const authSlice = createSlice ({
         },
 
         logoutStart: (state) => {
-            state.login.isFetching = true
+            state.logout.isFetching = true
         },
         logoutSuccess: (state) => {
             state.logout.isFetching = false,
             state.login.currentToken = null,
+            state.profile.currentUser = null,
             state.logout.error = false
         },
         logoutFailed: (state) => {
@@ -79,6 +84,7 @@ const authSlice = createSlice ({
 })
 
 export const {
+    loginInitial,
     loginStart,
     loginSuccess,
     loginFailed,

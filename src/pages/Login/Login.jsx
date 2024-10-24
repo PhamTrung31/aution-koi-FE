@@ -1,26 +1,45 @@
 import axios from "axios";
-import { useState } from "react";
+import { GoogleLogin } from "react-google-login";
+import { useEffect, useState } from "react";
 import { FaGoogle } from "react-icons/fa";
 import { getUserProfile, loginPayload } from "../../redux/apiRequest";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { loginInitial } from "../../redux/authSlice";
 
 function Login() {
-    const [email, setEmail] = useState("");
+    const error = useSelector((state) => state.auth.login.error);
+    const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const notify = () => toast.error(error.message);
 
     const handleLogin = (e) => {
         e.preventDefault();
         const payload = {
-            email: email,
+            username: username,
             password: password
-        }
+        };
 
-        loginPayload(payload, dispatch, navigate)
+        loginPayload(payload, dispatch, navigate);
+        console.log(error);
     }
-    
+
+    async function handleGoogleLogin() {
+
+    }
+
+    useEffect(() => {
+        console.log(error);
+        if (error !== null) {
+            notify();
+            dispatch(loginInitial());
+        }
+    }, [error])
+
 
     return (
         <div className="modal modal-sheet position-static d-block bg-body-secondary p-4 py-md-5" tabindex="-1" role="dialog" id="modalSignin">
@@ -33,13 +52,13 @@ function Login() {
                         <div className="modal-body p-5 pt-0">
                             <div className="form-floating mb-3">
                                 <input
-                                    type="email"
+                                    type="text"
                                     className="form-control rounded-3"
                                     id="floatingInput"
                                     placeholder="name@example.com"
-                                    onChange={e => setEmail(e.target.value)}
+                                    onChange={e => setUsername(e.target.value)}
                                 />
-                                <label for="floatingInput">Email</label>
+                                <label for="floatingInput">Username</label>
                             </div>
                             <div className="form-floating mb-3">
                                 <input
@@ -71,7 +90,20 @@ function Login() {
                     </form>
                 </div>
             </div>
-        </div>
+            <ToastContainer
+                position="top-center"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+                transition:Bounce
+            />
+        </div >
     );
 }
 
