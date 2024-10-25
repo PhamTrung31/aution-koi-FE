@@ -1,19 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faPen,
-  faXmark,
-  faLock,
-  faLockOpen,
-} from "@fortawesome/free-solid-svg-icons";
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faPen, faLock, faLockOpen } from "@fortawesome/free-solid-svg-icons";
+import styles from "./Member.module.css";
 import { useDispatch, useSelector } from "react-redux";
-import styles from "./ManageStaff.module.css";
 import {
-  getAllStaffs,
-  addStaff,
-  deleteStaff,
-  updateStaff,
-  banStaff,
+  getAllUser,
+  deleteUser,
+  updateUser,
+  addUser,
 } from "../../redux/apiRequest";
 
 const Modal = ({ show, onClose, children }) => {
@@ -26,124 +21,133 @@ const Modal = ({ show, onClose, children }) => {
     </div>
   );
 };
-
-function ManageStaff() {
+function User() {
+  const [id, setId] = useState("");
   const [username, setUsername] = useState("");
-  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [fullname, setFullname] = useState("");
+  const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
-  const [selectedStaff, setSelectedStaff] = useState(null);
+  const [isactive, setIsActive] = useState("");
+  const [isBreeder, setIsBreeder] = useState(false);
+
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [avatarurl, setAvatarUrl] = useState("");
+
   const token = useSelector(
     (state) => state.auth.login?.currentToken.result.token
   );
-  const staffList = useSelector((state) => state.staff.staffs?.allStaffs);
+  const userList = useSelector((state) => state.user.users?.allUsers);
   const dispatch = useDispatch();
   console.log(token);
-
   useEffect(() => {
-    getAllStaffs(token, dispatch);
-    console.log(staffList);
+    getAllUser(token, dispatch);
+    console.log(userList);
   }, []);
-  const handleBanStaff = async (id) => {
-    if (window.confirm("Are you sure you want to ban this staff?")) {
-      await banStaff(dispatch, id);
-    }
-  };
 
-  const handleAddStaff = async (e) => {
+  const handleAddUser = async (e) => {
     e.preventDefault();
-    const staffData = {
-      username: username,
-      password: password,
-      phone: phone,
-      fullname: fullname,
-      address: address,
-    };
-    await addStaff(dispatch, staffData, token);
-
     setUsername("");
     setPassword("");
-    setPhone("");
     setFullname("");
+    setPhone("");
     setAddress("");
-    setShowAddModal(false);
-  };
-  const handleUpdateStaff = async (e) => {
-    e.preventDefault();
-    const staffData = {
+    setAvatarUrl("");
+    setIsBreeder(false);
+
+    const userData = {
       username: username,
       password: password,
-      phone: phone,
       fullname: fullname,
+      phone: phone,
       address: address,
+      avatar_url: avatarurl,
+      isBreeder: isBreeder,
     };
-    await updateStaff(dispatch, selectedStaff.id, staffData, token);
+    await addUser(dispatch, userData, token);
+  };
+  const handleUpdateUser = async (e) => {
+    e.preventDefault();
+    setId("");
     setUsername("");
     setPassword("");
-    setPhone("");
     setFullname("");
+    setPhone("");
     setAddress("");
+    setIsActive("");
+    setIsBreeder(false);
+    const userData = {
+      userId: id,
+      username: username,
+      password: password,
+      fullname: fullname,
+      phone: phone,
+      address: address,
+      avatar_url: avatarurl,
+      isActive: isactive,
+      isBreeder: isBreeder,
+    };
+    await updateUser(dispatch, selectedUser.id, userData, token);
     setShowEditModal(false);
   };
-  const openEditModal = (staff) => {
-    setSelectedStaff(staff);
-    setUsername(staff.username);
-    setPassword(staff.password);
-    setPhone(staff.phone);
-    setFullname(staff.fullname);
-    setAddress(staff.address);
+
+  const openEditModal = (user) => {
+    setSelectedUser(user);
+    setId(user.id);
+    setUsername(user.username);
+    setPassword(user.password);
+    setFullname(user.fullname);
+    setPhone(user.phone);
+    setAddress(user.address);
+    setAvatarUrl(user.avatar_url);
+    setIsActive(user.isActive);
+    setIsBreeder(user.isBreeder);
     setShowEditModal(true);
   };
-
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [showAddModal, setShowAddModal] = useState(false);
-
-  const handleDeleteStaff = async (id) => {
-    if (window.confirm("Are you sure you want to delete this staff?")) {
-      await deleteStaff(dispatch, id, token);
+  const handleDeleteUser = async (id) => {
+    if (window.confirm("Are you sure you want to delete this user?")) {
+      await deleteUser(dispatch, id, token);
     }
   };
 
   return (
     <div>
       <div className="container py-3 table">
-        <h2 className="mb-5 text-center">Manage Staff </h2>
+        <h2 className="mb-5 text-center">Manage User </h2>
         <table class="table table-light table-bordered border border-dark shadow p-3 mb-5 rounded-4">
           <tr className="table-dark">
             <th>ID</th>
             <th>Name</th>
-            <th>Contact</th>
+            <th>Phone</th>
             <th>Address</th>
-            <th>Create Date</th>
+            <th>Role</th>
             <th>Action</th>
           </tr>
-          {staffList?.map((staff) => {
+          {userList?.map((user) => {
             return (
-              <tr key={staff.id}>
-                <td>{staff.id}</td>
-                <td>{staff.fullname}</td>
-                <td>{staff.phone}</td>
-                <td>{staff.address}</td>
-                <td>{staff.userCreatedDate}</td>
+              <tr key={user.id}>
+                <td>{user.id}</td>
+                <td>{user.fullname}</td>
+                <td>{user.phone}</td>
+                <td>{user.address}</td>
+                <td>{user.role}</td>
                 <td>
                   <button
                     className={styles.actionBtn + " " + styles.editBtn}
-                    onClick={() => openEditModal(staff)}
+                    onClick={() => openEditModal(user)}
                   >
                     <FontAwesomeIcon icon={faPen} />
                   </button>
                   <button
                     className={styles.actionBtn + " " + styles.deleteBtn}
-                    onClick={() => handleDeleteStaff(staff.id)}
+                    onClick={() => handleDeleteUser(user.id)}
                   >
                     <FontAwesomeIcon icon={faXmark} />
                   </button>
-                  <button
-                    className={styles.actionBtn + " " + styles.deleteBtn}
-                    onClick={() => handleBanStaff(staff.id)}
-                  >
-                    {staff.isActive ? (
+                  <button className={styles.actionBtn}>
+                    {user.isActive ? (
                       <FontAwesomeIcon icon={faLockOpen} />
                     ) : (
                       <FontAwesomeIcon icon={faLock} />
@@ -162,60 +166,6 @@ function ManageStaff() {
         Create New Staff
       </button>
 
-      <Modal show={showAddModal}>
-        <div class="position-relative p-2 text-center text-muted bg-body border border-dashed rounded-5">
-          <button
-            type="button"
-            class="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill"
-            aria-label="Close"
-            onClick={() => setShowAddModal(false)}
-          ></button>
-          <h1 class="text-body-emphasis">Add New Staff</h1>
-          <div>
-            <form onSubmit={handleAddStaff}>
-              <input
-                type="text"
-                name="name"
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Name"
-                className={styles.roundedInput}
-              />
-              <input
-                type="text"
-                name="password"
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-                className={styles.roundedInput}
-              />
-              <input
-                type="text"
-                name="fullname"
-                onChange={(e) => setFullname(e.target.value)}
-                placeholder="fullname"
-                className={styles.roundedInput}
-              />
-              <input
-                type="text"
-                name="phone"
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="Phone"
-                className={styles.roundedInput}
-              />
-              <input
-                type="text"
-                name="address"
-                onChange={(e) => setAddress(e.target.value)}
-                placeholder="Address"
-                className={styles.roundedInput}
-              />
-              <button type="submit" className="btn btn-outline-dark">
-                Submit
-              </button>
-            </form>
-          </div>
-        </div>
-      </Modal>
-
       <Modal show={showEditModal}>
         <div class="position-relative p-2 text-center text-muted bg-body border border-dashed rounded-5">
           <button
@@ -224,9 +174,18 @@ function ManageStaff() {
             aria-label="Close"
             onClick={() => setShowEditModal(false)}
           ></button>
-          <h1 class="text-body-emphasis">Edit Staff</h1>
-          <div className={styles.formContainer}>
-            <form onSubmit={handleUpdateStaff}>
+          <h1 class="text-body-emphasis">Edit User</h1>
+          <div>
+            <form onSubmit={handleUpdateUser}>
+              <input
+                type="text"
+                name="userId"
+                placeholder="ID"
+                value={id}
+                onChange={(e) => setId(e.target.value)}
+                className={styles.roundedInput}
+              />
+
               <input
                 type="text"
                 name="username"
@@ -235,6 +194,7 @@ function ManageStaff() {
                 placeholder="UserName"
                 className={styles.roundedInput}
               />
+
               <input
                 type="text"
                 name="password"
@@ -243,14 +203,16 @@ function ManageStaff() {
                 placeholder="Password"
                 className={styles.roundedInput}
               />
+
               <input
                 type="text"
                 name="fullname"
                 value={fullname}
                 onChange={(e) => setFullname(e.target.value)}
-                placeholder="fullname"
+                placeholder="Fullname"
                 className={styles.roundedInput}
               />
+
               <input
                 type="text"
                 name="phone"
@@ -268,6 +230,122 @@ function ManageStaff() {
                 placeholder="Address"
                 className={styles.roundedInput}
               />
+
+              <input
+                type="text"
+                name="avatar_url"
+                value={avatarurl}
+                onChange={(e) => setAvatarUrl(e.target.value)}
+                placeholder="Avatar URL"
+                className={styles.roundedInput}
+              />
+
+              <label>
+                Active:
+                <input
+                  type="checkbox"
+                  name="isActive"
+                  checked={isactive}
+                  onChange={(e) => setIsActive(e.target.checked)}
+                  className={styles.roundedInput}
+                />
+              </label>
+
+              <label>
+                Breeder:
+                <input
+                  type="checkbox"
+                  name="isBreeder"
+                  checked={isBreeder}
+                  onChange={(e) => setIsBreeder(e.target.checked)}
+                  className={styles.roundedInput}
+                />
+              </label>
+
+              <button type="submit" className="btn btn-dark">
+                Submit
+              </button>
+            </form>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal show={showAddModal}>
+        <div class="position-relative p-2 text-center text-muted bg-body border border-dashed rounded-5">
+          <button
+            type="button"
+            class="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill"
+            aria-label="Close"
+            onClick={() => setShowAddModal(false)}
+          ></button>
+          <h1 class="text-body-emphasis">Add New Staff</h1>
+          <div>
+            <form onSubmit={handleAddUser}>
+              <input
+                type="text"
+                name="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="UserName"
+                className={styles.roundedInput}
+              />
+
+              <input
+                type="text"
+                name="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+                className={styles.roundedInput}
+              />
+
+              <input
+                type="text"
+                name="fullname"
+                value={fullname}
+                onChange={(e) => setFullname(e.target.value)}
+                placeholder="Fullname"
+                className={styles.roundedInput}
+              />
+
+              <input
+                type="text"
+                name="phone"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="Phone"
+                className={styles.roundedInput}
+              />
+
+              <input
+                type="text"
+                name="address"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder="Address"
+                className={styles.roundedInput}
+              />
+
+              <input
+                type="text"
+                name="avatar_url"
+                value={avatarurl}
+                onChange={(e) => setAvatarUrl(e.target.value)}
+                placeholder="Avatar URL"
+                className={styles.roundedInput}
+              />
+
+              <label>
+                Breeder:
+                <input
+                  type="checkbox"
+                  name="isBreeder"
+                  checked={isBreeder}
+                  onChange={(e) => setIsBreeder(e.target.checked)}
+                  className={styles.roundedInput}
+                />
+              </label>
+
               <button type="submit" className="btn btn-outline-dark">
                 Submit
               </button>
@@ -279,4 +357,4 @@ function ManageStaff() {
   );
 }
 
-export default ManageStaff;
+export default User;

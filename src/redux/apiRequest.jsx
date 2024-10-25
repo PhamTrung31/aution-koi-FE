@@ -31,6 +31,12 @@ import {
   updateStaffStart,
   updateStaffSuccess,
   updateStaffFailed,
+  banStaffStart,
+  banStaffSuccess,
+  banStaffFailed,
+  unbanStaffStart,
+  unbanStaffSuccess,
+  unbanStaffFailed,
 } from "./staffSlice";
 import {
   getUserStart,
@@ -46,6 +52,27 @@ import {
   updateUserSuccess,
   updateUserFailed,
 } from "./userSlice";
+import {
+  getAuctionRequestStart,
+  getAuctionRequestSuccess,
+  getAuctionRequestFailed,
+  getAuctionRequestByBreederIdStart,
+  getAuctionRequestByBreederIdSuccess,
+  getAuctionRequestByBreederIdFailed,
+  getOneAuctionRequestStart,
+  getOneAuctionRequestSuccess,
+  getOneAuctionRequestFailed,
+  addAuctionRequestStart,
+  addAuctionRequestSuccess,
+  addAuctionRequestFailed,
+  deleteAuctionRequestStart,
+  deleteAuctionRequestSuccess,
+  deleteAuctionRequestFailed,
+  updateAuctionRequestStart,
+  updateAuctionRequestSuccess,
+  updateAuctionRequestFailed,
+} from "./auctionRequestSlice";
+import {} from "./breederSlice";
 import { isRejectedWithValue } from "@reduxjs/toolkit";
 
 export const loginPayload = async (payload, dispatch, navigate) => {
@@ -168,7 +195,7 @@ export const updateStaff = async (
   dispatch(updateStaffStart());
   try {
     const res = await axios.put(
-      `http://localhost:8081/auctionkoi/manager/${staffId}/status`,
+      `http://localhost:8081/auctionkoi/manager/${staffId}`,
       updatedata,
       {
         headers: { Authorization: `Bearer ${accessToken}` },
@@ -177,6 +204,21 @@ export const updateStaff = async (
     dispatch(updateStaffSuccess(res.data));
   } catch {
     dispatch(updateStaffFailed());
+  }
+};
+
+export const banStaff = async (dispatch, staffId, accessToken) => {
+  dispatch(banStaffStart());
+  try {
+    const res = await axios.post(
+      `http://localhost:8081/auctionkoi/manager/ban/${staffId}`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}  ` },
+      }
+    );
+    dispatch(banStaffSuccess(res.data));
+  } catch (err) {
+    dispatch(banStaffFailed());
   }
 };
 
@@ -212,7 +254,7 @@ export const deleteUser = async (dispatch, userId, accessToken) => {
   dispatch(deleteUserStart());
   try {
     const res = await axios.delete(
-      `http://localhost:8081/auctionkoi/staffs/${userId}/delete`,
+      `http://localhost:8081/auctionkoi/staffs/${userId}`,
       {
         headers: { Authorization: `Bearer ${accessToken}` },
       }
@@ -224,10 +266,10 @@ export const deleteUser = async (dispatch, userId, accessToken) => {
 };
 
 export const updateUser = async (dispatch, userId, updatedata, accessToken) => {
-  dispatch(updateStaffStart());
+  dispatch(updateUserStart());
   try {
     const res = await axios.put(
-      `http://localhost:8081/auctionkoi/staffs/${userId}/status`,
+      `http://localhost:8081/auctionkoi/staffs/${userId}`,
       updatedata,
       {
         headers: { Authorization: `Bearer ${accessToken}` },
@@ -236,5 +278,119 @@ export const updateUser = async (dispatch, userId, updatedata, accessToken) => {
     dispatch(updateUserSuccess(res.data));
   } catch {
     dispatch(updateUserFailed());
+  }
+};
+
+export const getAllAuctionRequest = async (accessToken, dispatch) => {
+  dispatch(getAuctionRequestStart());
+  try {
+    const res = await axios.get(
+      "http://localhost:8081/auctionkoi/auction/view-all-requests}",
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+    dispatch(getAuctionRequestSuccess(res.data.result));
+  } catch (err) {
+    dispatch(getAuctionRequestFailed());
+  }
+};
+
+export const getAllAuctionRequestByBreederID = async (
+  accessToken,
+  breederId,
+  dispatch
+) => {
+  dispatch(getAuctionRequestByBreederIdStart());
+  try {
+    const res = await axios.get(
+      `http://localhost:8081/auctionkoi//auction/view-all-breeder-requests/${breederId}`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+    dispatch(getAuctionRequestByBreederIdSuccess(res.data.result));
+  } catch (err) {
+    dispatch(getAuctionRequestByBreederIdFailed());
+  }
+};
+
+export const getOneAuctionRequest = async (
+  accessToken,
+  auctionRequestId,
+  dispatch
+) => {
+  dispatch(getOneAuctionRequestStart());
+  try {
+    const res = await axios.get(
+      `http://localhost:8081/auctionkoi/auctions/view-request-detail/${auctionRequestId}`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+    dispatch(getOneAuctionRequestSuccess(res.data.result));
+  } catch (err) {
+    dispatch(getOneAuctionRequestFailed());
+  }
+};
+
+export const addAuctionRequest = async (
+  dispatch,
+  auctionRequestData,
+  accessToken
+) => {
+  dispatch(addAuctionRequestStart());
+  try {
+    const res = await axios.post(
+      "http://localhost:8081/auctionkoi/auctions/send-request",
+      auctionRequestData,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+    dispatch(addAuctionRequestSuccess(res.data));
+  } catch (err) {
+    dispatch(addAuctionRequestFailed());
+  }
+};
+
+export const deleteAuctionRequest = async (
+  dispatch,
+  breederID,
+  auctionRequestId,
+  accessToken
+) => {
+  dispatch(deleteAuctionRequestStart());
+  try {
+    const res = await axios.delete(
+      `http://localhost:8081/auctionkoi/auctions/cancel/${auctionRequestId}/${breederID}`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+    dispatch(deleteAuctionRequestSuccess(res.data));
+  } catch {
+    dispatch(deleteAuctionRequestFailed());
+  }
+};
+
+export const updateAuctionRequest = async (
+  dispatch,
+  auctionRequestId,
+  updatedata,
+  accessToken
+) => {
+  dispatch(updateAuctionRequestStart());
+  try {
+    const res = await axios.put(
+      `http://localhost:8081/auctionkoi/auctions/update/${auctionRequestId}`,
+      updatedata,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+    dispatch(updateAuctionRequestSuccess(res.data));
+  } catch {
+    dispatch(updateAuctionRequestFailed());
   }
 };

@@ -20,8 +20,7 @@ import AuctionView from "./pages/AuctionView/AuctionView.jsx";
 import Forbidden403 from "./pages/Forbidden403/Forbidden403.jsx";
 import DemoAxios from "./components/DemoAxios.jsx";
 import Footer from "./components/Footer/Footer.jsx";
-import Member from "./pages/ManageMember/Member.jsx";
-import Breeder from "./pages/ManageBreeder/Breeder.jsx";
+import Member from "./pages/ManageUser/ManageUser.jsx";
 import ManageStaff from "./pages/ManageStaff/ManageStaff.jsx";
 import Request from "./pages/Request/MRequest.jsx";
 import StaffRequest from "./pages/StaffRequest/Request.jsx";
@@ -198,15 +197,6 @@ function App() {
                 </StaffElement>
               }
             />
-            <Route
-              path="/breeder"
-              element={
-                <StaffElement>
-                  <Breeder />
-                </StaffElement>
-              }
-            />
-
             <Route
               path="/createrequest"
               element={

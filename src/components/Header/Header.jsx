@@ -350,14 +350,6 @@ const StaffNavbar = () => {
             >
               member
             </Nav.Link>
-
-            <Nav.Link
-              as={Link}
-              to="/breeder"
-              onClick={() => handleUserTitle(user?.fullname)}
-            >
-              breeder
-            </Nav.Link>
           </Nav>
           <Nav>
             {user?.fullname ? (

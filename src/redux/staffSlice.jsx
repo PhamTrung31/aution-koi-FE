@@ -23,6 +23,16 @@ const staffSlice = createSlice({
       isFetching: false,
       error: false,
     },
+    banstaffs: {
+      banstaffs: [],
+      isFetching: false,
+      error: false,
+    },
+    unbanstaffs: {
+      unbanstaffs: [],
+      isFetching: false,
+      error: false,
+    },
   },
   reducers: {
     getStaffStart: (state) => {
@@ -68,10 +78,33 @@ const staffSlice = createSlice({
         (staff) => (staff.id === action.payload.id ? action.payload : staff)
       );
     },
-
     updateStaffFailed: (state) => {
       state.updatestaffs.isFetching = false;
       state.updatestaffs.error = true;
+    },
+
+    banStaffStart: (state) => {
+      state.banstaffs.isFetching = true;
+    },
+    banStaffSuccess: (state, action) => {
+      state.banstaffs.isFetching = false;
+      state.banstaffs.banstaffs.push(action.payload);
+    },
+    banStaffFailed: (state) => {
+      state.banstaffs.isFetching = false;
+      state.banstaffs.error = true;
+    },
+
+    unbanStaffStart: (state) => {
+      state.unbanstaffs.isFetching = true;
+    },
+    unbanStaffSuccess: (state, action) => {
+      state.unbanstaffs.isFetching = false;
+      state.unbanstaffs.unbanstaffs.push(action.payload);
+    },
+    unbanStaffFailed: (state) => {
+      state.unbanstaffs.isFetching = false;
+      state.unbanstaffs.error = true;
     },
   },
 });
@@ -88,5 +121,11 @@ export const {
   updateStaffStart,
   updateStaffSuccess,
   updateStaffFailed,
+  banStaffStart,
+  banStaffSuccess,
+  banStaffFailed,
+  unbanStaffStart,
+  unbanStaffSuccess,
+  unbanStaffFailed,
 } = staffSlice.actions;
 export default staffSlice.reducer;

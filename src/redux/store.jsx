@@ -3,6 +3,8 @@ import authReducer from "./authSlice";
 import categoryReducer from "./categorySlice";
 import staffReducer from "./staffSlice";
 import userReducer from "./userSlice";
+import breederReducer from "./breederSlice";
+import auctionrequestReducer from "./auctionRequestSlice";
 import {
   persistStore,
   persistReducer,
@@ -31,6 +33,8 @@ const store = configureStore({
     category: categoryReducer,
     staff: staffReducer,
     user: userReducer,
+    breeder: breederReducer,
+    auctionrequest: auctionrequestReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
