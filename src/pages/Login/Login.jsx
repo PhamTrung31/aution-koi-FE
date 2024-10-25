@@ -35,7 +35,7 @@ function Login() {
             notify();
             dispatch(loginInitial());
         }
-    }, [error])
+    }, [error]);
 
 
     return (

@@ -23,12 +23,16 @@ import {
   getStaffsSuccess,
   getStaffsFailed,
 } from "./staffSlice";
-import { 
+import {
   changeAvatarStart,
   changeAvatarSuccess,
   changeAvatarFailed
- } from "./userSlice";
-import { isRejectedWithValue } from "@reduxjs/toolkit";
+} from "./userSlice";
+import {
+  joinAuctionStart,
+  joinAuctionSuccess,
+  joinAuctionFailed
+} from "./auctionSlice";
 
 export const loginPayload = async (payload, dispatch, navigate) => {
   dispatch(loginStart());
@@ -41,7 +45,8 @@ export const loginPayload = async (payload, dispatch, navigate) => {
     getUserProfile(res.data.result.token, dispatch, navigate);
     navigate("/");
   } catch (err) {
-    const error = err.response?.data ||'An error occured';
+    console.log(err);
+    const error = err.response?.data || 'An error occured';
     dispatch(loginFailed(error));
     navigate("/login");
   }
@@ -116,16 +121,37 @@ export const changeAvatarImage = async (accessToken, userid, payload, dispatch, 
       `http://localhost:8081/auctionkoi/users/${userid}/avatar`,
       payload,
       {
-        headers: {Authorization: `Bearer ${accessToken}`}
+        headers: { Authorization: `Bearer ${accessToken}` }
       }
     );
     dispatch(changeAvatarSuccess(res.data));
     getUserProfile(accessToken, dispatch, navigate);
   } catch (err) {
-    const error = err.response?.data ||'An error occured';
+    const error = err.response?.data || 'An error occured';
     dispatch(changeAvatarFailed(error));
     navigate("/profile");
   }
 }
 
+export const joinNewAuction = async (accessToken, userid, auctionid, dispatch, navigate) => {
+  dispatch(joinAuctionStart());
+  try {
+    console.log(accessToken);
+    console.log(userid);
+    console.log(auctionid);
+    const res = await axios.post(
+      `http://localhost:8081/auctionkoi/auctions/join/${auctionid}/${userid}`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      }
+    );
+
+    dispatch(joinAuctionSuccess(res.data));
+    navigate("/auctionView");
+  } catch (err) {
+    console.log(err);
+    const error = err.response?.data || 'An error occured';
+    dispatch(joinAuctionFailed(error));
+  }
+}
 
