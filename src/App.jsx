@@ -28,6 +28,7 @@ import StaffRequest from "./pages/StaffRequest/Request.jsx";
 import Auction from "./pages/Auction/Auction.jsx";
 import CreateRequest from "./pages/CreateRequest/CreateRequest.jsx";
 import FirebaseImageUpload from "./pages/FirebaseImageUpload/FirebaseImageUpload.jsx";
+import Topup from "./pages/Topup/Topup.jsx";
 
 function App() {
   const CURRENT_USER_ROLE = useSelector((state) =>
@@ -53,7 +54,7 @@ function App() {
     if (CURRENT_USER_ROLE === "STAFF") {
       return <>{children}</>;
     } else {
-      return <Navigate to={"/login"} />;
+      return <Navigate to={"/forbidden403"} />;
     }
   }
 
@@ -61,7 +62,7 @@ function App() {
     if (CURRENT_USER_ROLE === "MANAGER") {
       return <>{children}</>;
     } else {
-      return <Navigate to={"/login"} />;
+      return <Navigate to={"/forbidden403"} />;
     }
   }
 
@@ -94,6 +95,7 @@ function App() {
 
             <Route path="/currentAuction" element={<MemberElement><CurrentAuction /></MemberElement>}/>
             <Route path="/auctionView" element={<MemberElement><AuctionView /></MemberElement>}/>
+            <Route path="/topup" element={<MemberElement><Topup /></MemberElement>}/>
 
 
             {/* <Route path="/member" element={<ManagerElement><Member /></ManagerElement>}/>

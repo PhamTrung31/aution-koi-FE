@@ -22,7 +22,7 @@ const Modal = ({ show, onClose, children }) => {
 };
 
 function ManageStaff() {
-  const token = useSelector((state) => state.auth.login?.currentToken.result.token);
+  const token = useSelector((state) => state.auth.login?.currentToken.token);
   const staffList = useSelector((state) => state.staff.staffs?.allStaffs);
   const dispatch = useDispatch();
   console.log(token);

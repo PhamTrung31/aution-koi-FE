@@ -65,7 +65,7 @@ function AuctionView() {
                 <div className="py-5 text-center">
                     <h2>Auction's Time Left:</h2>
                     <p className="lead mb-4 fs-1">
-                        Countdown {timerDays < 1 ? timerDays + ' day' : timerDays + ' days'} {timerHours < 10 ? '0' + timerHours : timerHours}
+                        {timerDays < 1 ? timerDays + ' day' : timerDays + ' days'} {timerHours < 10 ? '0' + timerHours : timerHours}
                         :{timerMinutes < 10 ? '0' + timerMinutes : timerMinutes}
                         :{timerSeconds < 10 ? '0' + timerSeconds : timerSeconds}
                     </p>

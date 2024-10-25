@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { logOut } from "../../redux/apiRequest";
 import { FaUsers } from "react-icons/fa";
+import { LuWallet } from "react-icons/lu";
 
 function Header({ userRole }) {
   return (
@@ -99,7 +100,7 @@ const MemberHeader = () => {
               <>
                 <Navbar.Collapse id="navbar-white-example">
                   <Nav.Link className="fw-bold" style={{ color: "#eb1c24" }}>
-                    Wallet: {formatWallet} vnd
+                  <LuWallet /> Wallet: {formatWallet} vnd
                   </Nav.Link>                
                   
                   <Nav>
@@ -118,15 +119,10 @@ const MemberHeader = () => {
                       </NavDropdown.Item>
                       <NavDropdown.Item
                         as={Link}
-                        to="/profile"
+                        to="/topup"
                       // onClick={() => handleUserTitle("Your Balance")}
                       >
                         Top-Up Wallet
-                      </NavDropdown.Item>
-                      <NavDropdown.Item
-                      // onClick={() => handleUserTitle("Payment History")}
-                      >
-                        Payment History
                       </NavDropdown.Item>
                       <NavDropdown.Item onClick={handleLogout}>
                         Log out
@@ -143,9 +139,6 @@ const MemberHeader = () => {
                     />         
                   </Nav.Link>
                 </Navbar.Collapse>
-                {/* <Nav.Link id="regis">
-                  Log out
-                </Nav.Link> */}
               </>
             ) : (
               <>
