@@ -136,16 +136,16 @@ export const changeAvatarImage = async (accessToken, userid, payload, dispatch, 
 export const joinNewAuction = async (accessToken, userid, auctionid, dispatch, navigate) => {
   dispatch(joinAuctionStart());
   try {
-    console.log(accessToken);
-    console.log(userid);
-    console.log(auctionid);
+    
     const res = await axios.post(
       `http://localhost:8081/auctionkoi/auctions/join/${auctionid}/${userid}`,
       {
         headers: { Authorization: `Bearer ${accessToken}` }
       }
     );
-
+    console.log(accessToken);
+    console.log(userid);
+    console.log(auctionid);
     dispatch(joinAuctionSuccess(res.data));
     navigate("/auctionView");
   } catch (err) {

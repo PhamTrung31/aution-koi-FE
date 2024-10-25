@@ -11,7 +11,7 @@ function CurrentAuction() {
     const { currentUser } = useSelector((state) => state.auth.profile);
     const error = useSelector((state) => state.auction.joinAuction.error);
     const token = useSelector((state) => state.auth.login?.currentToken.token);
-    const [currentAuction, setCurrentAuction] = useState(4);
+    const [currentAuction, setCurrentAuction] = useState(1);
     const notify = () => toast.error(error.message);
 
     const [timerDays, setTimerDays] = useState('00');
@@ -20,7 +20,7 @@ function CurrentAuction() {
     const [timerSeconds, setTimerSeconds] = useState('00');
 
     const dispatch = useDispatch();
-    const navigate = useNavigate;
+    const navigate = useNavigate();
     let interval = useRef();
 
     const startTimer = () => {
