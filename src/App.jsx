@@ -20,14 +20,17 @@ import AuctionView from "./pages/AuctionView/AuctionView.jsx";
 import Forbidden403 from "./pages/Forbidden403/Forbidden403.jsx";
 import DemoAxios from "./components/DemoAxios.jsx";
 import Footer from "./components/Footer/Footer.jsx";
-import Member from "./pages/Member/Member.jsx";
-import Breeder from "./pages/Breeder/Breeder.jsx";
+import Member from "./pages/ManageUser/ManageUser.jsx";
 import ManageStaff from "./pages/ManageStaff/ManageStaff.jsx";
 import Request from "./pages/Request/MRequest.jsx";
 import StaffRequest from "./pages/StaffRequest/Request.jsx";
 import Auction from "./pages/Auction/Auction.jsx";
 import CreateRequest from "./pages/CreateRequest/CreateRequest.jsx";
 import FirebaseImageUpload from "./pages/FirebaseImageUpload/FirebaseImageUpload.jsx";
+import Dashboard from "./pages/DashBoard/DashBoard.jsx";
+import BoardChart from "./pages/DashBoard/BoardChart.jsx";
+import StatCard from "./pages/DashBoard/StatCard.jsx";
+import DonutChart from "./pages/DashBoard/DonutChart.jsx";
 import Topup from "./pages/Topup/Topup.jsx";
 
 function App() {
@@ -91,23 +94,23 @@ function App() {
             <Route path="/register" element={<PublicElement><Register /></PublicElement>}/>
             <Route path="/profile" element={<PublicElement><Profile userRole={CURRENT_USER_ROLE} /></PublicElement>}/>
             <Route path="/uploadImage" element={<PublicElement><FirebaseImageUpload /></PublicElement>}/>
-
-
+                                                
             <Route path="/currentAuction" element={<MemberElement><CurrentAuction /></MemberElement>}/>
             <Route path="/auctionView" element={<MemberElement><AuctionView /></MemberElement>}/>
-            <Route path="/topup" element={<MemberElement><Topup /></MemberElement>}/>
+            <Route path="/topup" element={<MemberElement><Topup /></MemberElement>}/>                         
 
-
-            {/* <Route path="/member" element={<ManagerElement><Member /></ManagerElement>}/>
-            <Route path="/breeder" element={<ManagerElement><Breeder /></ManagerElement>}/> */}
-            <Route path="/manageStaff" element={<ManagerElement><ManageStaff /></ManagerElement>}/>
-            <Route path="/request" element={<ManagerElement><Request /></ManagerElement>}/>
-
+            <Route path="/manageStaff" element={<ManagerElement><ManageStaff /></ManagerElement>} />
+            <Route path="/request" element={<ManagerElement><Request /></ManagerElement>} />
+            <Route path="/dashboard" element={<ManagerElement><Dashboard /></ManagerElement>} />
+            <Route path="/boardchart" element={<ManagerElement><BoardChart /></ManagerElement>} />
+            <Route path="/donutchart" element={<ManagerElement><DonutChart /></ManagerElement>}/>
+            <Route ath="/statcard" element={<ManagerElement><StatCard /></ManagerElement>} />
 
             <Route path="/staffrequest" element={<StaffElement><StaffRequest /></StaffElement>}/>
             <Route path="/auction" element={<StaffElement><Auction /></StaffElement>}/>
-            <Route path="/createrequest" element={<BreederElement><CreateRequest /></BreederElement>}/>
-
+            <Route path="/member" element={<StaffElement><Member /></StaffElement>} />
+                                                
+            <Route path="/createrequest" element={<BreederElement><CreateRequest /></BreederElement>} />
 
             <Route path="/forbidden403" element={<Forbidden403 />} />
             <Route path="*" element={<div>Page Not Found!</div>} />
