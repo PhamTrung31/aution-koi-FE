@@ -194,9 +194,40 @@ function User() {
                 placeholder="UserName"
                 className={styles.roundedInput}
               />
+              <div class="d-flex align-items-center">
+                <h5 class="mb-0 me-2">Role:</h5>
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="breederCheckbox"
+                    checked={isBreeder}
+                    onChange={(e) => setIsBreeder(e.target.checked)}
+                  />
+                  <label class="form-check-label" for="breederCheckbox">
+                    {isBreeder ? "Breeder" : "Member"}
+                  </label>
+                </div>
+              </div>
+
+              <div class="d-flex align-items-center">
+                <h5 class="mb-0 me-2">Active:</h5>
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="activeCheckbox"
+                    checked={isactive}
+                    onChange={(e) => setIsActive(e.target.checked)}
+                  />
+                  <label class="form-check-label" for="activeCheckbox">
+                    {isactive ? "Active" : "Inactive"}
+                  </label>
+                </div>
+              </div>
 
               <input
-                type="text"
+                type="password"
                 name="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -239,28 +270,6 @@ function User() {
                 placeholder="Avatar URL"
                 className={styles.roundedInput}
               />
-
-              <label>
-                Active:
-                <input
-                  type="checkbox"
-                  name="isActive"
-                  checked={isactive}
-                  onChange={(e) => setIsActive(e.target.checked)}
-                  className={styles.roundedInput}
-                />
-              </label>
-
-              <label>
-                Breeder:
-                <input
-                  type="checkbox"
-                  name="isBreeder"
-                  checked={isBreeder}
-                  onChange={(e) => setIsBreeder(e.target.checked)}
-                  className={styles.roundedInput}
-                />
-              </label>
 
               <button type="submit" className="btn btn-dark">
                 Submit
@@ -278,7 +287,7 @@ function User() {
             aria-label="Close"
             onClick={() => setShowAddModal(false)}
           ></button>
-          <h1 class="text-body-emphasis">Add New Staff</h1>
+          <h1 class="text-body-emphasis">Add New User</h1>
           <div>
             <form onSubmit={handleAddUser}>
               <input
@@ -289,9 +298,24 @@ function User() {
                 placeholder="UserName"
                 className={styles.roundedInput}
               />
+              <div class="d-flex align-items-center">
+                <h5 class="mb-0 me-2">Role:</h5>
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="breederCheckbox"
+                    checked={isBreeder}
+                    onChange={(e) => setIsBreeder(e.target.checked)}
+                  />
+                  <label class="form-check-label" for="breederCheckbox">
+                    {isBreeder ? "Breeder" : "Member"}
+                  </label>
+                </div>
+              </div>
 
               <input
-                type="text"
+                type="password"
                 name="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -334,17 +358,6 @@ function User() {
                 placeholder="Avatar URL"
                 className={styles.roundedInput}
               />
-
-              <label>
-                Breeder:
-                <input
-                  type="checkbox"
-                  name="isBreeder"
-                  checked={isBreeder}
-                  onChange={(e) => setIsBreeder(e.target.checked)}
-                  className={styles.roundedInput}
-                />
-              </label>
 
               <button type="submit" className="btn btn-outline-dark">
                 Submit

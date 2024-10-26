@@ -47,7 +47,7 @@ function ManageStaff() {
   }, []);
   const handleBanStaff = async (id) => {
     if (window.confirm("Are you sure you want to ban this staff?")) {
-      await banStaff(dispatch, id);
+      await banStaff(dispatch, id, token);
     }
   };
 
@@ -181,7 +181,7 @@ function ManageStaff() {
                 className={styles.roundedInput}
               />
               <input
-                type="text"
+                type="password"
                 name="password"
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
@@ -236,7 +236,7 @@ function ManageStaff() {
                 className={styles.roundedInput}
               />
               <input
-                type="text"
+                type="password"
                 name="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
