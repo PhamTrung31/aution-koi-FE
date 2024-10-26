@@ -37,7 +37,6 @@ const MemberHome = () => {
 
     useEffect(() => {
         getAllCategories(dispatch)
-        console.log(categoryList)
     },[])
 
     return (
@@ -60,8 +59,8 @@ const MemberHome = () => {
                     <h1 className="display-4 fw-bold text-body-emphasis lh-1 mb-3">Get your favorite Koi right now with BetoKoi</h1>
                     <p className="lead">BetoKoi is a platform for buying and selling Koi fish through live auctions. Users can browse listings, place bids, and purchase directly from breeders. It offers features like detailed Koi profiles, real-time bidding, notifications, and secure payments, catering to both hobbyists and collectors.</p>
                     <div className="d-grid gap-2 d-md-flex justify-content-md-start">
-                        <button type="button" className="btn btn-primary btn-lg px-4 me-md-2">Primary</button>
-                        <button type="button" className="btn btn-outline-secondary btn-lg px-4">Default</button>
+                        {/* <button type="button" className="btn btn-primary btn-lg px-4 me-md-2">Primary</button>
+                        <button type="button" className="btn btn-outline-secondary btn-lg px-4">Default</button> */}
                     </div>
                 </div>
             </div>

@@ -73,7 +73,16 @@ import {
   updateAuctionRequestFailed,
 } from "./auctionRequestSlice";
 import {} from "./breederSlice";
-import { isRejectedWithValue } from "@reduxjs/toolkit";
+import {
+  changeAvatarStart,
+  changeAvatarSuccess,
+  changeAvatarFailed
+} from "./userSlice";
+import {
+  joinAuctionStart,
+  joinAuctionSuccess,
+  joinAuctionFailed
+} from "./auctionSlice";
 
 export const loginPayload = async (payload, dispatch, navigate) => {
   dispatch(loginStart());
@@ -82,9 +91,9 @@ export const loginPayload = async (payload, dispatch, navigate) => {
       "http://localhost:8081/auctionkoi/auth/token",
       payload
     );
-    dispatch(loginSuccess(res.data));
-    console.log(res.data.result.token);
+    dispatch(loginSuccess(res.data.result));
     getUserProfile(res.data.result.token, dispatch, navigate);
+    navigate("/");
   } catch (err) {
     const error = err.response?.data || "An error occured";
     dispatch(loginFailed(error));
@@ -103,7 +112,7 @@ export const registerUser = async (user, dispatch, navigate) => {
   }
 };
 
-export const getUserProfile = async (accessToken, dispatch, navigate) => {
+export const getUserProfile = async (accessToken, dispatch) => {
   dispatch(getProfileStart());
   try {
     const res = await axios.get(
@@ -113,7 +122,6 @@ export const getUserProfile = async (accessToken, dispatch, navigate) => {
       }
     );
     dispatch(getProfileSuccess(res.data));
-    navigate("/");
   } catch (err) {
     dispatch(getProfileFailed());
   }
@@ -264,6 +272,47 @@ export const deleteUser = async (dispatch, userId, accessToken) => {
     dispatch(deleteUserFailed());
   }
 };
+
+export const changeAvatarImage = async (accessToken, userid, payload, dispatch, navigate) => {
+  dispatch(changeAvatarStart());
+  try {
+    const res = await axios.put(
+      `http://localhost:8081/auctionkoi/users/${userid}/avatar`,
+      payload,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      }
+    );
+    dispatch(changeAvatarSuccess(res.data));
+    getUserProfile(accessToken, dispatch, navigate);
+  } catch (err) {
+    const error = err.response?.data || 'An error occured';
+    dispatch(changeAvatarFailed(error));
+    navigate("/profile");
+  }
+}
+
+export const joinNewAuction = async (accessToken, userid, auctionid, dispatch, navigate) => {
+  dispatch(joinAuctionStart());
+  try {
+    console.log(accessToken);
+    console.log(userid);
+    console.log(auctionid);
+    const res = await axios.post(
+      `http://localhost:8081/auctionkoi/auctions/join/${auctionid}/${userid}`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      }
+    );
+
+    dispatch(joinAuctionSuccess(res.data));
+    navigate("/auctionView");
+  } catch (err) {
+    console.log(err);
+    const error = err.response?.data || 'An error occured';
+    dispatch(joinAuctionFailed(error));
+  }
+}
 
 export const updateUser = async (dispatch, userId, updatedata, accessToken) => {
   dispatch(updateUserStart());

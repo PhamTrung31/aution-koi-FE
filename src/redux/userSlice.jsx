@@ -23,6 +23,11 @@ const userSlice = createSlice({
       isFetching: false,
       error: false,
     },
+    changeAvatar: {
+      success: null,
+      error: null,
+      isFetching: false,
+    },
   },
   reducers: {
     getUserStart: (state) => {
@@ -68,11 +73,21 @@ const userSlice = createSlice({
         (user) => (user.id === action.payload.id ? action.payload : user)
       );
     },
-
     updateUserFailed: (state) => {
       state.updateusers.isFetching = false;
       state.updateusers.error = true;
     },
+    changeAvatarStart: (state) => {
+      state.changeAvatar.isFetching = true
+    },
+    changeAvatarSuccess: (state, action) => {
+       state.changeAvatar.isFetching = false,
+       state.changeAvatar.success = action.payload 
+    },
+    changeAvatarFailed: (state, action) => {
+       state.changeAvatar.isFetching = false,
+       state.changeAvatar.error = action.payload 
+    }
   },
 });
 export const {
@@ -88,5 +103,9 @@ export const {
   updateUserStart,
   updateUserSuccess,
   updateUserFailed,
+  changeAvatarStart,
+  changeAvatarSuccess,
+  changeAvatarFailed
 } = userSlice.actions;
+
 export default userSlice.reducer;

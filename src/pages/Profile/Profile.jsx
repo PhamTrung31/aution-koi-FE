@@ -1,10 +1,15 @@
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import './Profile.css'
 import { useNavigate, Link } from 'react-router-dom'
 import Forbidden403 from '../Forbidden403/Forbidden403'
+import { useEffect, useRef, useState } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import uploadImage from "../../utils/firebase/uploadImage.jsx";
+import { changeAvatarImage, getUserProfile } from '../../redux/apiRequest.jsx';
 
 function Profile({ userRole }) {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   return (
     <body>
@@ -24,7 +29,38 @@ function Profile({ userRole }) {
 }
 
 const MemberProfile = () => {
-  const user = useSelector((state) => state.auth.profile?.currentUser)
+  const { currentUser } = useSelector((state) => state.auth.profile);
+  const token = useSelector((state) => state.auth.login?.currentToken.token);
+  const [img, setImg] = useState("");
+  const inputRef = useRef(null);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleImageClick = () => {
+    inputRef.current.click();
+  }
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    console.log(file);
+    setImg(file);
+  }
+
+  const handleUploadAvatar = async () => {
+    if (!img) {
+      toast.error("No image changes");
+      return;
+    }
+
+    const url = await uploadImage(img);
+    if (url) {
+      const payload = {
+        avatarUrl: url
+      };
+      changeAvatarImage(token, currentUser.id, payload, dispatch, navigate);
+      toast.success("Avatar updated successfully!");
+    }
+  };
 
   return (
     <section style={{ backgroundColor: '#eee' }}>
@@ -34,13 +70,36 @@ const MemberProfile = () => {
             <div className="card mb-4">
               <div className="card-body text-center">
                 <img
-                  src="https://www.redmond.gov/ImageRepository/Document?documentId=15106"
+                  src={currentUser.avatarUrl ? currentUser.avatarUrl : "https://www.redmond.gov/ImageRepository/Document?documentId=15106"}
                   alt="avatar"
                   className="rounded-circle img-fluid"
-                  style={{ width: '150px' }}
+                  style={{ width: '150px', height: '150px' }}
                 />
-                <h5 className="my-3 fs-3">{user.fullname}</h5>
-                <button className='btn btn-primary mt-3'>Change Avatar</button>
+                <h5 className="my-3 fs-3">{currentUser.fullname}</h5>
+                <button className='btn btn-primary mt-3' data-bs-toggle="modal" data-bs-target="#exampleModal">Change avatar</button>
+                {/* Model */}
+                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Choose Avatar</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body" onClick={handleImageClick}>
+                        {img ? (
+                          <img src={URL.createObjectURL(img)} alt="upload" style={{ height: '300px', width: '300px' }} />
+                        ) : (
+                          <img src="\logo\upload.webp" alt="upload" style={{ height: '300px', width: '300px' }} />
+                        )}
+                        <input type="file" ref={inputRef} onChange={handleImageChange} style={{ display: 'none' }} />
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" onClick={handleUploadAvatar}>Save changes</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
             <div className="card mb-4 mb-lg-0">
@@ -82,7 +141,7 @@ const MemberProfile = () => {
                     <p className="mb-0">Full Name</p>
                   </div>
                   <div className="col-sm-9">
-                    <p className="text-muted mb-0">{user.fullname}</p>
+                    <p className="text-muted mb-0">{currentUser.fullname}</p>
                   </div>
                 </div>
                 <hr />
@@ -91,7 +150,7 @@ const MemberProfile = () => {
                     <p className="mb-0">Email / Username</p>
                   </div>
                   <div className="col-sm-9">
-                    <p className="text-muted mb-0">{user.username}</p>
+                    <p className="text-muted mb-0">{currentUser.username}</p>
                   </div>
                 </div>
                 <hr />
@@ -111,7 +170,7 @@ const MemberProfile = () => {
                     <p className="mb-0">Phone</p>
                   </div>
                   <div className="col-sm-9">
-                    <p className="text-muted mb-0">{user.phone}</p>
+                    <p className="text-muted mb-0">{currentUser.phone}</p>
                   </div>
                 </div>
                 <hr />
@@ -120,7 +179,7 @@ const MemberProfile = () => {
                     <p className="mb-0">Address</p>
                   </div>
                   <div className="col-sm-9">
-                    <p className="text-muted mb-0">{user.address}</p>
+                    <p className="text-muted mb-0">{currentUser.address}</p>
                   </div>
                 </div>
               </div>
@@ -138,9 +197,8 @@ const MemberProfile = () => {
                         <div className="col-sm-5">
                           <h6 className="mb-0">Auction #10 - End date: 12/3/2024</h6>
                         </div>
-                        <div className='col-sm-4'>Winner: {user.fullname}</div>
+                        <div className='col-sm-4'>Winner: {currentUser.fullname}</div>
                         <div className="col-sm-2">
-                          {/* <p className="text-muted mb-0">{user.fullname}</p> */}
                           <Link to='/'>View Detail</Link>
                         </div>
                       </div>
@@ -152,9 +210,8 @@ const MemberProfile = () => {
                         <div className="col-sm-5">
                           <h6 className="mb-0">Auction #10 - End date: 12/3/2024</h6>
                         </div>
-                        <div className='col-sm-4'>Winner: {user.fullname}</div>
+                        <div className='col-sm-4'>Winner: {currentUser.fullname}</div>
                         <div className="col-sm-2">
-                          {/* <p className="text-muted mb-0">{user.fullname}</p> */}
                           <Link to='/'>View Detail</Link>
                         </div>
                       </div>
@@ -166,9 +223,8 @@ const MemberProfile = () => {
                         <div className="col-sm-5">
                           <h6 className="mb-0">Auction #10 - End date: 12/3/2024</h6>
                         </div>
-                        <div className='col-sm-4'>Winner: {user.fullname}</div>
+                        <div className='col-sm-4'>Winner: {currentUser.fullname}</div>
                         <div className="col-sm-2">
-                          {/* <p className="text-muted mb-0">{user.fullname}</p> */}
                           <Link to='/'>View Detail</Link>
                         </div>
                       </div>
@@ -191,6 +247,19 @@ const MemberProfile = () => {
           </div>
         </div>
       </div>
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition:Bounce
+      />
     </section>
   )
 }

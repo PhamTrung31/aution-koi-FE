@@ -35,7 +35,7 @@ function ManageStaff() {
   const [address, setAddress] = useState("");
   const [selectedStaff, setSelectedStaff] = useState(null);
   const token = useSelector(
-    (state) => state.auth.login?.currentToken.result.token
+    (state) => state.auth.login?.currentToken.token
   );
   const staffList = useSelector((state) => state.staff.staffs?.allStaffs);
   const dispatch = useDispatch();

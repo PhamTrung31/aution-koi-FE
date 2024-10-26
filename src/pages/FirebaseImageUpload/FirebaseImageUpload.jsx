@@ -1,33 +1,25 @@
 import React, { useEffect, useState } from "react";
-import { imageDb } from "./Config";
-import { getDownloadURL, list, listAll, ref, uploadBytes } from "firebase/storage";
-import { v4 } from "uuid";
+import { imageDb } from "../../utils/firebase/Config.jsx";
+import { getDownloadURL, listAll, ref} from "firebase/storage";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import uploadImage from "../../utils/firebase/uploadImage.jsx"
 
 function FirebaseImageUpload() {
-    const [img, setImg] = useState("")
-    const [imgUrl, setImgUrl] = useState([])
+    const [img, setImg] = useState("");
+    const [imgUrl, setImgUrl] = useState([]);
+    const notify = () => toast.error("Wow so easy!");
 
     const handleClick = async () => {
         if (!img) {
             alert("Please select an image to upload.");
             return;
         }
-
-        try {
-            const imgRef = ref(imageDb, `files/${v4()}`);
-            // Upload the image
-            await uploadBytes(imgRef, img);
-            console.log("File uploaded successfully!");
-
-            // Get the download URL
-            const url = await getDownloadURL(imgRef);
+        const url = await uploadImage(img);
+        if(url) {
             console.log("Download URL:", url);
-
-            // Update the state with the new URL
-            setImgUrl((prevUrls) => [...prevUrls, url]);
-        } catch (error) {
-            console.error("Error uploading file:", error);
         }
+        setImgUrl((prevUrls) => [...prevUrls, url]);
     };
 
     useEffect(() => {
@@ -57,6 +49,21 @@ function FirebaseImageUpload() {
                     </div>
                 )
             })}
+            <br />
+            <button onClick={notify}>Notify!</button>
+            <ToastContainer
+                position="top-center"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+                transition:Bounce
+            />
         </div>
     )
 }

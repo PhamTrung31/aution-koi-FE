@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { logOut } from "../../redux/apiRequest";
 import { FaUsers } from "react-icons/fa";
+import { LuWallet } from "react-icons/lu";
 
 function Header({ userRole }) {
   return (
@@ -74,7 +75,7 @@ const MemberHeader = () => {
               About
             </Nav.Link>
             <NavDropdown
-              title={auctionTitle}
+              title="Auction"
               id="collapsible-nav-dropdown"
               menuVariant="dark"
             >
@@ -98,12 +99,14 @@ const MemberHeader = () => {
             {user?.fullname ? (
               <>
                 <Navbar.Collapse id="navbar-white-example">
-                  <Nav.Link className="fw-bold">
-                    Wallet: {formatWallet} vnd
-                  </Nav.Link>
+                  <Nav.Link className="fw-bold" style={{ color: "#eb1c24" }}>
+                  <LuWallet /> Wallet: {formatWallet} vnd
+                  </Nav.Link>                
+                  
                   <Nav>
                     <NavDropdown
                       id="nav-dropdown-dark-example"
+                      className="fw-bold"
                       title={userTitle ? userTitle : user.fullname}
                       menuVariant="dark"
                     >
@@ -115,21 +118,27 @@ const MemberHeader = () => {
                         Profile
                       </NavDropdown.Item>
                       <NavDropdown.Item
-                        onClick={() => handleUserTitle("Your Balance")}
+                        as={Link}
+                        to="/topup"
+                      // onClick={() => handleUserTitle("Your Balance")}
                       >
-                        Your Balance
+                        Top-Up Wallet
                       </NavDropdown.Item>
-                      <NavDropdown.Item
-                        onClick={() => handleUserTitle("Payment History")}
-                      >
-                        Payment History
+                      <NavDropdown.Item onClick={handleLogout}>
+                        Log out
                       </NavDropdown.Item>
                     </NavDropdown>
                   </Nav>
+
+                  <Nav.Link>
+                    <img
+                      src={user.avatarUrl}
+                      onClick={() => handleUserTitle(user?.fullname)}
+                      height={"50px"}
+                      width={"50px"}
+                    />         
+                  </Nav.Link>
                 </Navbar.Collapse>
-                <Nav.Link id="regis" onClick={handleLogout}>
-                  Log out
-                </Nav.Link>
               </>
             ) : (
               <>

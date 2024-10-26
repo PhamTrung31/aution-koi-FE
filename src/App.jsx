@@ -31,6 +31,7 @@ import Dashboard from "./pages/DashBoard/DashBoard.jsx";
 import BoardChart from "./pages/DashBoard/BoardChart.jsx";
 import StatCard from "./pages/DashBoard/StatCard.jsx";
 import DonutChart from "./pages/DashBoard/DonutChart.jsx";
+import Topup from "./pages/Topup/Topup.jsx";
 
 function App() {
   const CURRENT_USER_ROLE = useSelector((state) =>
@@ -56,7 +57,7 @@ function App() {
     if (CURRENT_USER_ROLE === "STAFF") {
       return <>{children}</>;
     } else {
-      return <Navigate to={"/login"} />;
+      return <Navigate to={"/forbidden403"} />;
     }
   }
 
@@ -64,7 +65,7 @@ function App() {
     if (CURRENT_USER_ROLE === "MANAGER") {
       return <>{children}</>;
     } else {
-      return <Navigate to={"/login"} />;
+      return <Navigate to={"/forbidden403"} />;
     }
   }
 
@@ -86,162 +87,30 @@ function App() {
         <Header userRole={CURRENT_USER_ROLE} />
         <div className="main">
           <Routes>
-            <Route
-              path="/"
-              element={
-                <PublicElement>
-                  <Home userRole={CURRENT_USER_ROLE} />
-                </PublicElement>
-              }
-            />
-            <Route
-              path="/about"
-              element={
-                <PublicElement>
-                  <About />
-                </PublicElement>
-              }
-            />
-            <Route
-              path="/pastAuction"
-              element={
-                <PublicElement>
-                  <PastAuction />
-                </PublicElement>
-              }
-            />
-            <Route
-              path="/login"
-              element={
-                <PublicElement>
-                  <Login />
-                </PublicElement>
-              }
-            />
-            <Route
-              path="/register"
-              element={
-                <PublicElement>
-                  <Register />
-                </PublicElement>
-              }
-            />
-            <Route
-              path="/profile"
-              element={
-                <PublicElement>
-                  <Profile userRole={CURRENT_USER_ROLE} />
-                </PublicElement>
-              }
-            />
-            <Route
-              path="/uploadImage"
-              element={
-                <PublicElement>
-                  <FirebaseImageUpload />
-                </PublicElement>
-              }
-            />
+            <Route path="/" element={<PublicElement><Home userRole={CURRENT_USER_ROLE} /></PublicElement>}/>
+            <Route path="/about" element={<PublicElement><About /></PublicElement>}/>
+            <Route path="/pastAuction" element={<PublicElement><PastAuction /></PublicElement>}/>
+            <Route path="/login" element={<PublicElement><Login /></PublicElement>}/>
+            <Route path="/register" element={<PublicElement><Register /></PublicElement>}/>
+            <Route path="/profile" element={<PublicElement><Profile userRole={CURRENT_USER_ROLE} /></PublicElement>}/>
+            <Route path="/uploadImage" element={<PublicElement><FirebaseImageUpload /></PublicElement>}/>
+                                                
+            <Route path="/currentAuction" element={<MemberElement><CurrentAuction /></MemberElement>}/>
+            <Route path="/auctionView" element={<MemberElement><AuctionView /></MemberElement>}/>
+            <Route path="/topup" element={<MemberElement><Topup /></MemberElement>}/>                         
 
-            <Route
-              path="/currentAuction"
-              element={
-                <MemberElement>
-                  <CurrentAuction />
-                </MemberElement>
-              }
-            />
-            <Route
-              path="/auctionView"
-              element={
-                <MemberElement>
-                  <AuctionView />
-                </MemberElement>
-              }
-            />
+            <Route path="/manageStaff" element={<ManagerElement><ManageStaff /></ManagerElement>} />
+            <Route path="/request" element={<ManagerElement><Request /></ManagerElement>} />
+            <Route path="/dashboard" element={<ManagerElement><Dashboard /></ManagerElement>} />
+            <Route path="/boardchart" element={<ManagerElement><BoardChart /></ManagerElement>} />
+            <Route path="/donutchart" element={<ManagerElement><DonutChart /></ManagerElement>}/>
+            <Route ath="/statcard" element={<ManagerElement><StatCard /></ManagerElement>} />
 
-            <Route
-              path="/manageStaff"
-              element={
-                <ManagerElement>
-                  <ManageStaff />
-                </ManagerElement>
-              }
-            />
-            <Route
-              path="/request"
-              element={
-                <ManagerElement>
-                  <Request />
-                </ManagerElement>
-              }
-            />
-            <Route
-              path="/dashboard"
-              element={
-                <ManagerElement>
-                  <Dashboard />
-                </ManagerElement>
-              }
-            />
-            <Route
-              path="/boardchart"
-              element={
-                <ManagerElement>
-                  <BoardChart />
-                </ManagerElement>
-              }
-            />
-            <Route
-              path="/donutchart"
-              element={
-                <ManagerElement>
-                  <DonutChart />
-                </ManagerElement>
-              }
-            />
-
-            <Route
-              path="/statcard"
-              element={
-                <ManagerElement>
-                  <StatCard />
-                </ManagerElement>
-              }
-            />
-
-            <Route
-              path="/staffrequest"
-              element={
-                <StaffElement>
-                  <StaffRequest />
-                </StaffElement>
-              }
-            />
-            <Route
-              path="/auction"
-              element={
-                <StaffElement>
-                  <Auction />
-                </StaffElement>
-              }
-            />
-            <Route
-              path="/member"
-              element={
-                <StaffElement>
-                  <Member />
-                </StaffElement>
-              }
-            />
-            <Route
-              path="/createrequest"
-              element={
-                <BreederElement>
-                  <CreateRequest />
-                </BreederElement>
-              }
-            />
+            <Route path="/staffrequest" element={<StaffElement><StaffRequest /></StaffElement>}/>
+            <Route path="/auction" element={<StaffElement><Auction /></StaffElement>}/>
+            <Route path="/member" element={<StaffElement><Member /></StaffElement>} />
+                                                
+            <Route path="/createrequest" element={<BreederElement><CreateRequest /></BreederElement>} />
 
             <Route path="/forbidden403" element={<Forbidden403 />} />
             <Route path="*" element={<div>Page Not Found!</div>} />

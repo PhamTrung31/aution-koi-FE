@@ -13,7 +13,15 @@ function Footer() {
         <MDBFooter className='text-white'>
             <MDBContainer className='p-4'>
                 <MDBRow>
-                    <MDBCol lg="6" md="12" className='mb-4 mb-md-0'>
+                    <MDBCol lg="1" md="12" className='mb-4 mb-md-0'>
+                        <img
+                            src="/logo/betokoi.png"
+                            alt="Logo Betokoi"
+                            id="logo"
+                            onClick={() => handleUserTitle(user?.fullname)}
+                        />
+                    </MDBCol>
+                    <MDBCol lg="5" md="12" className='mb-4 mb-md-0'>
                         <p>
                             Lorem ipsum dolor sit amet consectetur, adipisicing elit. Iste atque ea quis molestias.
                             Fugiat pariatur maxime quis culpa corporis vitae repudiandae aliquam voluptatem veniam,
