@@ -194,35 +194,45 @@ function User() {
                 placeholder="UserName"
                 className={styles.roundedInput}
               />
-              <div class="d-flex align-items-center">
-                <h5 class="mb-0 me-2">Role:</h5>
-                <div class="form-check">
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    id="breederCheckbox"
-                    checked={isBreeder}
-                    onChange={(e) => setIsBreeder(e.target.checked)}
-                  />
-                  <label class="form-check-label" for="breederCheckbox">
-                    {isBreeder ? "Breeder" : "Member"}
-                  </label>
-                </div>
-              </div>
+              <div className="container">
+                <div className="row align-items-center">
+                  <div className="col-auto d-flex align-items-center">
+                    <h5 className="mb-0 me-2">Role:</h5>
+                    <div className="form-check">
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        id="breederCheckbox"
+                        checked={isBreeder}
+                        onChange={(e) => setIsBreeder(e.target.checked)}
+                      />
+                      <label
+                        className="form-check-label"
+                        htmlFor="breederCheckbox"
+                      >
+                        {isBreeder ? "Breeder" : "Member"}
+                      </label>
+                    </div>
+                  </div>
 
-              <div class="d-flex align-items-center">
-                <h5 class="mb-0 me-2">Active:</h5>
-                <div class="form-check">
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    id="activeCheckbox"
-                    checked={isactive}
-                    onChange={(e) => setIsActive(e.target.checked)}
-                  />
-                  <label class="form-check-label" for="activeCheckbox">
-                    {isactive ? "Active" : "Inactive"}
-                  </label>
+                  <div className="col-auto d-flex align-items-center ms-5">
+                    <h5 className="mb-0 me-2">Active:</h5>
+                    <div className="form-check">
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        id="activeCheckbox"
+                        checked={isactive}
+                        onChange={(e) => setIsActive(e.target.checked)}
+                      />
+                      <label
+                        className="form-check-label"
+                        htmlFor="activeCheckbox"
+                      >
+                        {isactive ? "Active" : "Inactive"}
+                      </label>
+                    </div>
+                  </div>
                 </div>
               </div>
 

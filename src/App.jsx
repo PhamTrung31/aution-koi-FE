@@ -27,6 +27,10 @@ import StaffRequest from "./pages/StaffRequest/Request.jsx";
 import Auction from "./pages/Auction/Auction.jsx";
 import CreateRequest from "./pages/CreateRequest/CreateRequest.jsx";
 import FirebaseImageUpload from "./pages/FirebaseImageUpload/FirebaseImageUpload.jsx";
+import Dashboard from "./pages/DashBoard/DashBoard.jsx";
+import BoardChart from "./pages/DashBoard/BoardChart.jsx";
+import StatCard from "./pages/DashBoard/StatCard.jsx";
+import DonutChart from "./pages/DashBoard/DonutChart.jsx";
 
 function App() {
   const CURRENT_USER_ROLE = useSelector((state) =>
@@ -169,6 +173,39 @@ function App() {
               element={
                 <ManagerElement>
                   <Request />
+                </ManagerElement>
+              }
+            />
+            <Route
+              path="/dashboard"
+              element={
+                <ManagerElement>
+                  <Dashboard />
+                </ManagerElement>
+              }
+            />
+            <Route
+              path="/boardchart"
+              element={
+                <ManagerElement>
+                  <BoardChart />
+                </ManagerElement>
+              }
+            />
+            <Route
+              path="/donutchart"
+              element={
+                <ManagerElement>
+                  <DonutChart />
+                </ManagerElement>
+              }
+            />
+
+            <Route
+              path="/statcard"
+              element={
+                <ManagerElement>
+                  <StatCard />
                 </ManagerElement>
               }
             />
