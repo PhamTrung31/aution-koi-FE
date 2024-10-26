@@ -1,159 +1,122 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark, faPen } from "@fortawesome/free-solid-svg-icons";
 import styles from "./CreateRequest.module.css";
 import { width } from "@fortawesome/free-solid-svg-icons/fa0";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getAllAuctionRequestByBreederID,
+  addAuctionRequest,
+  deleteAuctionRequest,
+  updateAuctionRequest,
+} from "../../redux/apiRequest";
 const Modal = ({ show, children }) => {
   if (!show) {
     return null;
   }
   return (
     <div className={styles.modalOverlay}>
-      <div className={styles.modalsContent}>
-        {children}
-      </div>
+      <div className={styles.modalsContent}>{children}</div>
     </div>
   );
 };
 function CreateRequest() {
-  const [requests, setRequests] = useState([
-    {
-      id: 1,
-      fishName: "Goldfish",
-      method: "Auction",
-      startPrice: "100",
-      buyOutPrice: "200",
-      startTime: "2024-10-01T10:00",
-      endTime: "2024-10-01T15:00",
-    },
-    {
-      id: 2,
-      fishName: "Betta",
-      method: "Buy Now",
-      startPrice: "150",
-      buyOutPrice: "300",
-      startTime: "2024-10-02T12:00",
-      endTime: "2024-10-02T17:00",
-    },
-    {
-      id: 2,
-      fishName: "Betta",
-      method: "Buy Now",
-      startPrice: "150",
-      buyOutPrice: "300",
-      startTime: "2024-10-02T12:00",
-      endTime: "2024-10-02T17:00",
-    },
-    {
-      id: 2,
-      fishName: "Betta",
-      method: "Buy Now",
-      startPrice: "150",
-      buyOutPrice: "300",
-      startTime: "2024-10-02T12:00",
-      endTime: "2024-10-02T17:00",
-    },
-    {
-      id: 2,
-      fishName: "Betta",
-      method: "Buy Now",
-      startPrice: "150",
-      buyOutPrice: "300",
-      startTime: "2024-10-02T12:00",
-      endTime: "2024-10-02T17:00",
-    },
-    {
-      id: 2,
-      fishName: "Betta",
-      method: "Buy Now",
-      startPrice: "150",
-      buyOutPrice: "300",
-      startTime: "2024-10-02T12:00",
-      endTime: "2024-10-02T17:00",
-    },
-    {
-      id: 2,
-      fishName: "Betta",
-      method: "Buy Now",
-      startPrice: "150",
-      buyOutPrice: "300",
-      startTime: "2024-10-02T12:00",
-      endTime: "2024-10-02T17:00",
-    },
-  ]);
-  const handleAdd = async (e) => {
-    e.preventDefault();
-    const staffData = {};
-  };
+  const [userId, setuserId] = useState("");
+  const [fishId, setfishId] = useState("");
+  const [buyOut, setbuyOut] = useState("");
+  const [startPrice, setstartPrice] = useState("");
+  const [methodType, setmethodType] = useState("");
+  const [start_time, setstart_time] = useState("");
+  const [end_time, setend_time] = useState("");
 
-  const [editForm, setEditForm] = useState({
-    id: "",
-    fishName: "",
-    method: "",
-    startPrice: "",
-    buyOutPrice: "",
-    startTime: "",
-    endTime: "",
-  });
+  const [selectedUser, setSelectedUser] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
 
-  const handleEditRequest = (request) => {
-    setEditForm(request);
-    setShowEditModal(true);
-  };
+  const token = useSelector(
+    (state) => state.auth.login?.currentToken.result.token
+  );
+  const breeder = useSelector((state) => state.auth.profile?.currentUser);
+  const aucionRequestList = useSelector(
+    (state) => state.auctionrequest.auctionrequests?.auctionrequests
+  );
+  const dispatch = useDispatch();
+  console.log(token);
+  useEffect(() => {
+    getAllAuctionRequestByBreederID(token, breeder.id, dispatch);
+    console.log(aucionRequestList);
+  }, []);
 
-  const handleSaveChanges = () => {
-    const updatedRequests = requests.map((request) =>
-      request.id === editForm.id ? editForm : request
-    );
-    setRequests(updatedRequests);
-    setShowEditModal(false);
-  };
+  // const handleAddUser = async (e) => {
+  //   e.preventDefault();
+  //   setUsername("");
+  //   setPassword("");
+  //   setFullname("");
+  //   setPhone("");
+  //   setAddress("");
+  //   setAvatarUrl("");
+  //   setIsBreeder(false);
+  //   setShowAddModal(false);
+  //   const userData = {
+  //     username: username,
+  //     password: password,
+  //     fullname: fullname,
+  //     phone: phone,
+  //     address: address,
+  //     avatar_url: avatarurl,
+  //     isBreeder: isBreeder,
+  //   };
+  //   await addUser(dispatch, userData, token);
+  // };
+  // const handleUpdateUser = async (e) => {
+  //   e.preventDefault();
+  //   setId("");
+  //   setUsername("");
+  //   setPassword("");
+  //   setFullname("");
+  //   setPhone("");
+  //   setAddress("");
+  //   setIsActive("");
+  //   setIsBreeder(false);
+  //   const userData = {
+  //     userId: id,
+  //     username: username,
+  //     password: password,
+  //     fullname: fullname,
+  //     phone: phone,
+  //     address: address,
+  //     avatar_url: avatarurl,
+  //     isActive: isactive,
+  //     isBreeder: isBreeder,
+  //   };
+  //   await updateUser(dispatch, selectedUser.id, userData, token);
+  //   setShowEditModal(false);
+  // };
 
-  const [newRequest, setNewRequest] = useState({
-    id: "",
-    fishName: "",
-    method: "",
-    startPrice: "",
-    buyOutPrice: "",
-    startTime: "",
-    endTime: "",
-  });
-
-  const handleAddInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewRequest((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  };
-
-  const handleAddRequest = () => {
-    setRequests([...requests, { ...newRequest, id: requests.length + 1 }]);
-
-    setNewRequest({
-      id: "",
-      fishName: "",
-      method: "",
-      startPrice: "",
-      buyOutPrice: "",
-      startTime: "",
-      endTime: "",
-    });
-    setShowAddModal(false);
-  };
-
-  const handleDeleteRequest = (id) => {
-    const updatedRequests = requests.filter((request) => request.id !== id);
-    setRequests(updatedRequests);
-  };
+  // const openEditModal = (user) => {
+  //   setSelectedUser(user);
+  //   setId(user.id);
+  //   setUsername(user.username);
+  //   setPassword(user.password);
+  //   setFullname(user.fullname);
+  //   setPhone(user.phone);
+  //   setAddress(user.address);
+  //   setAvatarUrl(user.avatar_url);
+  //   setIsActive(user.isActive);
+  //   setIsBreeder(user.isBreeder);
+  //   setShowEditModal(true);
+  // };
+  // const handleDeleteUser = async (id) => {
+  //   if (window.confirm("Are you sure you want to delete this user?")) {
+  //     await deleteUser(dispatch, id, token);
+  //   }
+  // };
 
   return (
     <div className="container py-3 table">
       <h2 className="mb-5 text-center">Your Auction Request</h2>
-      <table class="table table-light table-bordered border border-danger shadow p-3 mb-5 rounded-4">
-        <tr className="table-danger">
+      <table class="table table-light table-bordered border border-dark shadow p-3 mb-5 rounded-4 overflow-auto">
+        <tr className="table-dark ">
           <th>ID</th>
           <th>Fish Name</th>
           <th>Method</th>
@@ -163,43 +126,50 @@ function CreateRequest() {
           <th>End Time</th>
           <th>Action</th>
         </tr>
-        {requests.map((request, index) => (
-          <tr key={index}>
-            <td>{request.id}</td>
-            <td>{request.fishName}</td>
-            <td>{request.method}</td>
-            <td>{request.startPrice}</td>
-            <td>{request.buyOutPrice}</td>
-            <td>{request.startTime}</td>
-            <td>{request.endTime}</td>
-            <td>
-              <button
-                className={styles.actionBtn + " " + styles.editBtn}
-                onClick={() => handleEditRequest(request)}
-              >
-                <FontAwesomeIcon icon={faPen} />
-              </button>
-              <button
-                className={styles.actionBtn + " " + styles.deleteBtn}
-                onClick={() => handleDeleteRequest(request.id)}
-              >
-                <FontAwesomeIcon icon={faXmark} />
-              </button>
-            </td>
-          </tr>
-        ))}
+
+        {aucionRequestList?.map((request) => {
+          return (
+            <tr key={request.id}>
+              <td>{request.id}</td>
+              <td>{request.fishName}</td>
+              <td>{request.method}</td>
+              <td>{request.startPrice}</td>
+              <td>{request.buyOutPrice}</td>
+              <td>{request.startTime}</td>
+              <td>{request.endTime}</td>
+              <td>
+                <button
+                  className={styles.actionBtn + " " + styles.editBtn}
+                  onClick={() => handleEditRequest(request)}
+                >
+                  <FontAwesomeIcon icon={faPen} />
+                </button>
+                <button
+                  className={styles.actionBtn + " " + styles.deleteBtn}
+                  onClick={() => handleDeleteRequest(request.id)}
+                >
+                  <FontAwesomeIcon icon={faXmark} />
+                </button>
+              </td>
+            </tr>
+          );
+        })}
       </table>
 
       <button
-        className={styles.buttonkoi + " btn btn-outline-danger"}
+        className={styles.buttonkoi + " btn btn-outline-dark"}
         onClick={() => setShowAddModal(true)}
       >
         Create New Request
       </button>
-
-      <Modal show={showAddModal}>
+      {/* <Modal show={showAddModal}>
         <div class="position-relative p-2 text-center text-muted bg-body border border-dashed rounded-5">
-          <button type="button" class="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill" aria-label="Close" onClick={() => setShowAddModal(false)}></button>
+          <button
+            type="button"
+            class="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill"
+            aria-label="Close"
+            onClick={() => setShowAddModal(false)}
+          ></button>
           <h1 class="text-body-emphasis">Create New Request</h1>
           <div className={styles.formContainer}>
             <div className={styles.leftColumn}>
@@ -270,7 +240,7 @@ function CreateRequest() {
                 className={styles.roundedInput}
               />
 
-              <button className=" btn btn-danger" onClick={handleAddRequest}>
+              <button className=" btn btn-dark" onClick={handleAddRequest}>
                 Create Request
               </button>
             </div>
@@ -279,12 +249,21 @@ function CreateRequest() {
       </Modal>
       <Modal show={showEditModal}>
         <div class="position-relative p-2 text-center text-muted bg-body border border-dashed rounded-5">
-          <button type="button" class="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill" aria-label="Close" onClick={() => setShowEditModal(false)}></button>
+          <button
+            type="button"
+            class="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill"
+            aria-label="Close"
+            onClick={() => setShowEditModal(false)}
+          ></button>
           <h1 class="text-body-emphasis">Edit Request</h1>
           <div className={styles.formContainer}>
             <div className={styles.leftColumn}>
               <div className={styles.importBox}>
-              <img src="https://www.acaquarium.com/wp-content/uploads/2023/02/ammonia-poisoning-in-goldfish.jpg" class="img-thumbnail" alt="..."/>
+                <img
+                  src="https://www.acaquarium.com/wp-content/uploads/2023/02/ammonia-poisoning-in-goldfish.jpg"
+                  class="img-thumbnail"
+                  alt="..."
+                />
               </div>
               <div className={styles.importBox}>
                 <label htmlFor="importVideo">Import Video</label>
@@ -297,7 +276,9 @@ function CreateRequest() {
                 type="text"
                 name="id"
                 value={editForm.id}
-                onChange={(e) => setEditForm({ ...editForm, id: e.target.value })}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, id: e.target.value })
+                }
                 placeholder="ID"
                 className={styles.roundedInput}
               />
@@ -315,7 +296,9 @@ function CreateRequest() {
                 type="text"
                 name="method"
                 value={editForm.method}
-                onChange={(e) => setEditForm({ ...editForm, method: e.target.value })}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, method: e.target.value })
+                }
                 placeholder="Method"
                 className={styles.roundedInput}
               />
@@ -360,13 +343,13 @@ function CreateRequest() {
                 placeholder="End Time"
               />
 
-              <button className="btn btn-danger" onClick={handleSaveChanges}>
+              <button className="btn btn-dark" onClick={handleSaveChanges}>
                 Save Changes
               </button>
             </div>
           </div>
         </div>
-        {/* <h2>Edit Request</h2>
+        <h2>Edit Request</h2>
         <input
           type="text"
           name="id"
@@ -435,8 +418,8 @@ function CreateRequest() {
         />
         <button className="btn btn-danger" onClick={handleSaveChanges}>
           Save Changes
-        </button> */}
-      </Modal>
+        </button>
+      </Modal> */}
     </div>
   );
 }

@@ -180,10 +180,10 @@ const ManagerNavbar = () => {
             <Nav.Link as={Link} to="/manageStaff">
               <FaUsers /> Manage Staff
             </Nav.Link>
-            <Nav.Link as={Link} to="#">
+            <Nav.Link as={Link} to="/request">
               Auction Request
             </Nav.Link>
-            <Nav.Link as={Link} to="#">
+            <Nav.Link as={Link} to="/dashboard">
               Dashboard
             </Nav.Link>
           </Nav>
@@ -350,6 +350,14 @@ const StaffNavbar = () => {
               onClick={() => handleUserTitle(user?.fullname)}
             >
               Request
+            </Nav.Link>
+
+            <Nav.Link
+              as={Link}
+              to="/member"
+              onClick={() => handleUserTitle(user?.fullname)}
+            >
+              member
             </Nav.Link>
           </Nav>
           <Nav>
