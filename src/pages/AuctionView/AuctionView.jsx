@@ -3,14 +3,30 @@ import { Link } from 'react-router-dom';
 import React, { useEffect, useRef, useState } from 'react';
 import { Button } from 'bootstrap';
 
-function AuctionView() {
+function AuctionView({ auctionType }) {
+    return (
+        <body>
+            {auctionType === 1 ? (
+                <IncreasingAuction />
+            ) : auctionType === 2 ? (
+                <AnonymousAuction />
+            ) : auctionType === 3 ? (
+                <BuyOutAuction />
+            ) : (
+                <div>Page Not Found!</div>
+            )}
+        </body>
+    )
+}
 
+const IncreasingAuction = () => {
     const [buyOut, setBuyOut] = useState(6000000);
-    const [highestBid, setHigestBid] = useState(3000000);
-    const [bid, setBid] = useState(highestBid + highestBid * 0.1);
+    const [highestBid, setHighestBid] = useState(3000000);    
+    const [incre, setIncre] = useState(200000);
+    const [step, setStep] = useState(1);
+    const [bid, setBid] = useState(highestBid + incre*step);
     const [autoBid, setAutoBid] = useState(0);
     const [maxBid, setMaxBid] = useState(0);
-    const [incre, setIncre] = useState(0);
 
     const [timerDays, setTimerDays] = useState('00');
     const [timerHours, setTimerHours] = useState('00');
@@ -127,10 +143,11 @@ function AuctionView() {
                         <div type="button" className="p-2 btn btn-outline-success btn-lg w-100">
                             <div><span className='fw-bold'>Buy Out</span>: {buyOut} vnd</div>
                         </div><br />
+                        <hr className="my-4" />
 
                         {/* Bid Area */}
                         <div>
-                            <h4 className="mt-4">Put Your Bid Here</h4>
+                            <h4 className="mt-4">Auction's Increment: <span className='text-danger'>{incre}</span> vnd</h4>
                             <form className="needs-validation" noValidate>
                                 <div className="row g-3">
                                     {autoBid === 0 ? (
@@ -151,8 +168,8 @@ function AuctionView() {
                                             </div>
 
                                             <div className="col-md-4">
-                                                <label for="form-label">Increment</label>
-                                                <select
+                                                <label for="floatingBid">Step</label>
+                                                {/* <select
                                                     className="form-select"
                                                     id="form-label"
                                                     value={incre}
@@ -165,7 +182,17 @@ function AuctionView() {
                                                     <option value={0.1}>10%</option>
                                                     <option value={0.2}>20%</option>
                                                     <option value={0.5}>50%</option>
-                                                </select>
+                                                </select> */}
+                                                <input
+                                                    type="number"
+                                                    className="form-control rounded-3"
+                                                    id="floatingBid"
+                                                    value={step}
+                                                    onChange={(e) => {
+                                                        setStep(e.target.value);
+                                                        setBid(highestBid + incre * e.target.value)
+                                                    }}
+                                                />
                                             </div>
                                             <div className="col-md-4">
                                                 <button className='btn btn-danger w-100' onClick={handleAutoBid}>Auto Bid</button>
@@ -329,6 +356,18 @@ function AuctionView() {
                 </div>
             </main>
         </div>
+    );
+}
+
+const AnonymousAuction = () => {
+    return (
+        <div>Anonymous Auction</div>
+    );
+}
+
+const BuyOutAuction = () => {
+    return (
+        <div>Buy Out Auction</div>
     );
 }
 
