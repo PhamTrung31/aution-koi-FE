@@ -6,6 +6,7 @@ import userReducer from "./userSlice";
 import breederReducer from "./breederSlice";
 import auctionrequestReducer from "./auctionRequestSlice";
 import auctionReducer from "./auctionSlice";
+import walletReducer from "./walletSlice";
 import {
   persistStore,
   persistReducer,
@@ -19,13 +20,19 @@ import {
 import sessionStorage from "redux-persist/lib/storage/session"; // Sử dụng sessionStorage
 
 // Cấu hình persist cho auth (hoặc các slice khác nếu cần)
-const persistConfig = {
+const authPersistConfig = {
   key: "auth",
   storage: sessionStorage, // Đổi từ localStorage sang sessionStorage
 };
 
+const walletPersistConfig = {
+  key: "wallet",
+  storage: sessionStorage,
+};
+
 // Tạo persist reducer cho auth
-const persistedAuthReducer = persistReducer(persistConfig, authReducer);
+const persistedAuthReducer = persistReducer(authPersistConfig, authReducer);
+const persistedWalletReducer = persistReducer(walletPersistConfig, walletReducer);
 
 // Tạo store
 const store = configureStore({
@@ -36,7 +43,8 @@ const store = configureStore({
     user: userReducer,
     breeder: breederReducer,
     auctionrequest: auctionrequestReducer,
-    auction: auctionReducer
+    auction: auctionReducer,
+    wallet: persistedWalletReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

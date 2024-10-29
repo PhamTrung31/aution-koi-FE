@@ -32,6 +32,7 @@ import BoardChart from "./pages/DashBoard/BoardChart.jsx";
 import StatCard from "./pages/DashBoard/StatCard.jsx";
 import DonutChart from "./pages/DashBoard/DonutChart.jsx";
 import Topup from "./pages/Topup/Topup.jsx";
+import TopupSuccess from "./pages/TopupSuccess/TopupSuccess.jsx";
 
 function App() {
   const CURRENT_USER_ROLE = useSelector((state) =>
@@ -96,15 +97,16 @@ function App() {
             <Route path="/uploadImage" element={<PublicElement><FirebaseImageUpload /></PublicElement>}/>
                                                 
             <Route path="/currentAuction" element={<MemberElement><CurrentAuction /></MemberElement>}/>
-            <Route path="/auctionView" element={<MemberElement><AuctionView /></MemberElement>}/>
-            <Route path="/topup" element={<MemberElement><Topup /></MemberElement>}/>                         
+            <Route path="/auctionView" element={<MemberElement><AuctionView auctionType={1}/></MemberElement>}/>
+            <Route path="/topup" element={<MemberElement><Topup /></MemberElement>}/>
+            <Route path="/topupSuccess" element={<MemberElement><TopupSuccess /></MemberElement>}/>                         
 
             <Route path="/manageStaff" element={<ManagerElement><ManageStaff /></ManagerElement>} />
             <Route path="/request" element={<ManagerElement><Request /></ManagerElement>} />
             <Route path="/dashboard" element={<ManagerElement><Dashboard /></ManagerElement>} />
             <Route path="/boardchart" element={<ManagerElement><BoardChart /></ManagerElement>} />
             <Route path="/donutchart" element={<ManagerElement><DonutChart /></ManagerElement>}/>
-            <Route ath="/statcard" element={<ManagerElement><StatCard /></ManagerElement>} />
+            <Route path="/statcard" element={<ManagerElement><StatCard /></ManagerElement>} />
 
             <Route path="/staffrequest" element={<StaffElement><StaffRequest /></StaffElement>}/>
             <Route path="/auction" element={<StaffElement><Auction /></StaffElement>}/>
