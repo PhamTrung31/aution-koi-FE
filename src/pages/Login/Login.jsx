@@ -1,9 +1,8 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { FaGoogle } from "react-icons/fa";
 import { loginPayload } from "../../redux/apiRequest";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { loginInitial } from "../../redux/authSlice";
@@ -22,12 +21,11 @@ function Login() {
             username: username,
             password: password
         };
-
         loginPayload(payload, dispatch, navigate);
     }
 
-    async function handleGoogleLogin() {
-
+    const googleLogin = () => {
+        window.location.href = `http://localhost:8081/auctionkoi/login/oauth2y/google`
     }
 
     useEffect(() => {
@@ -39,9 +37,9 @@ function Login() {
 
 
     return (
-        <div className="modal modal-sheet position-static d-block bg-body-secondary p-4 py-md-5" tabindex="-1" role="dialog" id="modalSignin">
-            <div className="modal-dialog" role="document">
-                <div className="modal-content rounded-4 shadow">
+        <div className="modal-sheet position-static d-block bg-body-secondary p-4 py-md-5 d-flex align-items-center" tabindex="-1" role="dialog" id="modalSignin">
+            <div className="modal-dialog p-4 py-md-5 w-25" role="document">
+                <div className="modal modal-content rounded-4 shadow">
                     <div className="modal-header p-5 pb-4 border-bottom-0" style={{ justifyContent: "center" }}>
                         <h1 className="fw-bold mb-0 fs-2">Login</h1>
                     </div>
@@ -74,32 +72,34 @@ function Login() {
                                 type="submit">
                                 Log In
                             </button>
-                            <button
+                            <Link
                                 className="w-100 py-2 mb-2 btn btn-outline-danger rounded-3"
-                                type="button">
+                                type="button"
+                                onClick={googleLogin}
+                            >
                                 <svg
                                     className="bi me-1"
                                     width="16"
                                     height="16"><use xlink:href="#google"></use></svg>
                                 Continue with Google <FaGoogle />
-                            </button>
+                            </Link>
                         </div>
                     </form>
+                    <ToastContainer
+                        position="top-center"
+                        autoClose={5000}
+                        hideProgressBar={false}
+                        newestOnTop={false}
+                        closeOnClick
+                        rtl={false}
+                        pauseOnFocusLoss
+                        draggable
+                        pauseOnHover
+                        theme="light"
+                        transition:Bounce
+                    />
                 </div>
             </div>
-            <ToastContainer
-                position="top-center"
-                autoClose={5000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme="light"
-                transition:Bounce
-            />
         </div >
     );
 }

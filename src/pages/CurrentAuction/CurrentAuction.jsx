@@ -23,8 +23,47 @@ function CurrentAuction() {
     const navigate = useNavigate();
     let interval = useRef();
 
+    const [auctionStartInfo, setAuctionStartInfo] = useState({
+        auction_id: 0,
+        fish_id: 0,
+        fish_name: "",
+        fish_age: 0,
+        fish_size: 0,
+        fish_sex: "",
+        imageUrl: "",
+        videoUrl: "",
+        auction_status: "",
+        deposit_amount: 0,
+        start_time: "",
+        end_time: "",
+        buy_out: 0,
+        highestBid: 0,
+    });
+
+    useEffect(() => {
+        // Simulated WebSocket connection and receiving data
+        const ws = new WebSocket("ws://localhost:8081/auctionkoi/ws");
+
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            const startDate = new Date(data.start_time);
+            const currentDate = new Date();
+            const countdownTime = startDate.getTime() - currentDate.getTime();
+
+            setAuctionStartInfo((prev) => ({
+                ...prev,
+                ...data,
+                countdownDate: countdownTime > 0 ? countdownTime : 0,
+            }));
+        };
+
+        return () => {
+            ws.close(); // Clean up the WebSocket connection on unmount
+        };
+    }, []);
+
     const startTimer = () => {
-        const countdownDate = new Date('10-30-2024 00:00:00').getTime();
+        const countdownDate = new Date('11-01-2024 00:00:00').getTime();
 
         interval = setInterval(() => {
             const now = new Date().getTime();
