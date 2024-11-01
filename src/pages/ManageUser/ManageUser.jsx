@@ -38,7 +38,9 @@ function User() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [avatarurl, setAvatarUrl] = useState("");
 
-  const token = useSelector((state) => state.auth.login?.currentToken.token);
+  const token = useSelector(
+    (state) => state.auth.login?.currentToken.result.token
+  );
   const userList = useSelector((state) => state.user.users?.allUsers);
   const dispatch = useDispatch();
   console.log(token);

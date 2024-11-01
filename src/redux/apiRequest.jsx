@@ -56,7 +56,10 @@ import {
   banUserFailed,
   unbanUserStart,
   unbanUserSuccess,
-  unbanUserFailed
+  unbanUserFailed,
+  changeAvatarStart,
+  changeAvatarSuccess,
+  changeAvatarFailed
 } from "./userSlice";
 import {
   getAuctionRequestStart,
@@ -97,15 +100,20 @@ import {
   updateKoiFishFailed
 } from "./koifishSlice";
 import {
-  changeAvatarStart,
-  changeAvatarSuccess,
-  changeAvatarFailed
-} from "./userSlice";
+  topupWalletStart,
+  topupWalletSuccess,
+  topupWalletFailed
+} from "./walletSlice";
 import {
   joinAuctionStart,
   joinAuctionSuccess,
   joinAuctionFailed
 } from "./auctionSlice";
+import {
+  getUserWalletStart,
+  getUserWalletSuccess,
+  getUserWalletFailed
+} from "./walletSlice";
 
 export const loginPayload = async (payload, dispatch, navigate) => {
   dispatch(loginStart());
@@ -145,6 +153,7 @@ export const getUserProfile = async (accessToken, dispatch) => {
       }
     );
     dispatch(getProfileSuccess(res.data));
+    getUserWallet(res.data.id, dispatch);
   } catch (err) {
     dispatch(getProfileFailed());
   }
@@ -340,16 +349,16 @@ export const changeAvatarImage = async (accessToken, userid, payload, dispatch, 
 export const joinNewAuction = async (accessToken, userid, auctionid, dispatch, navigate) => {
   dispatch(joinAuctionStart());
   try {
-    console.log(accessToken);
-    console.log(userid);
-    console.log(auctionid);
+    
     const res = await axios.post(
       `http://localhost:8081/auctionkoi/auctions/join/${auctionid}/${userid}`,
       {
         headers: { Authorization: `Bearer ${accessToken}` }
       }
     );
-
+    console.log(accessToken);
+    console.log(userid);
+    console.log(auctionid);
     dispatch(joinAuctionSuccess(res.data));
     navigate("/auctionView");
   } catch (err) {
@@ -613,3 +622,33 @@ export const apporve = async (dispatch, approvedata, accessToken) => {
 //     dispatch(updateUserFailed());
 //   }
 // };
+
+export const topupWalletRequest = async (payload, dispatch, navigate) => {
+  dispatch(topupWalletStart());
+  try {
+    const res = await axios.post(
+      `http://localhost:8081/auctionkoi/vnpay/submitOrder`,
+      payload
+    );
+    console.log(res.data);
+    dispatch(topupWalletSuccess(res.data));
+    // navigate(res.data.vnpayUrl);
+    window.location.href = res.data.vnpayUrl;
+  } catch (err) {
+    const error = err.response?.data || "An error occured";
+    dispatch(topupWalletFailed(error));
+    navigate("/topup");
+  }
+};
+
+export const getUserWallet = async (userid, dispatch) => {
+  dispatch(getUserWalletStart());
+  try {
+    const res = await axios.get(`http://localhost:8081/auctionkoi/wallet/${userid}`);
+    console.log(res.data.result)
+    dispatch(getUserWalletSuccess(res.data.result));
+  } catch (err) {
+    const error = err.response?.data || "An error occured";
+    dispatch(getUserWalletFailed(error));
+  }
+}

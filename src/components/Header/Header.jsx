@@ -25,12 +25,12 @@ function Header({ userRole }) {
 
 const MemberHeader = () => {
   const user = useSelector((state) => state.auth.profile?.currentUser);
+  const wallet = useSelector((state) => state.wallet.currentWallet?.data);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [userTitle, setUserTitle] = useState(user ? user.fullname : null);
   const [auctionTitle, setAuctionTitle] = useState("Auction");
-  const [wallet, setWallet] = useState(100000000);
-  const formatWallet = new Intl.NumberFormat("de-DE").format(wallet);
+  const formatWallet = new Intl.NumberFormat("de-DE").format(wallet?.balance);
 
   const handleUserTitle = (title) => {
     setUserTitle(title);

@@ -1,9 +1,26 @@
 import { SiMoneygram } from "react-icons/si";
 import { SiWebmoney } from "react-icons/si";
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom';
+import { topupWalletRequest } from "../../redux/apiRequest";
+import { useDispatch, useSelector } from "react-redux";
+import { useState} from "react";
 
 
 function Topup() {
+    const [money, setMoney] = useState(0);
+    const user = useSelector((state) => state.auth.profile?.currentUser);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const handleTopup = (e) => {
+        e.preventDefault();
+        const body = {
+            amount: money,
+            memberId: user.id,
+        }
+        topupWalletRequest(body, dispatch, navigate);
+    }
+
     return (
         <div class="col-lg-8 mx-auto p-4 py-md-5">
             <header class="d-flex align-items-center pb-3 mb-5 border-bottom">
@@ -15,6 +32,7 @@ function Topup() {
 
             <main>
                 <div className="row g-5">
+                    {/* Slider */}
                     <div className="col-md-5 col-lg-4 order-md-last">
                         <div id="carouselExampleInterval" className="carousel slide w-50" data-bs-ride="carousel">
                             <div className="carousel-inner">
@@ -38,6 +56,8 @@ function Topup() {
                             </button>
                         </div>
                     </div>
+
+                    {/* Input */}
                     <div className="col-md-7 col-lg-8">
                         <div class="form-floating">
                             <select class="form-select" id="floatingSelect" aria-label="Floating label select example">
@@ -51,8 +71,8 @@ function Topup() {
                         <form class="card p-3 mt-4">
                             <div class="input-group">
                                 <span class="input-group-text">vnd</span>
-                                <input type="number" class="form-control" placeholder="Enter Money Here" />
-                                <button type="submit" class="btn btn-outline-danger">Top-up</button>
+                                <input type="number" class="form-control" placeholder="Enter Money Here" onChange={(e) => setMoney(e.target.value)}/>
+                                <button type="submit" class="btn btn-outline-danger" onClick={handleTopup}>Top-up</button>
                             </div>
                         </form>
                     </div>
