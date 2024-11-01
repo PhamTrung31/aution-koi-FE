@@ -97,7 +97,7 @@ function App() {
             <Route path="/uploadImage" element={<PublicElement><FirebaseImageUpload /></PublicElement>}/>
                                                 
             <Route path="/currentAuction" element={<MemberElement><CurrentAuction /></MemberElement>}/>
-            <Route path="/auctionView" element={<MemberElement><AuctionView auctionType={3}/></MemberElement>}/>
+            <Route path="/auctionView" element={<MemberElement><AuctionView auctionType={0}/></MemberElement>}/>
             <Route path="/topup" element={<MemberElement><Topup /></MemberElement>}/>
             <Route path="/topupSuccess" element={<MemberElement><TopupSuccess /></MemberElement>}/>                         
 

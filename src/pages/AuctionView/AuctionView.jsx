@@ -3,18 +3,17 @@ import { Link } from "react-router-dom";
 import React, { useEffect, useRef, useState } from "react";
 import { Button } from "bootstrap";
 import { Client } from "@stomp/stompjs";
-import SockJS from "sockjs-client";
 
 let stompClient;
 
 function AuctionView({ auctionType }) {
   return (
     <body>
-      {auctionType === 1 ? (
+      {auctionType === 0 ? (
         <IncreasingAuction />
-      ) : auctionType === 2 ? (
+      ) : auctionType === 1 ? (
         <AnonymousAuction />
-      ) : auctionType === 3 ? (
+      ) : auctionType === 2 ? (
         <BuyOutAuction />
       ) : (
         <div>Page Not Found!</div>
@@ -24,30 +23,17 @@ function AuctionView({ auctionType }) {
 }
 
 const IncreasingAuction = () => {
-  const [buyOut, setBuyOut] = useState(6000000);
   const [highestBid, setHighestBid] = useState(3000000);
   const [incre, setIncre] = useState(200000);
   const [step, setStep] = useState(1);
   const [bid, setBid] = useState(highestBid + incre * step);
   const [autoBid, setAutoBid] = useState(0);
   const [maxBid, setMaxBid] = useState(0);
+  const [countdown, setCountdown] = useState();
 
-  const [auctionStartInfo, setAuctionStartInfo] = useState({
-    auction_id: 0,
-    fish_id: 0,
-    fish_name: "",
-    fish_age: 0,
-    fish_size: 0,
-    fish_sex: "",
-    imageUrl: "",
-    videoUrl: "",
-    auction_status: "",
-    deposit_amount: 0,
-    start_time: "",
-    end_time: "",
-    buy_out: 0,
-    highestBid: 0,
-  });
+  const [message, setMessage] = useState(
+    JSON.parse(sessionStorage.getItem('websocketMessage')) || null
+  );
 
   const [timerDays, setTimerDays] = useState("00");
   const [timerHours, setTimerHours] = useState("00");
@@ -57,62 +43,42 @@ const IncreasingAuction = () => {
   let interval = useRef();
 
   useEffect(() => {
-    // Configure and connect STOMP client
-    const stompClient = Stomp.client("ws://localhost:8081/auctionkoi");
+    const client = new Client({
+      brokerURL: "ws://localhost:8081/auctionkoi/ws",
+      onConnect: () => {
+        console.log('Connected to WebSocket');
 
-    stompClient.connect({}, () => {
-      // Subscribe to topic and handle incoming messages
-      stompClient.subscribe("/auctions", (message) => {
-        if (message.body) {
-          const data = JSON.parse(message.body);
-          const startDate = new Date(data.start_time);
-          const currentDate = new Date();
-          const countdownTime = startDate.getTime() - currentDate.getTime();
+        client.subscribe('/auctions/start', (msg) => {
+          const parsedMessage = JSON.parse(msg.body);
 
-          setAuctionStartInfo((prev) => ({
-            ...prev,
-            ...data,
-            countdownDate: countdownTime > 0 ? countdownTime : 0,
-          }));
-        }
-      });
+          // Lưu vào sessionStorage
+          sessionStorage.setItem('websocketMessage', JSON.stringify(parsedMessage));
+
+          // Cập nhật state để component render lại khi message thay đổi
+          setMessage(parsedMessage);
+        });
+      },
+      onStompError: (frame) => {
+        console.error('Broker reported error: ' + frame.headers['message']);
+        console.error('Additional details: ' + frame.body);
+      },
     });
 
+    client.activate();
+
     return () => {
-      // Disconnect the client when component unmounts
-      if (stompClient.connected) {
-        stompClient.disconnect();
-      }
+      client.deactivate();
     };
-  }, []);
-
-  useEffect(() => {
-    if (auctionStartInfo.countdownDate > 0) {
-      interval.current = setInterval(() => {
-        setAuctionStartInfo((prev) => ({
-          ...prev,
-          countdownDate: prev.countdownDate - 1000,
-        }));
-      }, 1000);
-    }
-
-    return () => clearInterval(interval.current);
-  }, [auctionStartInfo.countdownDate]);
-
-  // Format countdown time to mm:ss
-  const formatCountdown = (milliseconds) => {
-    const totalSeconds = Math.floor(milliseconds / 1000);
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    return `${minutes}m ${seconds}s`;
-  };
+  }, []); // Chỉ chạy một lần khi component mount
 
   const startTimer = () => {
-    const countdownDate = new Date("10-30-2024 17:58:00").getTime();
+    if (!message?.end_time) return;
+
+    const countdownDate = new Date(message.end_time).getTime();
 
     interval = setInterval(() => {
       const now = new Date().getTime();
-      const distance = countdownDate - now;
+      const distance = countdownDate - now - (7 * 60 * 60 * 1000);
 
       const days = Math.floor(distance / (1000 * 60 * 60 * 24));
       const hours = Math.floor(
@@ -139,7 +105,7 @@ const IncreasingAuction = () => {
     return () => {
       clearInterval(interval.current);
     };
-  });
+  }, [message]);
 
   const handleAutoBid = (e) => {
     e.preventDefault();
@@ -150,15 +116,15 @@ const IncreasingAuction = () => {
 
   return (
     <div className="container" style={{ marginBottom: "28.5px" }}>
-      <main>
+      {message ? <main>
         <div className="py-5 text-center">
           <h2>Auction's Time Left:</h2>
           <p className="lead mb-4 fs-1">
             {timerDays == 1
               ? timerDays + " day"
               : timerDays == 0
-              ? ""
-              : timerDays + " days"}{" "}
+                ? ""
+                : timerDays + " days"}{" "}
             {timerHours < 10 ? "0" + timerHours : timerHours}:
             {timerMinutes < 10 ? "0" + timerMinutes : timerMinutes}:
             {timerSeconds < 10 ? "0" + timerSeconds : timerSeconds}
@@ -226,7 +192,7 @@ const IncreasingAuction = () => {
               className="p-2 btn btn-outline-success btn-lg w-100"
             >
               <div>
-                <span className="fw-bold">Buy Out</span>: {buyOut} vnd
+                <span className="fw-bold">Buy Out</span>: {message.buy_out} vnd
               </div>
             </div>
             <br />
@@ -262,20 +228,6 @@ const IncreasingAuction = () => {
                       </div>
                       <div className="col-md-4">
                         <label for="floatingBid">Step</label>
-                        {/* <select
-                                                    className="form-select"
-                                                    id="form-label"
-                                                    value={incre}
-                                                    required
-                                                    onChange={(e) => {
-                                                        setBid(highestBid + highestBid * e.target.value)
-                                                        setIncre(e.target.value)
-                                                    }}>
-                                                    <option value={0}> </option>
-                                                    <option value={0.1}>10%</option>
-                                                    <option value={0.2}>20%</option>
-                                                    <option value={0.5}>50%</option>
-                                                </select> */}
                         <input
                           type="number"
                           className="form-control rounded-3"
@@ -423,7 +375,7 @@ const IncreasingAuction = () => {
                         <div class="d-flex gap-2 w-100 justify-content-between">
                           <div>
                             <h6 class="mb-0">Variety</h6>
-                            <p class="mb-0 opacity-75">Some placeholder</p>
+                            <p class="mb-0 opacity-75">{message.fish_name}</p>
                           </div>
                         </div>
                       </a>
@@ -442,7 +394,7 @@ const IncreasingAuction = () => {
                         <div class="d-flex gap-2 w-100 justify-content-between">
                           <div>
                             <h6 class="mb-0">Sex</h6>
-                            <p class="mb-0 opacity-75">Some placeholder</p>
+                            <p class="mb-0 opacity-75">{message.fish_sex}</p>
                           </div>
                         </div>
                       </a>
@@ -461,7 +413,7 @@ const IncreasingAuction = () => {
                         <div class="d-flex gap-2 w-100 justify-content-between">
                           <div>
                             <h6 class="mb-0">Size</h6>
-                            <p class="mb-0 opacity-75">Some placeholder</p>
+                            <p class="mb-0 opacity-75">{message.fish_size}</p>
                           </div>
                         </div>
                       </a>
@@ -480,7 +432,7 @@ const IncreasingAuction = () => {
                         <div class="d-flex gap-2 w-100 justify-content-between">
                           <div>
                             <h6 class="mb-0">Age</h6>
-                            <p class="mb-0 opacity-75">Some placeholder</p>
+                            <p class="mb-0 opacity-75">{message.fish_age}</p>
                           </div>
                         </div>
                       </a>
@@ -510,6 +462,10 @@ const IncreasingAuction = () => {
           </div>
         </div>
       </main>
+        :
+        <p>Waiting for notification...</p>
+      }
+
     </div>
   );
 };
@@ -815,8 +771,7 @@ const BuyOutAuction = () => {
     const client = new Client({
       // Use ws:// for STOMP over WebSocket
       brokerURL: "ws://localhost:8081/auctionkoi/ws",
-      //   webSocketFactory: () =>
-      //     new SockJS("ws://localhost:8081/auctionkoi/ws"),
+
       connectHeaders: {
         login: "guest",
         passcode: "guest",
@@ -828,7 +783,7 @@ const BuyOutAuction = () => {
         console.log("Connected to WebSocket");
 
         // Subscribe to the auction topic
-        client.subscribe("/auctions/start", (message) => {
+        client.subscribe("/auctions/test", (message) => {
           console.log("Connect to the start topic");
 
           console.log("Message body still invalid!");
@@ -967,7 +922,7 @@ const BuyOutAuction = () => {
                           onChange={(e) => {
                             setBid(
                               auctionStartInfo.highestBid +
-                                auctionStartInfo.highestBid * e.target.value
+                              auctionStartInfo.highestBid * e.target.value
                             );
                             setIncre(e.target.value);
                           }}
@@ -1037,7 +992,7 @@ const BuyOutAuction = () => {
                           onChange={(e) =>
                             setBid(
                               auctionStartInfo.highestBid +
-                                auctionStartInfo.highestBid * e.target.value
+                              auctionStartInfo.highestBid * e.target.value
                             )
                           }
                         >
