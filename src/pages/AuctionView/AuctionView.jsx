@@ -4,8 +4,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { Button } from "bootstrap";
 import { Client } from "@stomp/stompjs";
 
-let stompClient;
-
 function AuctionView({ auctionType }) {
   return (
     <body>
@@ -32,7 +30,7 @@ const IncreasingAuction = () => {
   const [countdown, setCountdown] = useState();
 
   const [message, setMessage] = useState(
-    JSON.parse(sessionStorage.getItem('websocketMessage')) || null
+    JSON.parse(sessionStorage.getItem('websocketStartMessage')) || null
   );
 
   const [timerDays, setTimerDays] = useState("00");
@@ -41,35 +39,6 @@ const IncreasingAuction = () => {
   const [timerSeconds, setTimerSeconds] = useState("00");
 
   let interval = useRef();
-
-  useEffect(() => {
-    const client = new Client({
-      brokerURL: "ws://localhost:8081/auctionkoi/ws",
-      onConnect: () => {
-        console.log('Connected to WebSocket');
-
-        client.subscribe('/auctions/start', (msg) => {
-          const parsedMessage = JSON.parse(msg.body);
-
-          // Lưu vào sessionStorage
-          sessionStorage.setItem('websocketMessage', JSON.stringify(parsedMessage));
-
-          // Cập nhật state để component render lại khi message thay đổi
-          setMessage(parsedMessage);
-        });
-      },
-      onStompError: (frame) => {
-        console.error('Broker reported error: ' + frame.headers['message']);
-        console.error('Additional details: ' + frame.body);
-      },
-    });
-
-    client.activate();
-
-    return () => {
-      client.deactivate();
-    };
-  }, []); // Chỉ chạy một lần khi component mount
 
   const startTimer = () => {
     if (!message?.end_time) return;

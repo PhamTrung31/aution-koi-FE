@@ -1,76 +1,46 @@
-import React, { useEffect, useRef, useState } from 'react';
-import './CurrentAuction.css'; // Import CSS for styling
-import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { joinNewAuction } from '../../redux/apiRequest';
-import { joinAuctionInitial } from '../../redux/auctionSlice';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import React, { useEffect, useRef, useState } from "react";
+import "./CurrentAuction.css"; // Import CSS for styling
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { joinNewAuction } from "../../redux/apiRequest";
+import { joinAuctionInitial } from "../../redux/auctionSlice";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { Client } from "@stomp/stompjs";
 
 function CurrentAuction() {
     const { currentUser } = useSelector((state) => state.auth.profile);
     const error = useSelector((state) => state.auction.joinAuction.error);
     const token = useSelector((state) => state.auth.login?.currentToken.token);
-    const [currentAuction, setCurrentAuction] = useState(1);
     const notify = () => toast.error(error.message);
 
-    const [timerDays, setTimerDays] = useState('00');
-    const [timerHours, setTimerHours] = useState('00');
-    const [timerMinutes, setTimerMinutes] = useState('00');
-    const [timerSeconds, setTimerSeconds] = useState('00');
+    const [timerDays, setTimerDays] = useState("00");
+    const [timerHours, setTimerHours] = useState("00");
+    const [timerMinutes, setTimerMinutes] = useState("00");
+    const [timerSeconds, setTimerSeconds] = useState("00");
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
+
+    const [message, setMessage] = useState(
+        JSON.parse(sessionStorage.getItem('websocketPendingMessage')) || null
+    );
+
     let interval = useRef();
 
-    const [auctionStartInfo, setAuctionStartInfo] = useState({
-        auction_id: 0,
-        fish_id: 0,
-        fish_name: "",
-        fish_age: 0,
-        fish_size: 0,
-        fish_sex: "",
-        imageUrl: "",
-        videoUrl: "",
-        auction_status: "",
-        deposit_amount: 0,
-        start_time: "",
-        end_time: "",
-        buy_out: 0,
-        highestBid: 0,
-    });
-
-    useEffect(() => {
-        // Simulated WebSocket connection and receiving data
-        const ws = new WebSocket("ws://localhost:8081/auctionkoi/ws");
-
-        ws.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            const startDate = new Date(data.start_time);
-            const currentDate = new Date();
-            const countdownTime = startDate.getTime() - currentDate.getTime();
-
-            setAuctionStartInfo((prev) => ({
-                ...prev,
-                ...data,
-                countdownDate: countdownTime > 0 ? countdownTime : 0,
-            }));
-        };
-
-        return () => {
-            ws.close(); // Clean up the WebSocket connection on unmount
-        };
-    }, []);
-
     const startTimer = () => {
-        const countdownDate = new Date('11-01-2024 00:00:00').getTime();
+        if (!message?.start_time) return;
+
+        const countdownDate = new Date(message.start_time).getTime();
 
         interval = setInterval(() => {
             const now = new Date().getTime();
-            const distance = countdownDate - now;
+            const distance = countdownDate - now - (7 * 60 * 60 * 1000);
 
             const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const hours = Math.floor(
+                (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+            );
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
@@ -84,19 +54,25 @@ function CurrentAuction() {
                 setTimerMinutes(minutes);
                 setTimerSeconds(seconds);
             }
-        }, 1000)
+        }, 1000);
     };
 
     useEffect(() => {
         startTimer();
         return () => {
             clearInterval(interval.current);
-        }
-    });
+        };
+    }, [message]);
 
     const handleJoinAuction = (e) => {
         e.preventDefault();
-        joinNewAuction(token, currentUser.id, currentAuction, dispatch, navigate);
+        joinNewAuction(
+            token,
+            currentUser.id,
+            auctionPendingInfo.auction_id,
+            dispatch,
+            navigate
+        );
     };
 
     useEffect(() => {
@@ -106,42 +82,83 @@ function CurrentAuction() {
         }
     }, [error]);
 
+    useEffect(() => {
+        console.log(message);
+    }, [message]);
+
     return (
         <div className="px-4 pt-5 my-5 text-center border-bottom">
-            <h1 className="display-5 fw-bold text-center">Auction will be start in</h1>
+            <h1
+                className="display-5 fw-bold text-center"
+                style={{
+                    color: message ? "inherit" : "#d3d3d3",
+                    visibility: message ? "visible" : "hidden",
+                }}
+            >
+                {message ? "Auction will start in" : ""}
+            </h1>
             <div className="col-lg-6 mx-auto">
-                <p className="lead mb-4 fs-1 fw-light">
-                    {timerDays == 1 ? (timerDays + ' day') : timerDays == 0 ? ("") : timerDays + ' days'} {timerHours < 10 ? '0' + timerHours : timerHours}
-                    :{timerMinutes < 10 ? '0' + timerMinutes : timerMinutes}
-                    :{timerSeconds < 10 ? '0' + timerSeconds : timerSeconds}
-                </p>
-                <div className="d-grid gap-2 d-sm-flex justify-content-sm-center mb-5">
-                    <Link
-                        type="button"
-                        className="btn btn-success btn-lg px-4 me-sm-3"
-                        // onClick={handleJoinAuction}
-                        to={"/auctionView"}
+                {message ? (
+                    <>
+                        <div className="lead mb-4 fs-1 fw-light">
+                            <span>
+                                {timerDays == 1
+                                    ? timerDays + " day"
+                                    : timerDays == 0
+                                        ? ""
+                                        : timerDays + " days"}{" "}
+                                {timerHours < 10 ? "0" + timerHours : timerHours}:
+                                {timerMinutes < 10 ? "0" + timerMinutes : timerMinutes}:
+                                {timerSeconds < 10 ? "0" + timerSeconds : timerSeconds}
+                            </span>
+                        </div>
+                        <div className="d-grid gap-2 d-sm-flex justify-content-sm-center mb-5">
+                            <Link
+                                type="button"
+                                className="btn btn-success btn-lg px-4 me-sm-3"
+                                // onClick={handleJoinAuction}
+                                to={"/auctionView"}
+                            // style={{
+                            //     opacity: auctionPendingInfo.countdownDate === 0 ? 0.5 : 1,
+                            //     pointerEvents:
+                            //         auctionPendingInfo.countdownDate === 0 ? "none" : "auto",
+                            // }}
+                            >
+                                Join Now
+                            </Link>
+                        </div>
+                        <div className="overflow-hidden" style={{ maxHeight: "30vh" }}>
+                            <div className="container px-5">
+                                <video
+                                    className="img-fluid border rounded-3 shadow-lg mb-4"
+                                    width="700"
+                                    height="500"
+                                    controls
+                                    muted
+                                    loop
+                                    autoPlay
+                                >
+                                    <source src="koi-pond-video.mp4" type="video/mp4" />
+                                    Your browser does not support the video tag.
+                                </video>
+                            </div>
+                        </div>
+                    </>
+                ) : (
+                    <div
+                        style={{
+                            color: "#ccc",
+                            fontSize: "2.4rem",
+                            textAlign: "center",
+                            marginTop: "40px",
+                            fontWeight: "bold",
+                        }}
                     >
-                        Join Now
-                    </Link>
-                </div>
+                        No Scheduled Auctions
+                    </div>
+                )}
             </div>
-            <div className="overflow-hidden" style={{ maxHeight: '30vh' }}>
-                <div className="container px-5">
-                    <video
-                        className="img-fluid border rounded-3 shadow-lg mb-4"
-                        width="700"
-                        height="500"
-                        controls
-                        muted
-                        loop
-                        autoPlay
-                    >
-                        <source src="koi-pond-video.mp4" type="video/mp4" />
-                        Your browser does not support the video tag.
-                    </video>
-                </div>
-            </div>
+
             <ToastContainer
                 position="top-center"
                 autoClose={5000}
@@ -153,10 +170,9 @@ function CurrentAuction() {
                 draggable
                 pauseOnHover
                 theme="light"
-                transition:Bounce
             />
         </div>
-    )
+    );
 }
 
-export default CurrentAuction
+export default CurrentAuction;
