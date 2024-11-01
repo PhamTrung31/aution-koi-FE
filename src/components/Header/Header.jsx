@@ -342,14 +342,14 @@ const StaffNavbar = () => {
               to="/auction"
               onClick={() => handleUserTitle(user?.fullname)}
             >
-              Auction
+              Manage Auction
             </Nav.Link>
             <Nav.Link
               as={Link}
               to="/staffrequest"
               onClick={() => handleUserTitle(user?.fullname)}
             >
-              Request
+             Manage Request
             </Nav.Link>
 
             <Nav.Link
@@ -357,7 +357,7 @@ const StaffNavbar = () => {
               to="/member"
               onClick={() => handleUserTitle(user?.fullname)}
             >
-              member
+              Manage User
             </Nav.Link>
           </Nav>
           <Nav>

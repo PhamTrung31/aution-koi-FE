@@ -24,7 +24,7 @@ import Member from "./pages/ManageUser/ManageUser.jsx";
 import ManageStaff from "./pages/ManageStaff/ManageStaff.jsx";
 import Request from "./pages/Request/MRequest.jsx";
 import StaffRequest from "./pages/StaffRequest/Request.jsx";
-import Auction from "./pages/Auction/Auction.jsx";
+import Auction from "./pages/StaffManageAuction/Auction.jsx";
 import CreateRequest from "./pages/CreateRequest/CreateRequest.jsx";
 import FirebaseImageUpload from "./pages/FirebaseImageUpload/FirebaseImageUpload.jsx";
 import Dashboard from "./pages/DashBoard/DashBoard.jsx";
@@ -33,6 +33,8 @@ import StatCard from "./pages/DashBoard/StatCard.jsx";
 import DonutChart from "./pages/DashBoard/DonutChart.jsx";
 import Topup from "./pages/Topup/Topup.jsx";
 import TopupSuccess from "./pages/TopupSuccess/TopupSuccess.jsx";
+
+
 
 function App() {
   const CURRENT_USER_ROLE = useSelector((state) =>

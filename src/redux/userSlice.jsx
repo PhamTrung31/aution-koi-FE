@@ -23,6 +23,16 @@ const userSlice = createSlice({
       isFetching: false,
       error: false,
     },
+    banusers: {
+      banusers: [],
+      isFetching: false,
+      error: false,
+    },
+    unbanusers: {
+      unbanusers: [],
+      isFetching: false,
+      error: false,
+    },
     changeAvatar: {
       success: null,
       error: null,
@@ -77,6 +87,29 @@ const userSlice = createSlice({
       state.updateusers.isFetching = false;
       state.updateusers.error = true;
     },
+    banUserStart: (state) => {
+      state.banusers.isFetching = true;
+    },
+    banUserSuccess: (state, action) => {
+      state.banusers.isFetching = false;
+      state.banusers.banusers.push(action.payload);
+    },
+    banUserFailed: (state) => {
+      state.banusers.isFetching = false;
+      state.banusers.error = true;
+    },
+
+    unbanUserStart: (state) => {
+      state.unbanusers.isFetching = true;
+    },
+    unbanUserSuccess: (state, action) => {
+      state.unbanusers.isFetching = false;
+      state.unbanusers.unbanusers.push(action.payload);
+    },
+    unbanUserFailed: (state) => {
+      state.unbanusers.isFetching = false;
+      state.unbanusers.error = true;
+    },
     changeAvatarStart: (state) => {
       state.changeAvatar.isFetching = true
     },
@@ -103,6 +136,12 @@ export const {
   updateUserStart,
   updateUserSuccess,
   updateUserFailed,
+  banUserStart,
+  banUserSuccess,
+  banUserFailed,
+  unbanUserStart,
+  unbanUserSuccess,
+  unbanUserFailed,
   changeAvatarStart,
   changeAvatarSuccess,
   changeAvatarFailed

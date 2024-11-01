@@ -9,9 +9,11 @@ import {
   deleteUser,
   updateUser,
   addUser,
+  banUser,
+  unbanUser
 } from "../../redux/apiRequest";
 
-const Modal = ({ show, onClose, children }) => {
+const Modal = ({ show, children }) => {
   if (!show) {
     return null;
   }
@@ -49,14 +51,6 @@ function User() {
 
   const handleAddUser = async (e) => {
     e.preventDefault();
-    setUsername("");
-    setPassword("");
-    setFullname("");
-    setPhone("");
-    setAddress("");
-    setAvatarUrl("");
-    setIsBreeder(false);
-
     const userData = {
       username: username,
       password: password,
@@ -67,17 +61,16 @@ function User() {
       isBreeder: isBreeder,
     };
     await addUser(dispatch, userData, token);
-  };
-  const handleUpdateUser = async (e) => {
-    e.preventDefault();
-    setId("");
     setUsername("");
     setPassword("");
     setFullname("");
     setPhone("");
     setAddress("");
-    setIsActive("");
+    setAvatarUrl("");
     setIsBreeder(false);
+  };
+  const handleUpdateUser = async (e) => {
+    e.preventDefault();
     const userData = {
       userId: id,
       username: username,
@@ -90,6 +83,12 @@ function User() {
       isBreeder: isBreeder,
     };
     await updateUser(dispatch, selectedUser.id, userData, token);
+    setId("");
+    setUsername("");
+    setPassword("");
+    setFullname("");
+    setPhone("");
+    setAddress("");
     setShowEditModal(false);
   };
 
@@ -111,6 +110,17 @@ function User() {
       await deleteUser(dispatch, id, token);
     }
   };
+  const handleBanUser = async (id) => {
+    if (window.confirm("Are you sure you want to delete this user?")) {
+      await banUser(dispatch, id, token);
+    }
+  };
+  const handleUnbanUser = async (id) => {
+    if (window.confirm("Are you sure you want to unban this user?")) {
+      await unbanUser(dispatch, id, token);
+    }
+  }; 
+  
 
   return (
     <div>
@@ -146,7 +156,11 @@ function User() {
                   >
                     <FontAwesomeIcon icon={faXmark} />
                   </button>
-                  <button className={styles.actionBtn}>
+                  
+                  <button
+                    className={styles.actionBtn + " " + styles.deleteBtn}
+                    onClick={() => user.isActive ? handleBanUser(user.id) : handleUnbanUser(user.id) }
+                  >
                     {user.isActive ? (
                       <FontAwesomeIcon icon={faLockOpen} />
                     ) : (

@@ -14,6 +14,7 @@ import {
   deleteStaff,
   updateStaff,
   banStaff,
+  unbanStaff
 } from "../../redux/apiRequest";
 
 const Modal = ({ show, onClose, children }) => {
@@ -48,6 +49,11 @@ function ManageStaff() {
   const handleBanStaff = async (id) => {
     if (window.confirm("Are you sure you want to ban this staff?")) {
       await banStaff(dispatch, id, token);
+    }
+  };
+  const handleUnbanStaff = async (id) => {
+    if (window.confirm("Are you sure you want to unban this staff?")) {
+      await unbanStaff(dispatch, id, token);
     }
   };
 
@@ -141,7 +147,7 @@ function ManageStaff() {
                   </button>
                   <button
                     className={styles.actionBtn + " " + styles.deleteBtn}
-                    onClick={() => handleBanStaff(staff.id)}
+                    onClick={() => (staff.isActive ? handleBanStaff(staff.id) : handleUnbanStaff(staff.id))}
                   >
                     {staff.isActive ? (
                       <FontAwesomeIcon icon={faLockOpen} />
