@@ -6,6 +6,7 @@ import userReducer from "./userSlice";
 import breederReducer from "./breederSlice";
 import auctionrequestReducer from "./auctionRequestSlice";
 import auctionReducer from "./auctionSlice";
+import koifishReducer from "./koifishSlice"
 import {
   persistStore,
   persistReducer,
@@ -36,7 +37,9 @@ const store = configureStore({
     user: userReducer,
     breeder: breederReducer,
     auctionrequest: auctionrequestReducer,
-    auction: auctionReducer
+    auction: auctionReducer,
+    koifish: koifishReducer
+    
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

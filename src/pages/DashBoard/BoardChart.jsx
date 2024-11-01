@@ -37,10 +37,10 @@ function BoardChart() {
     ],
     datasets: [
       {
-        label: "Sales",
+        label: "Auction",
         data: [
-          12000, 15000, 13000, 14000, 16000, 19000, 22000, 20000, 24000, 26000,
-          21000, 25000,
+          12, 15, 20, 30, 22, 19, 15, 31, 24, 28,
+          20, 11,
         ],
         backgroundColor: "rgba(75, 123, 236, 0.5)",
         borderColor: "#4B7BEC",
@@ -54,17 +54,16 @@ function BoardChart() {
     scales: {
       y: {
         beginAtZero: true,
-        max: 30000,
+        max: 50,
       },
     },
   };
 
   return (
     <div style={{ maxHeight: "400px" }}>
-      {" "}
-      {/* Set max height */}
+
       <Bar data={data} options={options} height={300} />{" "}
-      {/* Adjust height if needed */}
+
     </div>
   );
 }

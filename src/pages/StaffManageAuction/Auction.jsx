@@ -161,10 +161,38 @@ function Auction() {
                   value={selectedKoifish.id}
                   className={styles.roundedInput}
                 />
-                <p>Name: {selectedKoifish.name}</p>
-                <p>Species: {selectedKoifish.species}</p>
-                <p>Age: {selectedKoifish.age}</p>
-                <p>Size: {selectedKoifish.size}</p>
+                <input
+                  readOnly
+                  type="text"
+                  name="name"
+                  placeholder="Name"
+                  value={selectedKoifish.name}
+                  className={styles.roundedInput}
+                />
+                <input
+                  readOnly
+                  type="text"
+                  name="species"
+                  placeholder="Species"
+                  value={selectedKoifish.species}
+                  className={styles.roundedInput}
+                />
+                <input
+                  readOnly
+                  type="text"
+                  name="age"
+                  placeholder="Age"
+                  value={selectedKoifish.age}
+                  className={styles.roundedInput}
+                />
+                <input
+                  readOnly
+                  type="text"
+                  name="size"
+                  placeholder="Size"
+                  value={selectedKoifish.size}
+                  className={styles.roundedInput}
+                />
               </div>
             )}
           </div>
@@ -191,9 +219,31 @@ function Auction() {
                   value={selectedAuction.name}
                   className={styles.roundedInput}
                 />
-                <p>Status: {selectedAuction.status}</p>
-                <p>Start Date: {selectedAuction.startDate}</p>
-                <p>End Date: {selectedAuction.endDate}</p>
+                <input
+                  readOnly
+                  type="text"
+                  name="status"
+                  placeholder="Status"
+                  value={selectedAuction.status}
+                  className={styles.roundedInput}
+                />
+                <input
+                  readOnly
+                  type="text"
+                  name="startDate"
+                  placeholder="Start Date"
+                  value={selectedAuction.startDate}
+                  className={styles.roundedInput}
+                />
+                <input
+                  readOnly
+                  type="text"
+                  name="endDate"
+                  placeholder="End Date"
+                  value={selectedAuction.endDate}
+                  className={styles.roundedInput}
+                />
+              
               </div>
             )}
           </div>

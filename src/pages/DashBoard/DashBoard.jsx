@@ -17,43 +17,38 @@ function DashBoard() {
     <div className="container my-5">
       <div className="row g-3 mb-4">
         <StatCard
-          title="Budget"
-          value="$24k"
-          icon={<FontAwesomeIcon icon={faDollarSign} />}
-          percentageChange={12}
-          changeDirection="up"
-        />
-        <StatCard
-          title="Total Customers"
-          value="1.6k"
+          title="Total Koi breeder"
           icon={<FontAwesomeIcon icon={faUser} />}
-          percentageChange={-16}
-          changeDirection="down"
+          amount="100"
+          color="text-success"
         />
         <StatCard
-          title="Task Progress"
-          value="75%"
+          title="Total User"
+          amount="1.6k"
+          icon={<FontAwesomeIcon icon={faUser} />}
+          color="text-danger"
+        />
+        <StatCard
+          title="Total Auction Happen In Web"
+          amount="190"
           icon={<FontAwesomeIcon icon={faTasks} />}
-          percentageChange={5}
-          changeDirection="up"
-          className="task-progress"
+          color="text-success"
         />
         <StatCard
           title="Total Profit"
-          value="$15k"
+          amount="$15k"
           icon={<FontAwesomeIcon icon={faMoneyBill} />}
-          percentageChange={8}
-          changeDirection="up"
+          color="text-success"
         />
       </div>
 
       <div className="row">
         <div className="col-md-8">
-          <h5>Sales</h5>
+          <h5>Auction</h5>
           <BarChart />
         </div>
         <div className="col-md-4">
-          <h5>Traffic Source</h5>
+          <h5>Auction Method</h5>
           <DonutChart />
         </div>
       </div>

@@ -6,10 +6,10 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 function DonutChart() {
   const data = {
-    labels: ["Direct", "Referral", "Social"],
+    labels: ["Blind", "Traditional", "Buy Out"],
     datasets: [
       {
-        label: "Traffic Source",
+        label: "Auction Method",
         data: [45, 25, 30],
         backgroundColor: ["#4B7BEC", "#F7B924", "#38ADA9"],
       },
@@ -28,10 +28,7 @@ function DonutChart() {
 
   return (
     <div style={{ maxHeight: "300px" }}>
-      {" "}
-      {/* Set max height */}
       <Doughnut data={data} options={options} height={250} />{" "}
-      {/* Adjust height if needed */}
     </div>
   );
 }

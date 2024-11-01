@@ -24,13 +24,18 @@ const auctionrequestSlice = createSlice({
       isFetching: false,
       error: false,
     },
-    deleteauctionrequests: {
+    deleteauctionrequest: {
       deleteauctionrequests: [],
       isFetching: false,
       error: false,
     },
     updateauctionrequests: {
       updateauctionrequests: [],
+      isFetching: false,
+      error: false,
+    },
+    approve: {
+      approveRequests: [],
       isFetching: false,
       error: false,
     },
@@ -53,8 +58,7 @@ const auctionrequestSlice = createSlice({
     },
     getAuctionRequestByBreederIdSuccess: (state, action) => {
       state.auctionrequestbybreederid.isFetching = false;
-      state.auctionrequestbybreederid.auctionrequestbybreederids =
-        action.payload;
+      state.auctionrequestbybreederid.auctionrequestbybreederids = action.payload;
     },
     getAuctionRequestByBreederIdFailed: (state) => {
       state.auctionrequestbybreederid.isFetching = false;
@@ -85,15 +89,17 @@ const auctionrequestSlice = createSlice({
       state.addauctionrequests.error = true;
     },
     deleteAuctionRequestStart: (state) => {
-      state.deleteauctionrequests.isFetching = true;
+      state.deleteauctionrequest.isFetching = true;
     },
     deleteAuctionRequestSuccess: (state, action) => {
-      state.deleteauctionrequests.isFetching = false;
-      state.deleteauctionrequests.deleteauctionrequests.delete(action.payload);
+      state.deleteauctionrequest.isFetching = false;
+      state.deleteauctionrequest.deleteauctionrequests = state.deleteauctionrequest.deleteauctionrequests.filter(
+        (request) => request.id !== action.payload.id
+      );
     },
     deleteAuctionRequestFailed: (state) => {
-      state.deleteauctionrequests.isFetching = false;
-      state.deleteauctionrequests.error = true;
+      state.deleteauctionrequest.isFetching = false;
+      state.deleteauctionrequest.error = true;
     },
     updateAuctionRequestStart: (state) => {
       state.updateauctionrequests.isFetching = true;
@@ -111,6 +117,23 @@ const auctionrequestSlice = createSlice({
     updateAuctionRequestFailed: (state) => {
       state.updateauctionrequests.isFetching = false;
       state.updateauctionrequests.error = true;
+    },
+
+    approveAuctionRequestStart: (state) => {
+      state.approve.isFetching = true;
+    },
+    approveAuctionRequestSuccess: (state, action) => {
+      state.approve.isFetching = false;
+      state.approve.approveRequests = state.approve.approveRequests.map(
+        (auctionrequest) =>
+          auctionrequest.id === action.payload.id
+            ? action.payload
+            : auctionrequest
+      );
+    },
+    approveAuctionRequestFailed: (state) => {
+      state.approve.isFetching = false;
+      state.approve.error = true;
     },
   },
 });
@@ -133,5 +156,8 @@ export const {
   updateAuctionRequestStart,
   updateAuctionRequestSuccess,
   updateAuctionRequestFailed,
+  approveAuctionRequestStart,
+  approveAuctionRequestSuccess,
+  approveAuctionRequestFailed,
 } = auctionrequestSlice.actions;
 export default auctionrequestSlice.reducer;

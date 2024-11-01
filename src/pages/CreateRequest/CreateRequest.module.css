@@ -136,5 +136,13 @@ tbody tr {
 }
 
 .buttonkoi {
-  margin-left: 79%;
+  margin-left: 86%;
+  margin-top: -85px;
+}
+.viewBtn {
+  padding: 5px 10px;
+  background-color: #f0f0f0;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  cursor: pointer;
 }
