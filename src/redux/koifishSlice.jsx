@@ -4,7 +4,12 @@ const koifishSlice = createSlice({
   name: "koifish",
   initialState: {
     koifishs: {
-      allKoifish: [],
+      koifishById: [],
+      isFetching: false,
+      error: false,
+    },
+    koifishByBreederId: {
+      koifishByBreederId: [],
       isFetching: false,
       error: false,
     },
@@ -25,16 +30,27 @@ const koifishSlice = createSlice({
     },
   },
   reducers: {
-    getKoiFishStart: (state) => {
+    getKoiFishByIdStart: (state) => {
       state.koifishs.isFetching = true;
     },
-    getKoiFishSuccess: (state, action) => {
+    getKoiFishByIdSuccess: (state, action) => {
       state.koifishs.isFetching = false;
-      state.koifishs.allKoifish = action.payload;
+      state.koifishs.koifishById = action.payload;
     },
-    getKoiFishFailed: (state) => {
+    getKoiFishByIdFailed: (state) => {
       state.koifishs.isFetching = false;
       state.koifishs.error = true;
+    },
+    getKoiFishByBreederIdStart: (state) => {
+      state.koifishByBreederId.isFetching = true;
+    },
+    getKoiFishByBreederIdSuccess: (state, action) => {
+      state.koifishByBreederId.isFetching = false;
+      state.koifishByBreederId.koifishByBreederId = action.payload;
+    },
+    getKoiFishByBreederIdFailed: (state) => {
+      state.koifishByBreederId.isFetching = false;
+      state.koifishByBreederId.error = true;
     },
 
     addKoiFishStart: (state) => {
@@ -76,9 +92,9 @@ const koifishSlice = createSlice({
   },
 });
 export const {
-  getKoiFishStart,
-  getKoiFishSuccess,
-  getKoiFishFailed,
+  getKoiFishByIdStart,
+  getKoiFishByIdSuccess,
+  getKoiFishByIdFailed,
   addKoiFishStart,
   addKoiFishSuccess,
   addKoiFishFailed,
@@ -87,7 +103,10 @@ export const {
   deleteKoiFishFailed,
   updateKoiFishStart,
   updateKoiFishSuccess,
-  updateKoiFishFailed
+  updateKoiFishFailed,
+  getKoiFishByBreederIdStart,
+  getKoiFishByBreederIdSuccess,
+  getKoiFishByBreederIdFailed
 } = koifishSlice.actions;
 
 export default koifishSlice.reducer;

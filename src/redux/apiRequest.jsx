@@ -82,13 +82,35 @@ import {
   updateAuctionRequestFailed,
   approveAuctionRequestStart,
   approveAuctionRequestSuccess,
-  approveAuctionRequestFailed
+  approveAuctionRequestFailed,
+  getAuctionRequestForManagerStart,
+  getAuctionRequestForManagerSuccess,
+  getAuctionRequestForManagerFailed,
+  managerReviewStart,
+  managerReviewSuccess,
+  managerReviewFailed,
+  getAuctionRequestForStaffToAssignStart,
+  getAuctionRequestForStaffToAssignSuccess,
+  getAuctionRequestForStaffToAssignFailed,
+  staffReviewStart,
+  staffReviewSuccess,
+  staffReviewFailed,
+  getAuctionRequestByAssignedStaffStart,
+  getAuctionRequestByAssignedStaffSuccess,
+  getAuctionRequestByAssignedStaffFailed
 } from "./auctionRequestSlice";
-
 import {
-  getKoiFishStart,
-  getKoiFishSuccess,
-  getKoiFishFailed,
+
+} from "./breederSlice";
+import {
+  topupWalletStart,
+  topupWalletSuccess,
+  topupWalletFailed
+} from "./walletSlice";
+import{
+  getKoiFishByIdStart,
+  getKoiFishByIdSuccess,
+  getKoiFishByIdFailed,
   addKoiFishStart,
   addKoiFishSuccess,
   addKoiFishFailed,
@@ -97,17 +119,18 @@ import {
   deleteKoiFishFailed,
   updateKoiFishStart,
   updateKoiFishSuccess,
-  updateKoiFishFailed
+  updateKoiFishFailed,
+  getKoiFishByBreederIdStart,
+  getKoiFishByBreederIdSuccess,
+  getKoiFishByBreederIdFailed
 } from "./koifishSlice";
-import {
-  topupWalletStart,
-  topupWalletSuccess,
-  topupWalletFailed
-} from "./walletSlice";
 import {
   joinAuctionStart,
   joinAuctionSuccess,
-  joinAuctionFailed
+  joinAuctionFailed,
+  getAuctionStart,
+  getAuctionSuccess,
+  getAuctionFailed
 } from "./auctionSlice";
 import {
   getUserWalletStart,
@@ -423,7 +446,7 @@ export const getAllAuction = async (accessToken, dispatch) => {
   dispatch(getAuctionRequestStart());
   try {
     const res = await axios.get(
-      "http://localhost:8081/auctionkoi/auctions/view-all-requests",
+      "http://localhost:8081/auctionkoi/auctions/wait",
       {
         headers: { Authorization: `Bearer ${accessToken}` },
       }
@@ -434,7 +457,9 @@ export const getAllAuction = async (accessToken, dispatch) => {
   }
 };
 
-export const getAuctionRequestDetail = async (
+
+
+export const getOneAuctionRequest = async (
   accessToken,
   auctionRequestId,
   dispatch
@@ -562,66 +587,63 @@ export const apporve = async (dispatch, approvedata, accessToken) => {
   }
 };
 
-// export const getAllKoiFish = async (accessToken, dispatch) => {
-//   dispatch(getUserStart());
-//   try {
-//     const res = await axios.get("http://localhost:8081/auctionkoi/staffs/all", {
-//       headers: { Authorization: `Bearer ${accessToken}` },
-//     });
-//     dispatch(getUserSuccess(res.data.result));
-//   } catch (err) {
-//     dispatch(getUserFailed());
-//   }
-// };
+export const getKoiFishById = async (accessToken, koifishId, dispatch) => {
+  dispatch(getKoiFishByIdStart());
+  try {
+    const res = await axios.get(`http://localhost:8081/auctionkoi/koifish/koifish/${koifishId}`, 
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+    dispatch(getKoiFishByIdSuccess(res.data.result));
+  } catch (err) {
+    dispatch(getKoiFishByIdFailed());
+  }
+};
 
-// export const addUser = async (dispatch, staffData, accessToken) => {
-//   dispatch(addUserStart());
-//   try {
-//     const res = await axios.post(
-//       "http://localhost:8081/auctionkoi/staffs/create",
-//       staffData,
-//       {
-//         headers: { Authorization: `Bearer ${accessToken}` },
-//       }
-//     );
-//     dispatch(addUserSuccess(res.data));
-//     getAllUser(accessToken,dispatch);
-//   } catch (err) {
-//     dispatch(addUserFailed());
-//   }
-// };
+export const getKoiFishByBreederId = async (accessToken, breederId, dispatch) => {
+  dispatch(getKoiFishByBreederIdStart());
+  try {
+    const res = await axios.get(`http://localhost:8081/auctionkoi/koifish/breeder/${breederId}`, 
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+    dispatch(getKoiFishByBreederIdSuccess(res.data.result));
+  } catch (err) {
+    dispatch(getKoiFishByBreederIdFailed());
+  }
+};
 
-// export const deleteUser = async (dispatch, userId, accessToken) => {
-//   dispatch(deleteUserStart());
-//   try {
-//     const res = await axios.delete(
-//       `http://localhost:8081/auctionkoi/staffs/${userId}`,
-//       {
-//         headers: { Authorization: `Bearer ${accessToken}` },
-//       }
-//     );
-//     dispatch(deleteUserSuccess(res.data.result));
-//     getAllUser(accessToken,dispatch);
-//   } catch {
-//     dispatch(deleteUserFailed());
-//   }
-// };
-// export const updateUser = async (dispatch, userId, updatedata, accessToken) => {
-//   dispatch(updateUserStart());
-//   try {
-//     const res = await axios.put(
-//       `http://localhost:8081/auctionkoi/staffs/${userId}`,
-//       updatedata,
-//       {
-//         headers: { Authorization: `Bearer ${accessToken}` },
-//       }
-//     );
-//     dispatch(updateUserSuccess(res.data));
-//     getAllUser(accessToken,dispatch);
-//   } catch {
-//     dispatch(updateUserFailed());
-//   }
-// };
+export const getAuctionRequestForManager = async (accessToken, dispatch) => {
+  dispatch(getAuctionRequestForManagerStart());
+  try {
+    const res = await axios.get(
+      "http://localhost:8081/auctionkoi/auctions/manager-review",
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+    dispatch(getAuctionRequestForManagerSuccess(res.data.result));
+  } catch (err) {
+    dispatch(getAuctionRequestForManagerFailed());
+  }
+};
+
+export const getAuctionRequestForStaffToAssign = async (accessToken, staffId, dispatch) => {
+  dispatch(getAuctionRequestForStaffToAssignStart());
+  try {
+    const res = await axios.get(
+      `http://localhost:8081/auctionkoi/auctions/assigned-staff/${staffId}`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+    dispatch(getAuctionRequestForStaffToAssignSuccess(res.data.result));
+  } catch (err) {
+    dispatch(getAuctionRequestForStaffToAssignFailed());
+  }
+};
 
 export const topupWalletRequest = async (payload, dispatch, navigate) => {
   dispatch(topupWalletStart());
@@ -652,3 +674,79 @@ export const getUserWallet = async (userid, dispatch) => {
     dispatch(getUserWalletFailed(error));
   }
 }
+
+export const managerReview = async (dispatch, approvedata, accessToken) => {
+  dispatch(managerReviewStart());
+  try {
+    const res = await axios.put(
+      `http://localhost:8081/auctionkoi/auctions/manager/review`,
+      approvedata,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+    dispatch(managerReviewSuccess(res.data));
+  } catch {
+    dispatch(managerReviewFailed());
+  }
+};
+
+export const staffReview = async (dispatch, approvedata, accessToken) => {
+  dispatch(staffReviewStart());
+  try {
+    const res = await axios.put(
+      `http://localhost:8081/auctionkoi/auctions/staff/review`,
+      approvedata,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+    dispatch(staffReviewSuccess(res.data));
+  } catch {
+    dispatch(staffReviewFailed());
+  }
+};
+
+export const getAuctionRequestByAssignedStaff = async (accessToken, staffId, dispatch) => {
+  dispatch(getAuctionRequestByAssignedStaffStart());
+  try {
+    const res = await axios.get(`http://localhost:8081/auctionkoi/auctions/staff/all-assigned/${staffId}`, 
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+    dispatch(getAuctionRequestByAssignedStaffSuccess(res.data.result));
+  } catch (err) {
+    dispatch(getAuctionRequestByAssignedStaffFailed());
+  }
+};
+
+export const getAuctionById = async (accessToken, auctionId, dispatch) => {
+  dispatch(getAuctionStart());
+  try {
+    const res = await axios.get(`http://localhost:8081/auctionkoi/auctions/auctions/${auctionId}`, 
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+    dispatch(getAuctionSuccess(res.data.result));
+  } catch (err) {
+    dispatch(getAuctionFailed());
+  }
+};
+
+export const addKoiFish = async (dispatch, koifishData, breederId, accessToken) => {
+  dispatch(addKoiFishStart());
+  try {
+    const res = await axios.post(
+      `http://localhost:8081/auctionkoi/koifish/${breederId}`,
+      koifishData,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+    dispatch(addKoiFishSuccess(res.data));
+  } catch (err) {
+    dispatch(addKoiFishFailed());
+  }
+};

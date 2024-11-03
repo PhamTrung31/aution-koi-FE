@@ -250,6 +250,13 @@ const BreederNavbar = () => {
             >
               Your Request
             </Nav.Link>
+            <Nav.Link
+              as={Link}
+              to="/managekoifish"
+              onClick={() => handleUserTitle(user?.fullname)}
+            >
+              Manage Koi Fish
+            </Nav.Link>
           </Nav>
           <Nav>
             {user?.fullname ? (
@@ -358,6 +365,13 @@ const StaffNavbar = () => {
               onClick={() => handleUserTitle(user?.fullname)}
             >
               Manage User
+            </Nav.Link>
+            <Nav.Link
+              as={Link}
+              to="/staffreview"
+              onClick={() => handleUserTitle(user?.fullname)}
+            >
+              Review Request
             </Nav.Link>
           </Nav>
           <Nav>

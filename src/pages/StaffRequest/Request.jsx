@@ -3,7 +3,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import styles from "./Request.module.css";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllAuction, apporve } from "../../redux/apiRequest";
+import { getAllAuction, apporve, getKoiFishById } from "../../redux/apiRequest";
+
 
 const Modal = ({ show, children }) => {
   if (!show) {
@@ -17,42 +18,15 @@ const Modal = ({ show, children }) => {
 };
 
 function Request() {
-
-  const [koifish, setKoifish] = useState([
-    {
-      id: 1,
-      name: "Koi Fish A",
-      species: "Kohaku",
-      age: 2,
-      size: "30 cm",
-      description: "A beautiful Kohaku koi fish with bright red markings.",
-    },
-    {
-      id: 2,
-      name: "Koi Fish B",
-      species: "Sanke",
-      age: 3,
-      size: "35 cm",
-      description:
-        "A graceful Sanke koi with a combination of red, black, and white colors.",
-    },
-    {
-      id: 3,
-      name: "Koi Fish C",
-      species: "Showa",
-      age: 4,
-      size: "40 cm",
-      description:
-        "A stunning Showa koi with dark black and vibrant orange patterns.",
-    },
-  ]);
-
   const token = useSelector(
     (state) => state.auth.login?.currentToken.token
   );
   
   const aucionRequestList = useSelector(
     (state) => state.auctionrequest.auctionrequests?.allauctionrequests
+  );
+  const koifishById = useSelector(
+    (state) => state.koifish.koifishs?.koifishById
   );
   const dispatch = useDispatch();
   console.log(token);
@@ -66,7 +40,6 @@ function Request() {
   const [infoAuctionModal, setinfoAuctionModal] = useState(false);
   const [showApproveModal, setshowApproveModal] = useState(false);
   const [selectedAuctionRequest, setSelectedAuctionRequest] = useState(null);
-  const [selectedKoifish, setselectedKoifish] = useState(null);
   const [auctionRequestId, setauctionRequestId] = useState("");
   const [staffId, setstaffId] = useState("");
   const [isSendToManager, setisSendToManager] = useState(false);
@@ -74,7 +47,6 @@ function Request() {
   
   
   const handleApprove = async () => {
-
     const ApproveData = {
       auctionRequestId: auctionRequestId,
       staffId: staffId,
@@ -92,11 +64,9 @@ function Request() {
   };
 
   const handleOpenKoiFishModal = (AuctionRequest) => {
-    const koiFishData = koifish.find((fish) => fish.id === AuctionRequest.fish_id);
-    if (koiFishData) {
-      setselectedKoifish(koiFishData);
-      setinfoKoiFishModal(true);
-    }
+    setSelectedAuctionRequest(AuctionRequest);
+    getKoiFishById(token, AuctionRequest.fish, dispatch);
+    setinfoKoiFishModal(true);
   };
 
   const handleOpenAuctionModal = (AuctionRequest) => {
@@ -152,128 +122,127 @@ function Request() {
       </table>
 
       <Modal show={infoKoiFishModal}>
-        <div class="position-relative p-2 text-center text-muted bg-body border border-dashed rounded-5">
+        <div className="position-relative p-4 text-start text-muted bg-body border border-dashed rounded-5"> 
           <button
             type="button"
-            class="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill"
+            className="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill"
             aria-label="Close"
             onClick={() => setinfoKoiFishModal(false)}
           ></button>
-          <h1 class="text-body-emphasis">Koi Fish</h1>
-          <div>
-            {selectedKoifish && (
+          <h1 className="text-body-emphasis text-start">Koi Fish Detail</h1>
+          {koifishById && (
+            <div>
               <div>
+                <label className="form-label"><strong>Name:</strong></label>
                 <input
                   readOnly
-                  type="text"
-                  name="id"
-                  placeholder="ID"
-                  value={selectedKoifish.id}
-                  className={styles.roundedInput}
-                />
-                <input
-                  readOnly
-                  type="text"
-                  name="name"
-                  placeholder="Name"
-                  value={selectedKoifish.name}
-                  className={styles.roundedInput}
-                />
-                <input
-                  readOnly
-                  type="text"
-                  name="species"
-                  placeholder="Species"
-                  value={selectedKoifish.species}
-                  className={styles.roundedInput}
-                />
-                <input
-                  readOnly
-                  type="text"
-                  name="age"
-                  placeholder="Age"
-                  value={selectedKoifish.age}
-                  className={styles.roundedInput}
-                />
-                <input
-                  readOnly
-                  type="text"
-                  name="size"
-                  placeholder="Size"
-                  value={selectedKoifish.size}
+                  value={koifishById.name}
                   className={styles.roundedInput}
                 />
               </div>
-            )}
-          </div>
+              <div>
+                <label className="form-label"><strong>Sex:</strong></label>
+                <input
+                  readOnly
+                  value={koifishById.sex}
+                  className={styles.roundedInput}
+                />
+              </div>
+              <div>
+                <label className="form-label"><strong>Size:</strong></label>
+                <input
+                  readOnly
+                  value={koifishById.size}
+                  className={styles.roundedInput}
+                />
+              </div>
+              <div>
+                <label className="form-label"><strong>Age:</strong></label>
+                <input
+                  readOnly
+                  value={koifishById.age}
+                  className={styles.roundedInput}
+                />
+              </div>
+              <div>
+                <label className="form-label"><strong>Description:</strong></label>
+                <input
+                  readOnly
+                  value={koifishById.description}
+                  className={styles.roundedInput}
+                />
+              </div>
+              <div>
+                <label className="form-label"><strong>Status:</strong></label>
+                <input
+                  readOnly
+                  value={koifishById.status}
+                  className={styles.roundedInput}
+                />
+              </div>
+             
+            </div>
+          )}
         </div>
       </Modal>
-      <Modal show={infoAuctionModal}>
-        <div class="position-relative p-2 text-center text-muted bg-body border border-dashed rounded-5">
+      <Modal show={infoAuctionModal}> 
+        <div class="position-relative p-2 text-start text-muted bg-body border border-dashed rounded-5">
           <button
             type="button"
             class="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill"
             aria-label="Close"
             onClick={() => setinfoAuctionModal(false)}
           ></button>
-          <h1 class="text-body-emphasis">Auction</h1>
+          <h1 class="text-body-emphasis text-start">Auction</h1>
           <div>
             {selectedAuctionRequest && (
               <div>
-                <input
-                  readOnly
-                  type="text"
-                  name="buyOut"
-                  placeholder="Buy Out"
-                  value={selectedAuctionRequest.buyOut}
-                  className={styles.roundedInput}
-                />
-                <input
-                  readOnly
-                  type="text"
-                  name="startPrice"
-                  placeholder="Start Price "
-                  value={selectedAuctionRequest.startPrice}
-                  className={styles.roundedInput}
-                />
-                <input
-                  readOnly
-                  type="text"
-                  name="incrementStep"
-                  placeholder="Increment Step "
-                  value={selectedAuctionRequest.incrementStep}
-                  className={styles.roundedInput}
-                />
-                <input
-                  readOnly
-                  type="text"
-                  name="methodType"
-                  placeholder="Method Type"
-                  value={selectedAuctionRequest.methodType}
-                  className={styles.roundedInput}
-                />
-                <input
-                  readOnly
-                  type="text"
-                  name="startTime"
-                  placeholder="Start Time"
-                  value={selectedAuctionRequest.startTime}
-                  className={styles.roundedInput}
-                />
-                <input
-                  readOnly
-                  type="text"
-                  name="endTime"
-                  placeholder="End Time"
-                  value={selectedAuctionRequest.endTime}
-                  className={styles.roundedInput}
-                />
-              
+                <div>
+                  <label className="form-label"><strong>Buy Out Price:</strong></label>
+                  <input
+                    readOnly
+                    value={selectedAuctionRequest.buyOut}
+                    className={styles.roundedInput}
+                  />
+                </div>
+                <div>
+                  <label className="form-label"><strong>Start Price:</strong></label>
+                  <input
+                    readOnly
+                    value={selectedAuctionRequest.startPrice}
+                    className={styles.roundedInput}
+                  />
+                </div>
+                <div>
+                  <label className="form-label"><strong>Method Type:</strong></label>
+                  <input
+                    readOnly
+                    value={selectedAuctionRequest.methodType}
+                    className={styles.roundedInput}
+                  />
+                </div>
+                <div>
+                  <label className="form-label"><strong>Start Time:</strong></label>
+                  <input
+                    readOnly
+                    value={selectedAuctionRequest.startTime}
+                    className={styles.roundedInput}
+                  />
+                </div>
+                <div>
+                  <label className="form-label"><strong>End Time:</strong></label>
+                  <input
+                    readOnly
+                    value={selectedAuctionRequest.endTime}
+                    className={styles.roundedInput}
+                  />
+                </div>
               </div>
-            )}
-          </div>
-        </div>
-      </Modal>
+            )}</div>
+      </div>
+        </Modal>
+      
+
       <Modal show={showApproveModal}>
         <div className="position-relative p-2 text-center text-muted bg-body border border-dashed rounded-5">
           <button
@@ -315,7 +284,7 @@ function Request() {
                         className="form-check-label"
                         htmlFor="YesNoCheckbox"
                       >
-                        {isSendToManager ? "True" : "False"}
+                        {isSendToManager ? "true" : "false"}
                       </label>
                     </div>
                   </div>

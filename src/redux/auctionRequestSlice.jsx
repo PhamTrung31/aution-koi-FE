@@ -8,9 +8,23 @@ const auctionrequestSlice = createSlice({
       isFetching: false,
       error: false,
     },
-
     auctionrequestbybreederid: {
       auctionrequestbybreederids: [],
+      isFetching: false,
+      error: false,
+    },
+    auctionrequestbyassignedstaff: {
+      auctionrequestbyassignedstaffs: [],
+      isFetching: false,
+      error: false,
+    },
+    auctionrequestformanager: {
+      auctionrequestformanagers: [],
+      isFetching: false,
+      error: false,
+    },
+    auctionrequestforstafftoassign: {
+      auctionrequestforstafftoassigns: [],
       isFetching: false,
       error: false,
     },
@@ -39,6 +53,17 @@ const auctionrequestSlice = createSlice({
       isFetching: false,
       error: false,
     },
+    managerreview: {
+      managerreviews: [],
+      isFetching: false,
+      error: false,
+    },
+    staffreview: {
+      staffreviews: [],
+      isFetching: false,
+      error: false,
+    },
+    
   },
   reducers: {
     getAuctionRequestStart: (state) => {
@@ -63,6 +88,42 @@ const auctionrequestSlice = createSlice({
     getAuctionRequestByBreederIdFailed: (state) => {
       state.auctionrequestbybreederid.isFetching = false;
       state.auctionrequestbybreederid.error = true;
+    },
+
+    getAuctionRequestByAssignedStaffStart: (state) => {
+      state.auctionrequestbyassignedstaff.isFetching = true;
+    },
+    getAuctionRequestByAssignedStaffSuccess: (state, action) => {
+      state.auctionrequestbyassignedstaff.isFetching = false;
+      state.auctionrequestbyassignedstaff.auctionrequestbyassignedstaffs = action.payload;
+    },
+    getAuctionRequestByAssignedStaffFailed: (state) => {
+      state.auctionrequestbyassignedstaff.isFetching = false;
+      state.auctionrequestbyassignedstaff.error = true;
+    },
+
+    getAuctionRequestForManagerStart: (state) => {
+      state.auctionrequestformanager.isFetching = true;
+    },
+    getAuctionRequestForManagerSuccess: (state, action) => {
+      state.auctionrequestformanager.isFetching = false;
+      state.auctionrequestformanager.auctionrequestformanagers = action.payload;
+    },
+    getAuctionRequestForManagerFailed: (state) => {
+      state.auctionrequestformanager.isFetching = false;
+      state.auctionrequestformanager.error = true;
+    },
+
+    getAuctionRequestForStaffToAssignStart: (state) => {
+      state.auctionrequestforstafftoassign.isFetching = true;
+    },
+    getAuctionRequestForStaffToAssignSuccess: (state, action) => {
+      state.auctionrequestforstafftoassign.isFetching = false;
+      state.auctionrequestforstafftoassign.auctionrequestforstafftoassigns = action.payload;
+    },
+    getAuctionRequestForStaffToAssignFailed: (state) => {
+      state.auctionrequestforstafftoassign.isFetching = false;
+      state.auctionrequestforstafftoassign.error = true;
     },
 
     getOneAuctionRequestStart: (state) => {
@@ -135,6 +196,39 @@ const auctionrequestSlice = createSlice({
       state.approve.isFetching = false;
       state.approve.error = true;
     },
+
+    managerReviewStart: (state) => {
+      state.managerreview.isFetching = true;
+    },
+    managerReviewSuccess: (state, action) => {
+      state.managerreview.isFetching = false;
+      state.managerreview.managerreviews = state.managerreview.managerreviews.map(
+        (auctionrequest) =>
+          auctionrequest.id === action.payload.id
+            ? action.payload
+            : auctionrequest
+      );
+    },
+    managerReviewFailed: (state) => {
+      state.managerreview.isFetching = false;
+      state.managerreview.error = true;
+    },
+    staffReviewStart: (state) => {
+      state.staffreview.isFetching = true;
+    },
+    staffReviewSuccess: (state, action) => {
+      state.staffreview.isFetching = false;
+      state.staffreview.staffreviews = state.staffreview.staffreviews.map(
+        (auctionrequest) =>
+          auctionrequest.id === action.payload.id
+            ? action.payload
+            : auctionrequest
+      );
+    },
+    staffReviewFailed: (state) => {
+      state.staffreview.isFetching = false;
+      state.staffreview.error = true;
+    },
   },
 });
 export const {
@@ -159,5 +253,20 @@ export const {
   approveAuctionRequestStart,
   approveAuctionRequestSuccess,
   approveAuctionRequestFailed,
+  getAuctionRequestForManagerStart,
+  getAuctionRequestForManagerSuccess,
+  getAuctionRequestForManagerFailed,
+  managerReviewStart,
+  managerReviewSuccess,
+  managerReviewFailed,
+  getAuctionRequestForStaffToAssignStart,
+  getAuctionRequestForStaffToAssignSuccess,
+  getAuctionRequestForStaffToAssignFailed,
+  staffReviewStart,
+  staffReviewSuccess,
+  staffReviewFailed,
+  getAuctionRequestByAssignedStaffStart,
+  getAuctionRequestByAssignedStaffSuccess,
+  getAuctionRequestByAssignedStaffFailed,
 } = auctionrequestSlice.actions;
 export default auctionrequestSlice.reducer;

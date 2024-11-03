@@ -7,7 +7,7 @@ import {
 } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
-
+import { Client } from '@stomp/stompjs';
 import Header from "./components/Header/Header.jsx";
 import Home from "./pages/Home/Home.jsx";
 import Login from "./pages/Login/Login.jsx";
@@ -24,6 +24,7 @@ import Member from "./pages/ManageUser/ManageUser.jsx";
 import ManageStaff from "./pages/ManageStaff/ManageStaff.jsx";
 import Request from "./pages/Request/MRequest.jsx";
 import StaffRequest from "./pages/StaffRequest/Request.jsx";
+import StaffReview from "./pages/StaffReview/StaffReview.jsx";
 import Auction from "./pages/StaffManageAuction/Auction.jsx";
 import CreateRequest from "./pages/CreateRequest/CreateRequest.jsx";
 import FirebaseImageUpload from "./pages/FirebaseImageUpload/FirebaseImageUpload.jsx";
@@ -33,8 +34,8 @@ import StatCard from "./pages/DashBoard/StatCard.jsx";
 import DonutChart from "./pages/DashBoard/DonutChart.jsx";
 import Topup from "./pages/Topup/Topup.jsx";
 import TopupSuccess from "./pages/TopupSuccess/TopupSuccess.jsx";
+import ManageKoiFish from "./pages/ManageKoiFish/ManageKoiFish.jsx";
 
-import { Client } from "@stomp/stompjs";
 
 function App() {
   const CURRENT_USER_ROLE = useSelector((state) =>
@@ -146,9 +147,9 @@ function App() {
             <Route path="/staffrequest" element={<StaffElement><StaffRequest /></StaffElement>} />
             <Route path="/auction" element={<StaffElement><Auction /></StaffElement>} />
             <Route path="/member" element={<StaffElement><Member /></StaffElement>} />
-
+            <Route path="/staffreview" element={<StaffElement><StaffReview /></StaffElement>} />
             <Route path="/createrequest" element={<BreederElement><CreateRequest /></BreederElement>} />
-
+            <Route path="/managekoifish" element={<BreederElement><ManageKoiFish /></BreederElement>} />
             <Route path="/forbidden403" element={<Forbidden403 />} />
             <Route path="*" element={<div>Page Not Found!</div>} />
           </Routes>

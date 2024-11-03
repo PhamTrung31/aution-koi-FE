@@ -39,7 +39,7 @@ function User() {
   const [avatarurl, setAvatarUrl] = useState("");
 
   const token = useSelector(
-    (state) => state.auth.login?.currentToken.result.token
+    (state) => state.auth.login?.currentToken.token
   );
   const userList = useSelector((state) => state.user.users?.allUsers);
   const dispatch = useDispatch();
@@ -111,7 +111,7 @@ function User() {
     }
   };
   const handleBanUser = async (id) => {
-    if (window.confirm("Are you sure you want to delete this user?")) {
+    if (window.confirm("Are you sure you want to ban this user?")) {
       await banUser(dispatch, id, token);
     }
   };
@@ -149,12 +149,6 @@ function User() {
                     onClick={() => openEditModal(user)}
                   >
                     <FontAwesomeIcon icon={faPen} />
-                  </button>
-                  <button
-                    className={styles.actionBtn + " " + styles.deleteBtn}
-                    onClick={() => handleDeleteUser(user.id)}
-                  >
-                    <FontAwesomeIcon icon={faXmark} />
                   </button>
                   
                   <button
