@@ -12,6 +12,11 @@ const auctionSlice = createSlice ({
             allAuctions: [],
             isFetching: false,
             error: null
+        },
+        joinValidate: {
+            currentStatus: null,
+            isFetching: false,
+            error: null
         }
     },
     reducers: {
@@ -43,6 +48,17 @@ const auctionSlice = createSlice ({
             state.getAuction.isFetching = false;
             state.getAuction.error = true;
           },
+        joinValidateStart: (state) => {
+            state.joinValidate.isFetching = true
+        },
+        joinValidateSuccess: (state, action) => {
+            state.joinValidate.isFetching = false,
+            state.joinValidate.currentStatus = action.payload
+        },
+        joinValidateFailed: (state, action) => {
+            state.joinValidate.isFetching = false,
+            state.joinValidate.error = action.payload
+        }
     }
 })
 
@@ -53,7 +69,10 @@ export const {
     joinAuctionFailed,
     getAuctionStart,
     getAuctionSuccess,
-    getAuctionFailed
+    getAuctionFailed,
+    joinValidateStart,
+    joinValidateSuccess,
+    joinValidateFailed
 } = auctionSlice.actions
 
 export default auctionSlice.reducer

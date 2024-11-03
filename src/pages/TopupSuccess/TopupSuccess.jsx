@@ -1,8 +1,17 @@
 import { SiTicktick } from "react-icons/si";
 import { Link } from 'react-router-dom';
+import { getUserWallet } from "../../redux/apiRequest";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
 
 
 function TopupSuccess() {
+    const user = useSelector((state) => state.auth.profile.currentUser);
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        getUserWallet(user.id, dispatch);
+    }, []);
 
     return (
         <div className="px-4 my-5 text-center border-bottom">
