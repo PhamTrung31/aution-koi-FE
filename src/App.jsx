@@ -7,7 +7,6 @@ import {
 } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
-import { Client } from '@stomp/stompjs';
 import Header from "./components/Header/Header.jsx";
 import Home from "./pages/Home/Home.jsx";
 import Login from "./pages/Login/Login.jsx";
