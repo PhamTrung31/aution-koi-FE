@@ -8,6 +8,7 @@ import auctionrequestReducer from "./auctionRequestSlice";
 import auctionReducer from "./auctionSlice";
 import koifishReducer from "./koifishSlice";
 import walletReducer from "./walletSlice";
+import messageReducer from "./messageSlice";
 import {
   persistStore,
   persistReducer,
@@ -31,9 +32,15 @@ const walletPersistConfig = {
   storage: sessionStorage,
 };
 
+const messagePersistConfig = {
+  key: "message",
+  storage: sessionStorage,
+}
+
 // Tạo persist reducer cho auth
 const persistedAuthReducer = persistReducer(authPersistConfig, authReducer);
 const persistedWalletReducer = persistReducer(walletPersistConfig, walletReducer);
+const persistMessageReducer = persistReducer(messagePersistConfig, messageReducer);
 
 // Tạo store
 const store = configureStore({
@@ -46,7 +53,8 @@ const store = configureStore({
     auctionrequest: auctionrequestReducer,
     auction: auctionReducer,
     koifish: koifishReducer,
-    wallet: persistedWalletReducer
+    wallet: persistedWalletReducer,
+    message: persistMessageReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

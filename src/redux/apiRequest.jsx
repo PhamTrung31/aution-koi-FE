@@ -107,7 +107,10 @@ import {
 import {
   joinAuctionStart,
   joinAuctionSuccess,
-  joinAuctionFailed
+  joinAuctionFailed,
+  joinValidateStart,
+  joinValidateSuccess,
+  joinValidateFailed
 } from "./auctionSlice";
 import {
   getUserWalletStart,
@@ -153,7 +156,7 @@ export const getUserProfile = async (accessToken, dispatch) => {
       }
     );
     dispatch(getProfileSuccess(res.data));
-    getUserWallet(res.data.id, dispatch);
+    getUserWallet(accessToken, res.data.id, dispatch);
   } catch (err) {
     dispatch(getProfileFailed());
   }
@@ -206,7 +209,7 @@ export const addStaff = async (dispatch, staffData, accessToken) => {
       }
     );
     dispatch(addStaffSuccess(res.data));
-    getAllStaffs(accessToken,dispatch);
+    getAllStaffs(accessToken, dispatch);
   } catch (err) {
     dispatch(addStaffFailed());
   }
@@ -222,7 +225,7 @@ export const deleteStaff = async (dispatch, staffId, accessToken) => {
       }
     );
     dispatch(deleteStaffSuccess(res.data));
-    getAllStaffs(accessToken,dispatch);
+    getAllStaffs(accessToken, dispatch);
   } catch {
     dispatch(deleteStaffFailed());
   }
@@ -244,7 +247,7 @@ export const updateStaff = async (
       }
     );
     dispatch(updateStaffSuccess(res.data));
-    getAllStaffs(accessToken,dispatch);
+    getAllStaffs(accessToken, dispatch);
   } catch {
     dispatch(updateStaffFailed());
   }
@@ -254,13 +257,13 @@ export const banStaff = async (dispatch, userId, accessToken) => {
   dispatch(banStaffStart());
   try {
     const res = await axios.post(
-      `http://localhost:8081/auctionkoi/manager/ban/${userId}`,{},
+      `http://localhost:8081/auctionkoi/manager/ban/${userId}`, {},
       {
         headers: { Authorization: `Bearer ${accessToken}  ` },
       }
     );
     dispatch(banStaffSuccess(res.data));
-    getAllStaffs(accessToken,dispatch);
+    getAllStaffs(accessToken, dispatch);
   } catch (err) {
     dispatch(banStaffFailed());
   }
@@ -270,13 +273,13 @@ export const unbanStaff = async (dispatch, userId, accessToken) => {
   dispatch(unbanStaffStart());
   try {
     const res = await axios.post(
-      `http://localhost:8081/auctionkoi/manager/unban/${userId}`,{},
+      `http://localhost:8081/auctionkoi/manager/unban/${userId}`, {},
       {
         headers: { Authorization: `Bearer ${accessToken}  ` },
       }
     );
     dispatch(unbanStaffSuccess(res.data));
-    getAllStaffs(accessToken,dispatch);
+    getAllStaffs(accessToken, dispatch);
   } catch (err) {
     dispatch(unbanStaffFailed());
   }
@@ -305,7 +308,7 @@ export const addUser = async (dispatch, staffData, accessToken) => {
       }
     );
     dispatch(addUserSuccess(res.data));
-    getAllUser(accessToken,dispatch);
+    getAllUser(accessToken, dispatch);
   } catch (err) {
     dispatch(addUserFailed());
   }
@@ -321,7 +324,7 @@ export const deleteUser = async (dispatch, userId, accessToken) => {
       }
     );
     dispatch(deleteUserSuccess(res.data.result));
-    getAllUser(accessToken,dispatch);
+    getAllUser(accessToken, dispatch);
   } catch {
     dispatch(deleteUserFailed());
   }
@@ -349,7 +352,6 @@ export const changeAvatarImage = async (accessToken, userid, payload, dispatch, 
 export const joinNewAuction = async (accessToken, userid, auctionid, dispatch, navigate) => {
   dispatch(joinAuctionStart());
   try {
-    
     const res = await axios.post(
       `http://localhost:8081/auctionkoi/auctions/join/${auctionid}/${userid}`,
       {
@@ -379,7 +381,7 @@ export const updateUser = async (dispatch, userId, updatedata, accessToken) => {
       }
     );
     dispatch(updateUserSuccess(res.data));
-    getAllUser(accessToken,dispatch);
+    getAllUser(accessToken, dispatch);
   } catch {
     dispatch(updateUserFailed());
   }
@@ -396,7 +398,7 @@ export const banUser = async (dispatch, userId, accessToken) => {
       }
     );
     dispatch(banUserSuccess(res.data));
-    getAllUser(accessToken,dispatch);
+    getAllUser(accessToken, dispatch);
   } catch (err) {
     dispatch(banUserFailed());
   }
@@ -413,7 +415,7 @@ export const unbanUser = async (dispatch, userId, accessToken) => {
       }
     );
     dispatch(unbanUserSuccess(res.data));
-    getAllUser(accessToken,dispatch);
+    getAllUser(accessToken, dispatch);
   } catch (err) {
     dispatch(unbanUserFailed());
   }
@@ -464,9 +466,9 @@ export const addAuctionRequest = async (dispatch, auctionRequestData, accessToke
       "http://localhost:8081/auctionkoi/auctions/send-request",
       auctionRequestData, // Data should be an object
       {
-        headers: { 
-          Authorization: `Bearer ${accessToken}`, 
-          "Content-Type": "application/json" 
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json"
         },
       }
     );
@@ -641,10 +643,14 @@ export const topupWalletRequest = async (payload, dispatch, navigate) => {
   }
 };
 
-export const getUserWallet = async (userid, dispatch) => {
+export const getUserWallet = async (accessToken, userid, dispatch) => {
   dispatch(getUserWalletStart());
   try {
-    const res = await axios.get(`http://localhost:8081/auctionkoi/wallet/${userid}`);
+    const res = await axios.get(`http://localhost:8081/auctionkoi/wallet/${userid}`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
     console.log(res.data.result)
     dispatch(getUserWalletSuccess(res.data.result));
   } catch (err) {
@@ -652,3 +658,20 @@ export const getUserWallet = async (userid, dispatch) => {
     dispatch(getUserWalletFailed(error));
   }
 }
+
+export const joinAuctionValidate = async (accessToken, auctionid, userid, dispatch) => {
+  dispatch(joinValidateStart());
+  try {
+    const res = await axios.get(`http://localhost:8081/auctionkoi/auctions/check-participation/${auctionid}/${userid}`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+    console.log(res.data.message);
+    dispatch(joinValidateSuccess(res.data.message));
+  } catch (err) {
+    const error = err.response?.data || "An error occred";
+    dispatch(joinValidateFailed());
+  }
+}
+

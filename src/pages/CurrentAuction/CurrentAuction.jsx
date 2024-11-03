@@ -6,73 +6,79 @@ import { joinNewAuction } from "../../redux/apiRequest";
 import { joinAuctionInitial } from "../../redux/auctionSlice";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { Client } from "@stomp/stompjs";
+import { joinAuctionValidate } from "../../redux/apiRequest";
+import { countPendingTimeLeft } from "../../redux/messageSlice";
 
 function CurrentAuction() {
     const { currentUser } = useSelector((state) => state.auth.profile);
     const error = useSelector((state) => state.auction.joinAuction.error);
-    const token = useSelector((state) => state.auth.login?.currentToken.token);
-    const notify = () => toast.error(error.message);
+    const token = useSelector((state) => state.auth.login.currentToken.token);
+    const message = useSelector((state) => state.message.websocketPendingMessage);
+    const joinValid = useSelector((state) => state.auction.joinValidate.currentStatus);
+    const timeLeft = useSelector((state) => state.message.pendingTimeLeft);
+    const [isTimerCompleted, setIsTimerCompleted] = useState(false); // Cờ để kiểm tra xem countdown đã kết thúc chưa
 
-    const [timerDays, setTimerDays] = useState("00");
-    const [timerHours, setTimerHours] = useState("00");
-    const [timerMinutes, setTimerMinutes] = useState("00");
-    const [timerSeconds, setTimerSeconds] = useState("00");
+    const [timerDays, setTimerDays] = useState("0");
+    const [timerHours, setTimerHours] = useState("0");
+    const [timerMinutes, setTimerMinutes] = useState("0");
+    const [timerSeconds, setTimerSeconds] = useState("0");
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const notify = () => toast.error(error.message);
 
-    const [message, setMessage] = useState(
-        JSON.parse(sessionStorage.getItem('websocketPendingMessage')) || null
-    );
+    let interval = useRef(null);
 
-    let interval = useRef();
-
-    const startTimer = () => {
-        if (!message?.start_time) return;
-
+    const startTimer = async () => {
+        if (!message?.start_time || isTimerCompleted) return;
         const countdownDate = new Date(message.start_time).getTime();
 
-        interval = setInterval(() => {
-            const now = new Date().getTime();
-            const distance = countdownDate - now - (7 * 60 * 60 * 1000);
+        await new Promise((resolve) => {
+            interval = setInterval(() => {
+                const now = new Date().getTime();
+                const distance = countdownDate - now - (7 * 60 * 60 * 1000);
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor(
+                    (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+                );
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor(
-                (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-            );
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                if (distance < 0) {
+                    clearInterval(interval);
+                    resolve(); // Resolve the promise when the timer reaches zero
+                } else {
+                    // update timer
+                    setTimerDays(days);
+                    setTimerHours(hours);
+                    setTimerMinutes(minutes);
+                    setTimerSeconds(seconds);
+                }
+            }, 1000);
+        });
 
-            if (distance < 0) {
-                //stop our timer
-                clearInterval(interval.current);
-            } else {
-                // update timer
-                setTimerDays(days);
-                setTimerHours(hours);
-                setTimerMinutes(minutes);
-                setTimerSeconds(seconds);
-            }
-        }, 1000);
+        dispatch(countPendingTimeLeft(0));
     };
 
     useEffect(() => {
-        startTimer();
+        if (message?.start_time) {
+            startTimer();
+        }
         return () => {
-            clearInterval(interval.current);
+            // Cleanup interval khi component unmount hoặc message thay đổi
+            if (interval.current) {
+                clearInterval(interval.current);
+                interval.current = null;
+            }
         };
     }, [message]);
 
     const handleJoinAuction = (e) => {
         e.preventDefault();
-        joinNewAuction(
-            token,
-            currentUser.id,
-            auctionPendingInfo.auction_id,
-            dispatch,
-            navigate
-        );
+        console.log(token);
+        console.log(currentUser.id);
+        console.log(message.auction_id);
+        joinNewAuction(token, currentUser.id, message.auction_id, dispatch, navigate);
     };
 
     useEffect(() => {
@@ -83,7 +89,9 @@ function CurrentAuction() {
     }, [error]);
 
     useEffect(() => {
-        console.log(message);
+        if (message !== null) {
+            joinAuctionValidate(token, message.auction_id, currentUser.id, dispatch);
+        }
     }, [message]);
 
     return (
@@ -95,37 +103,72 @@ function CurrentAuction() {
                     visibility: message ? "visible" : "hidden",
                 }}
             >
-                {message ? "Auction will start in" : ""}
+                {
+                    timeLeft === 0 ? "Auction is happening"
+                        : message ? "Auction will start in"
+                            : ""
+                }
             </h1>
             <div className="col-lg-6 mx-auto">
                 {message ? (
                     <>
                         <div className="lead mb-4 fs-1 fw-light">
-                            <span>
-                                {timerDays == 1
-                                    ? timerDays + " day"
-                                    : timerDays == 0
-                                        ? ""
-                                        : timerDays + " days"}{" "}
-                                {timerHours < 10 ? "0" + timerHours : timerHours}:
-                                {timerMinutes < 10 ? "0" + timerMinutes : timerMinutes}:
-                                {timerSeconds < 10 ? "0" + timerSeconds : timerSeconds}
-                            </span>
+                            { timeLeft !== 0 ?
+                                <span>
+                                    {
+                                        timerDays == 1
+                                            ? timerDays + " day"
+                                            : timerDays == 0
+                                                ? ""
+                                                : timerDays + " days"
+                                    }{" "}
+                                    {
+                                        timerHours < 10
+                                            ? "0" + timerHours + ":"
+                                            : timerHours == 0
+                                                ? ""
+                                                : timerHours + ":"
+                                    }
+                                    {
+                                        timerMinutes < 10
+                                            ? "0" + timerMinutes + ":"
+                                            : timerMinutes == 0
+                                                ? ""
+                                                : timerMinutes + ":"
+                                    }
+                                    {
+                                        timerSeconds < 10
+                                            ? "0" + timerSeconds
+                                            : timerSeconds == 0
+                                                ? ""
+                                                : timerSeconds
+                                    }
+                                </span>
+                                : <span></span>
+                            }
                         </div>
                         <div className="d-grid gap-2 d-sm-flex justify-content-sm-center mb-5">
-                            <Link
-                                type="button"
-                                className="btn btn-success btn-lg px-4 me-sm-3"
-                                // onClick={handleJoinAuction}
-                                to={"/auctionView"}
-                            // style={{
-                            //     opacity: auctionPendingInfo.countdownDate === 0 ? 0.5 : 1,
-                            //     pointerEvents:
-                            //         auctionPendingInfo.countdownDate === 0 ? "none" : "auto",
-                            // }}
-                            >
-                                Join Now
-                            </Link>
+
+                            {
+                                joinValid === "Joined auction" ? (
+                                    <Link
+                                        type="button"
+                                        className="btn btn-success btn-lg px-4 me-sm-3"
+                                        // onClick={handleJoinAuction}
+                                        to={"/auctionView"}
+                                    >
+                                        View Auction
+                                    </Link>
+                                ) : (
+                                    <Link
+                                        type="button"
+                                        className="btn btn-success btn-lg px-4 me-sm-3"
+                                        onClick={handleJoinAuction}
+                                    >
+                                        Join Auction
+                                    </Link>
+                                )
+                            }
                         </div>
                         <div className="overflow-hidden" style={{ maxHeight: "30vh" }}>
                             <div className="container px-5">

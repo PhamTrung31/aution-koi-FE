@@ -5,7 +5,7 @@ import {
   Routes,
   Navigate,
 } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 
 import Header from "./components/Header/Header.jsx";
@@ -33,15 +33,18 @@ import StatCard from "./pages/DashBoard/StatCard.jsx";
 import DonutChart from "./pages/DashBoard/DonutChart.jsx";
 import Topup from "./pages/Topup/Topup.jsx";
 import TopupSuccess from "./pages/TopupSuccess/TopupSuccess.jsx";
+import { loadWebsocketPendingMessage } from "./redux/messageSlice.jsx";
 
 import { Client } from "@stomp/stompjs";
-
 function App() {
   const CURRENT_USER_ROLE = useSelector((state) =>
     state.auth.profile.currentUser
       ? state.auth.profile.currentUser.role
       : "GUEST"
   );
+
+  const dispatch = useDispatch();
+
   // const CURRENT_USER_ROLE = "customer"
 
   function PublicElement({ children }) {
@@ -94,7 +97,8 @@ function App() {
           const parsedMessage = JSON.parse(msg.body);
 
           // Lưu vào sessionStorage
-          sessionStorage.setItem('websocketPendingMessage', JSON.stringify(parsedMessage));
+          // sessionStorage.setItem('websocketPendingMessage', JSON.stringify(parsedMessage));
+          dispatch(loadWebsocketPendingMessage(JSON.parse(msg.body)));
         });
         
         client.subscribe('/auctions/start', (msg) => {
