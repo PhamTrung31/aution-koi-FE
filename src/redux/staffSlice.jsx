@@ -4,27 +4,128 @@ const staffSlice = createSlice({
   name: "staff",
   initialState: {
     staffs: {
-      allStaffs: null,
+      allStaffs: [],
+      isFetching: false,
+      error: false,
+    },
+    addstaffs: {
+      addStaffs: [],
+      isFetching: false,
+      error: false,
+    },
+    deletestaffs: {
+      deletestaffs: [],
+      isFetching: false,
+      error: false,
+    },
+    updatestaffs: {
+      updatestaffs: [],
+      isFetching: false,
+      error: false,
+    },
+    banstaffs: {
+      banstaffs: [],
+      isFetching: false,
+      error: false,
+    },
+    unbanstaffs: {
+      unbanstaffs: [],
       isFetching: false,
       error: false,
     },
   },
   reducers: {
-      getStaffsStart: (state) => {
-        state.staffs.isFetching = true
-      },
-      getStaffsSuccess: (state,action) => {
-        state.staffs.isFetching = false,
-        state.staffs.allStaffs = action.payload
-      },
-      getStaffsFailed: (state) => {
-        state.staffs.error = true
-      }
+    getStaffStart: (state) => {
+      state.staffs.isFetching = true;
+    },
+    getStaffSuccess: (state, action) => {
+      state.staffs.isFetching = false;
+      state.staffs.allStaffs = action.payload;
+    },
+    getStaffFailed: (state) => {
+      state.staffs.isFetching = false;
+      state.staffs.error = true;
+    },
+
+    addStaffStart: (state) => {
+      state.addstaffs.isFetching = true;
+    },
+    addStaffSuccess: (state, action) => {
+      state.addstaffs.isFetching = false;
+      state.addstaffs.addStaffs.push(action.payload);
+    },
+    addStaffFailed: (state) => {
+      state.addstaffs.isFetching = false;
+      state.addstaffs.error = true;
+    },
+    deleteStaffStart: (state) => {
+      state.deletestaffs.isFetching = true;
+    },
+    deleteStaffSuccess: (state, action) => {
+      state.deletestaffs.isFetching = false;
+      state.deletestaffs.deletestaffs.delete(action.payload);
+    },
+    deleteStaffFailed: (state) => {
+      state.deletestaffs.isFetching = false;
+      state.deletestaffs.error = true;
+    },
+    updateStaffStart: (state) => {
+      state.updatestaffs.isFetching = true;
+    },
+    updateStaffSuccess: (state, action) => {
+      state.updatestaffs.isFetching = false;
+      state.updatestaffs.updatestaffs = state.updatestaffs.updatestaffs.map(
+        (staff) => (staff.id === action.payload.id ? action.payload : staff)
+      );
+    },
+    updateStaffFailed: (state) => {
+      state.updatestaffs.isFetching = false;
+      state.updatestaffs.error = true;
+    },
+
+    banStaffStart: (state) => {
+      state.banstaffs.isFetching = true;
+    },
+    banStaffSuccess: (state, action) => {
+      state.banstaffs.isFetching = false;
+      state.banstaffs.banstaffs.push(action.payload);
+    },
+    banStaffFailed: (state) => {
+      state.banstaffs.isFetching = false;
+      state.banstaffs.error = true;
+    },
+
+    unbanStaffStart: (state) => {
+      state.unbanstaffs.isFetching = true;
+    },
+    unbanStaffSuccess: (state, action) => {
+      state.unbanstaffs.isFetching = false;
+      state.unbanstaffs.unbanstaffs.push(action.payload);
+    },
+    unbanStaffFailed: (state) => {
+      state.unbanstaffs.isFetching = false;
+      state.unbanstaffs.error = true;
+    },
   },
 });
 export const {
-  getStaffsStart,
-  getStaffsSuccess,
-  getStaffsFailed
+  getStaffStart,
+  getStaffSuccess,
+  getStaffFailed,
+  addStaffStart,
+  addStaffSuccess,
+  addStaffFailed,
+  deleteStaffStart,
+  deleteStaffSuccess,
+  deleteStaffFailed,
+  updateStaffStart,
+  updateStaffSuccess,
+  updateStaffFailed,
+  banStaffStart,
+  banStaffSuccess,
+  banStaffFailed,
+  unbanStaffStart,
+  unbanStaffSuccess,
+  unbanStaffFailed,
 } = staffSlice.actions;
 export default staffSlice.reducer;

@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { useDispatch, useSelector } from "react-redux";
-import { getAuctionRequestForManager, managerReview, getKoiFishById } from "../../redux/apiRequest";
+import { getAuctionRequestByAssignedStaff, getKoiFishById, getAuctionById } from "../../redux/apiRequest";
 
-import styles from "./Request.module.css";
+import styles from "./Auction.module.css";
 const Modal = ({ show, children }) => {
   if (!show) {
     return null;
@@ -15,52 +15,32 @@ const Modal = ({ show, children }) => {
     </div>
   );
 };
-function MRequest() {
+function Auction() {
   const token = useSelector((state) => state.auth.login?.currentToken.token);
   const aucionRequestList = useSelector(
-    (state) => state.auctionrequest.auctionrequestformanager?.auctionrequestformanagers
+    (state) => state.auctionrequest.auctionrequestbyassignedstaff?.auctionrequestbyassignedstaffs
+  );
+  const auctionById = useSelector(
+    (state) => state.auction.getAuction?.allAuctions
   );
   const koifishById = useSelector(
     (state) => state.koifish.koifishs?.koifishById
   );
+  const { currentUser } = useSelector((state) => state.auth.profile);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    getAuctionRequestForManager(token, dispatch);
+    getAuctionRequestByAssignedStaff(token, currentUser.id, dispatch);
   }, []);
   console.log(aucionRequestList);
+  console.log(auctionById);
 
 
   const [infoKoiFishModal, setinfoKoiFishModal] = useState(false);
   const [infoAuctionModal, setinfoAuctionModal] = useState(false);
-  const [showApproveModal, setshowApproveModal] = useState(false);
   const [selectedAuctionRequest, setSelectedAuctionRequest] = useState(null);
-  const [auctionRequestId, setauctionRequestId] = useState("");
-  const [managerId, setmanagerId] = useState("");
-  const [staffId, setstaffId] = useState("");
-  const [isApproved, setisApproved] = useState(false);
-  const [assignToStaff, setassignToStaff] = useState(false);
 
-  const handleApprove = async () => {
-    const ApproveData = {
-      auctionRequestId: auctionRequestId,
-      managerId: managerId,
-      staffId: staffId,
-      isApproved: isApproved,
-      assignToStaff: assignToStaff
-    };
-    await managerReview(dispatch, ApproveData, token);
-    resetForm();
-    setshowApproveModal(false);
-  };
 
-  const resetForm = () => {
-    setauctionRequestId("");
-    setmanagerId("")
-    setstaffId("");
-    setisApproved(false);
-    setassignToStaff(false)
-  };
 
   const handleOpenKoiFishModal = (AuctionRequest) => {
     setSelectedAuctionRequest(AuctionRequest);
@@ -69,7 +49,7 @@ function MRequest() {
   };
 
   const handleOpenAuctionModal = (AuctionRequest) => {
-    setSelectedAuctionRequest(AuctionRequest);
+    getAuctionById(token, AuctionRequest.auction, dispatch);
     setinfoAuctionModal(true);
   };
   return (
@@ -79,14 +59,15 @@ function MRequest() {
         <tr className="table-dark">
           <th>ID</th>
           <th>Breeder</th>
-          <th>Auction Detail</th>
+          <th>Status</th>
           <th>Koi Fish Detail</th>
-          <th>Actions</th>
+          <th>Auction Detail</th>
         </tr>
         {aucionRequestList?.map((aucionRequest) => (
           <tr key={aucionRequest.id}>
             <td>{aucionRequest.id}</td>
             <td>{aucionRequest.user}</td>
+            <td>{aucionRequest.requestStatus}</td>
             <td>
               <button
                 className={styles.viewBtn}
@@ -103,27 +84,20 @@ function MRequest() {
                 Detail
               </button>
             </td>
-            <td>
-              <button 
-                className={styles.actionBtn}
-                onClick={() => setshowApproveModal(true)}
-              >
-                <FontAwesomeIcon icon={faCheck} />
-              </button>
-            </td>
+            
           </tr>
         ))}
       </table>
 
       <Modal show={infoKoiFishModal}>
-        <div className="position-relative p-2 text-start text-muted bg-body border border-dashed rounded-5">
+        <div class="position-relative p-2 text-start text-muted bg-body border border-dashed rounded-5">
           <button
             type="button"
-            className="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill"
+            class="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill"
             aria-label="Close"
             onClick={() => setinfoKoiFishModal(false)}
           ></button>
-          <h1 className="text-body-emphasis text-start">Koi Fish Detail</h1>
+          <h1 class="text-body-emphasis text-start">Koi Fish Detail</h1>
           <div>
             {koifishById && (
               <div>
@@ -180,55 +154,64 @@ function MRequest() {
           </div>
         </div>
       </Modal>
+
       <Modal show={infoAuctionModal}>
-        <div className="position-relative p-2 text-start text-muted bg-body border border-dashed rounded-5">
+        <div class="position-relative p-2 text-start text-muted bg-body border border-dashed rounded-5">
           <button
             type="button"
-            className="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill"
+            class="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill"
             aria-label="Close"
             onClick={() => setinfoAuctionModal(false)}
           ></button>
-          <h1 className="text-body-emphasis text-start">Auction</h1>
+          <h1 class="text-body-emphasis text-start">Auction Detail</h1>
           <div>
-            {selectedAuctionRequest && (
+            {auctionById && (
               <div>
                 <div>
-                  <label className="form-label"><strong>Buy Out Price:</strong></label>
+                  <label className="form-label"><strong>ID:</strong></label>
                   <input
                     readOnly
-                    value={selectedAuctionRequest.buyOut}
+                    value={auctionById.id}
                     className={styles.roundedInput}
                   />
                 </div>
                 <div>
-                  <label className="form-label"><strong>Start Price:</strong></label>
+                  <label className="form-label"><strong>Winner:</strong></label>
                   <input
                     readOnly
-                    value={selectedAuctionRequest.startPrice}
+                    value={auctionById.winner}
                     className={styles.roundedInput}
                   />
                 </div>
                 <div>
-                  <label className="form-label"><strong>Method Type:</strong></label>
+                  <label className="form-label"><strong>Current Price:</strong></label>
                   <input
                     readOnly
-                    value={selectedAuctionRequest.methodType}
+                    value={auctionById.currentPrice}
                     className={styles.roundedInput}
                   />
                 </div>
                 <div>
-                  <label className="form-label"><strong>Start Time:</strong></label>
+                  <label className="form-label"><strong>Extension Seconds:</strong></label>
                   <input
                     readOnly
-                    value={selectedAuctionRequest.startTime}
+                    value={auctionById.extensionSeconds}
                     className={styles.roundedInput}
                   />
                 </div>
                 <div>
-                  <label className="form-label"><strong>End Time:</strong></label>
+                  <label className="form-label"><strong>Highest Price:</strong></label>
                   <input
                     readOnly
-                    value={selectedAuctionRequest.endTime}
+                    value={auctionById.highestPrice}
+                    className={styles.roundedInput}
+                  />
+                </div>
+                <div>
+                  <label className="form-label"><strong>Deposit Amount:</strong></label>
+                  <input
+                    readOnly
+                    value={auctionById.depositAmount}
                     className={styles.roundedInput}
                   />
                 </div>
@@ -237,78 +220,9 @@ function MRequest() {
           </div>
         </div>
       </Modal>
-      <Modal show={showApproveModal}>
-        <div className="position-relative p-2 text-center text-muted bg-body border border-dashed rounded-5">
-          <button
-            type="button"
-            className="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill"
-            aria-label="Close"
-            onClick={() => setshowApproveModal(false)}
-          ></button>
-          <h1 className="text-body-emphasis">Create Request</h1>
-          <div>
-            <form onSubmit={handleApprove}>
-              <input
-                type="text"
-                name="auctionRequestId"
-                onChange={(e) => setauctionRequestId(e.target.value)}
-                placeholder="AuctionRequest ID"
-                className={styles.roundedInput}
-              />
-              <input
-                type="text"
-                name="managerId"
-                onChange={(e) => setmanagerId(e.target.value)}
-                placeholder="Manager ID"
-                className={styles.roundedInput}
-              />
-              <input
-                type="text"
-                name="staffId"
-                onChange={(e) => setstaffId(e.target.value)}
-                placeholder="Staff ID"
-                className={styles.roundedInput}
-              />
-              <div className="col-auto d-flex align-items-center">
-                <h5 className="mb-0 me-2">Approve:</h5>
-                <div className="form-check">
-                  <input
-                    className="form-check-input"
-                    type="checkbox"
-                    id="YesNoCheckbox"
-                    checked={isApproved}
-                    onChange={(e) => setisApproved(e.target.checked)}
-                  />
-                  <label className="form-check-label" htmlFor="YesNoCheckbox">
-                    {isApproved ? "True" : "False"}
-                  </label>
-                </div>
-              </div>
-
-              <div className="col-auto d-flex align-items-center">
-                <h5 className="mb-0 me-2">Assign To Staff:</h5>
-                <div className="form-check">
-                  <input
-                    className="form-check-input"
-                    type="checkbox"
-                    id="YesNoCheckbox"
-                    checked={assignToStaff}
-                    onChange={(e) => setassignToStaff(e.target.checked)}
-                  />
-                  <label className="form-check-label" htmlFor="YesNoCheckbox">
-                    {assignToStaff ? "True" : "False"}
-                  </label>
-                </div>
-              </div>
-              <button type="submit" className="btn btn-outline-dark">
-                Submit
-              </button>
-            </form>
-          </div>
-        </div>
-      </Modal>
+      
     </div>
   );
 }
 
-export default MRequest;
+export default Auction;

@@ -1,441 +1,659 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark, faPen } from "@fortawesome/free-solid-svg-icons";
 import styles from "./CreateRequest.module.css";
-import { width } from "@fortawesome/free-solid-svg-icons/fa0";
+import { useDispatch, useSelector } from "react-redux";
+import dayjs from "dayjs";
+import utc from "dayjs-plugin-utc";
+import {
+  getAllAuctionRequestByBreederID,
+  addAuctionRequest,
+  updateAuctionRequest,
+  cancelAuctionRequest,
+  getKoiFishById,
+  getKoiFishByBreederId,
+  addKoiFish
+} from "../../redux/apiRequest";
 const Modal = ({ show, children }) => {
   if (!show) {
     return null;
   }
   return (
     <div className={styles.modalOverlay}>
-      <div className={styles.modalsContent}>
-        {children}
-      </div>
+      <div className={styles.modalsContent}>{children}</div>
     </div>
   );
 };
 function CreateRequest() {
-  const [requests, setRequests] = useState([
-    {
-      id: 1,
-      fishName: "Goldfish",
-      method: "Auction",
-      startPrice: "100",
-      buyOutPrice: "200",
-      startTime: "2024-10-01T10:00",
-      endTime: "2024-10-01T15:00",
-    },
-    {
-      id: 2,
-      fishName: "Betta",
-      method: "Buy Now",
-      startPrice: "150",
-      buyOutPrice: "300",
-      startTime: "2024-10-02T12:00",
-      endTime: "2024-10-02T17:00",
-    },
-    {
-      id: 2,
-      fishName: "Betta",
-      method: "Buy Now",
-      startPrice: "150",
-      buyOutPrice: "300",
-      startTime: "2024-10-02T12:00",
-      endTime: "2024-10-02T17:00",
-    },
-    {
-      id: 2,
-      fishName: "Betta",
-      method: "Buy Now",
-      startPrice: "150",
-      buyOutPrice: "300",
-      startTime: "2024-10-02T12:00",
-      endTime: "2024-10-02T17:00",
-    },
-    {
-      id: 2,
-      fishName: "Betta",
-      method: "Buy Now",
-      startPrice: "150",
-      buyOutPrice: "300",
-      startTime: "2024-10-02T12:00",
-      endTime: "2024-10-02T17:00",
-    },
-    {
-      id: 2,
-      fishName: "Betta",
-      method: "Buy Now",
-      startPrice: "150",
-      buyOutPrice: "300",
-      startTime: "2024-10-02T12:00",
-      endTime: "2024-10-02T17:00",
-    },
-    {
-      id: 2,
-      fishName: "Betta",
-      method: "Buy Now",
-      startPrice: "150",
-      buyOutPrice: "300",
-      startTime: "2024-10-02T12:00",
-      endTime: "2024-10-02T17:00",
-    },
-  ]);
-  const handleAdd = async (e) => {
-    e.preventDefault();
-    const staffData = {};
-  };
+  dayjs.extend(utc);
+  const [userId, setuserId] = useState("");
+  const [fishId, setfishId] = useState("");
+  const [buyOut, setbuyOut] = useState("");
+  const [incrementStep, setincrementStep] = useState("");
+  const [startPrice, setstartPrice] = useState("");
+  const [methodType, setmethodType] = useState("");
+  const [start_time, setstartTime] = useState("");
+  const [end_time, setendTime] = useState("");
 
-  const [editForm, setEditForm] = useState({
-    id: "",
-    fishName: "",
-    method: "",
-    startPrice: "",
-    buyOutPrice: "",
-    startTime: "",
-    endTime: "",
-  });
+  const [name, setname] = useState("");
+  const [sex, setsex] = useState("");
+  const [size, setsize] = useState("");
+  const [age, setage] = useState("");
+  const [description, setdescription] = useState("");
+  const [imageUrl, setimageUrl] = useState("");
+  const [videoUrl, setvideoUrl] = useState("");
+
+  const [selectedauctionrequest, setSelectedAuctionRequest] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [showFishDetailModal, setShowFishDetailModal] = useState(false);
+  const [showAddKoiFishModal, setShowAddKoiFishModal] = useState(false);
 
-  const handleEditRequest = (request) => {
-    setEditForm(request);
-    setShowEditModal(true);
+
+
+  const resetForm = () => {
+    setuserId("");
+    setfishId("");
+    setbuyOut("");
+    setincrementStep("");
+    setstartPrice("");
+    setmethodType("");
+    setstartTime("");
+    setendTime("");
   };
 
-  const handleSaveChanges = () => {
-    const updatedRequests = requests.map((request) =>
-      request.id === editForm.id ? editForm : request
-    );
-    setRequests(updatedRequests);
+  const token = useSelector(
+    (state) => state.auth.login?.currentToken.token
+  );
+  
+  const aucionRequestList = useSelector(
+    (state) => state.auctionrequest.auctionrequestbybreederid?.auctionrequestbybreederids
+  );
+  const koifishById = useSelector(
+    (state) => state.koifish.koifishs?.koifishById
+  );
+  const koiFishList = useSelector(
+    (state) => state.koifish.koifishByBreederId?.koifishByBreederId
+  );
+  const { currentUser } = useSelector((state) => state.auth.profile);
+  const dispatch = useDispatch();
+  console.log(token);
+
+ 
+  useEffect(() => {
+    getAllAuctionRequestByBreederID(token, currentUser.id, dispatch);
+    getKoiFishByBreederId(token, currentUser.id, dispatch);
+  }, []);
+  
+ 
+  
+  const handleSendRequest = async (e) => {
+    e.preventDefault();
+    const RequestData = {
+      userId: parseInt(currentUser.id),
+      fishId: parseInt(fishId),
+      buyOut: parseFloat(buyOut),
+      startPrice: parseFloat(startPrice),
+      methodType: methodType,
+    };
+    console.log(RequestData)
+    await addAuctionRequest(dispatch, RequestData, token);
+    resetForm();
+    setShowAddModal(false);
+  };
+  const handleUpdateSendRequest = async (e) => {
+    e.preventDefault();
+    const RequestData = {
+      userId: parseInt(currentUser.id),
+      fishId: parseInt(fishId),
+      buyOut: parseFloat(buyOut),
+      incrementStep: parseInt(incrementStep),
+      startPrice: parseFloat(startPrice),
+      methodType: methodType,
+      start_time: start_time,
+      end_time: end_time,
+    };
+    await updateAuctionRequest(dispatch, selectedauctionrequest.id, RequestData, token);
+    resetForm();
     setShowEditModal(false);
   };
 
-  const [newRequest, setNewRequest] = useState({
-    id: "",
-    fishName: "",
-    method: "",
-    startPrice: "",
-    buyOutPrice: "",
-    startTime: "",
-    endTime: "",
-  });
-
-  const handleAddInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewRequest((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
+  const openEditModal = (auctionrequest) => {
+    setSelectedAuctionRequest(auctionrequest);
+    setuserId(auctionrequest.user);
+    setfishId(auctionrequest.fish);
+    setbuyOut(auctionrequest.buyOut);
+    setincrementStep(auctionrequest.incrementStep);
+    setstartPrice(auctionrequest.startPrice);
+    setmethodType(auctionrequest.methodType);
+    setstartTime(auctionrequest.start_time);
+    setendTime(auctionrequest.end_time);
+    setShowEditModal(true);
   };
 
-  const handleAddRequest = () => {
-    setRequests([...requests, { ...newRequest, id: requests.length + 1 }]);
-
-    setNewRequest({
-      id: "",
-      fishName: "",
-      method: "",
-      startPrice: "",
-      buyOutPrice: "",
-      startTime: "",
-      endTime: "",
-    });
-    setShowAddModal(false);
+  const openDetailsModal = (auctionrequest) => {
+    setSelectedAuctionRequest(auctionrequest);
+    setShowDetailsModal(true);
+  };
+  const openFishDetailModal = (auctionrequest) => {
+    setSelectedAuctionRequest(auctionrequest);
+    getKoiFishById(token, auctionrequest.fish, dispatch);
+    setShowFishDetailModal(true);
   };
 
-  const handleDeleteRequest = (id) => {
-    const updatedRequests = requests.filter((request) => request.id !== id);
-    setRequests(updatedRequests);
+  const handleCancelSendRequest = async (id) => {
+    if (window.confirm("Are you sure you want to cancel this auction reuquest?")) {
+      await cancelAuctionRequest(dispatch, id, currentUser.id, token);
+    }
+  };
+
+  const handleAddKoiFish = async (e) => {
+    e.preventDefault();
+    const koiFishData = {
+      name: name,
+      sex: sex,
+      size: size,
+      age: age,
+      description: description,
+      imageUrl: imageUrl,
+      videoUrl: videoUrl,
+    };
+    await addKoiFish(dispatch, koiFishData, currentUser.id, token);
+    setShowAddKoiFishModal(false);
   };
 
   return (
     <div className="container py-3 table">
       <h2 className="mb-5 text-center">Your Auction Request</h2>
-      <table class="table table-light table-bordered border border-danger shadow p-3 mb-5 rounded-4">
-        <tr className="table-danger">
+      <table class="table table-light table-bordered border border-dark shadow p-3 mb-5 rounded-4 overflow-auto">
+        <tr className="table-dark ">
           <th>ID</th>
-          <th>Fish Name</th>
-          <th>Method</th>
-          <th>Start Price</th>
-          <th>Buy Out Price</th>
-          <th>Start Time</th>
-          <th>End Time</th>
+          <th>Fish Detail</th>
+          <th>Auction Detail </th>
+          <th>Status</th>
+          <th>Assigned Staff</th>
+          <th>Auction</th>
           <th>Action</th>
         </tr>
-        {requests.map((request, index) => (
-          <tr key={index}>
-            <td>{request.id}</td>
-            <td>{request.fishName}</td>
-            <td>{request.method}</td>
-            <td>{request.startPrice}</td>
-            <td>{request.buyOutPrice}</td>
-            <td>{request.startTime}</td>
-            <td>{request.endTime}</td>
-            <td>
-              <button
-                className={styles.actionBtn + " " + styles.editBtn}
-                onClick={() => handleEditRequest(request)}
-              >
-                <FontAwesomeIcon icon={faPen} />
-              </button>
-              <button
-                className={styles.actionBtn + " " + styles.deleteBtn}
-                onClick={() => handleDeleteRequest(request.id)}
-              >
-                <FontAwesomeIcon icon={faXmark} />
-              </button>
-            </td>
-          </tr>
-        ))}
+
+        {aucionRequestList?.map((request) => {
+          return (
+            <tr key={request.id}>
+              <td>{request.id}</td>
+              <td>
+                <button
+                  className={`${styles.actionBtn} ${styles.viewBtn}`}
+                  onClick={() => openFishDetailModal(request)}
+                >
+                  Detail
+                </button>
+                </td>
+              <td>
+                <button
+                  className={`${styles.actionBtn} ${styles.viewBtn}`}
+                  onClick={() => openDetailsModal(request)}
+                >
+                  Detail
+                </button>
+                </td>
+              <td>{request.requestStatus}</td>
+              <td>{request.assignedStaff}</td>
+              <td>{request.auction}</td>
+              <td>
+                <button
+                  className={styles.actionBtn + " " + styles.editBtn}
+                  onClick={() => openEditModal(request)}
+                >
+                  <FontAwesomeIcon icon={faPen} />
+                </button>
+                <button
+                  className={styles.actionBtn + " " + styles.deleteBtn}
+                  onClick={() => handleCancelSendRequest(request.id)}
+                >
+                  <FontAwesomeIcon icon={faXmark} />
+                </button>
+              </td>
+            </tr>
+          );
+        })}
       </table>
 
       <button
-        className={styles.buttonkoi + " btn btn-outline-danger"}
+        className={styles.buttonkoi + " btn btn-outline-dark"}
         onClick={() => setShowAddModal(true)}
       >
         Create New Request
       </button>
-
       <Modal show={showAddModal}>
-        <div class="position-relative p-2 text-center text-muted bg-body border border-dashed rounded-5">
-          <button type="button" class="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill" aria-label="Close" onClick={() => setShowAddModal(false)}></button>
-          <h1 class="text-body-emphasis">Create New Request</h1>
-          <div className={styles.formContainer}>
-            <div className={styles.leftColumn}>
-              <div className={styles.importBox}>
-                <label htmlFor="importImage">Import Image</label>
-                <input type="file" id="importImage" accept="image/*" />
+        <div className="position-relative p-2 text-center text-muted bg-body border border-dashed rounded-5">
+          <button
+            type="button"
+            className="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill"
+            aria-label="Close"
+            onClick={() => setShowAddModal(false)}
+          ></button>
+          <h1 className="text-body-emphasis">Create New Request</h1>
+            <div>
+              <form onSubmit={handleSendRequest}>
+                <div className="form-group mb-3">
+                  <select
+                    className="form-select form-select-lg mb-3"
+                    value={fishId}
+                    onChange={(e) => setfishId(e.target.value)}
+                    required
+                  >
+                    <option value="">Select Fish</option>
+                    {koiFishList?.map((fish) => (
+                      <option key={fish.id} value={fish.id}>
+                        {fish.name} - Size: {fish.size}cm - Age: {fish.age} months
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                
+                <div className="d-flex align-items-center">
+                <h5 className="mb-0 me-2">Method:</h5>
+                <div className="form-check me-3">
+                  <input
+                    className="form-check-input"
+                    type="radio"
+                    id="TraditionalMethod"
+                    name="method"
+                    value="TRADITIONAL"
+                    checked={methodType === "TRADITIONAL"}
+                    onChange={() => setmethodType("TRADITIONAL")}
+                  />
+                  <label className="form-check-label" htmlFor="TraditionalMethod">
+                    TRADITIONAL
+                  </label>
+                </div>
+                <div className="form-check me-3">
+                  <input
+                    className="form-check-input"
+                    type="radio"
+                    id="AnonymousMethod"
+                    name="method"
+                    value="ANONYMOUS"
+                    checked={methodType === "ANONYMOUS"}
+                    onChange={() => setmethodType("ANONYMOUS")}
+                  />
+                  <label className="form-check-label" htmlFor="AnonymousMethod">
+                    ANONYMOUS
+                  </label>
+                </div>
+                <div className="form-check">
+                  <input
+                    className="form-check-input"
+                    type="radio"
+                    id="FixedPriceMethod"
+                    name="method"
+                    value="FIXED_PRICE"
+                    checked={methodType === "FIXED_PRICE"}
+                    onChange={() => setmethodType("FIXED_PRICE")}
+                  />
+                  <label className="form-check-label" htmlFor="FixedPriceMethod">
+                    FIXED PRICE
+                  </label>
+                </div>
               </div>
-              <div className={styles.importBox}>
-                <label htmlFor="importVideo">Import Video</label>
-                <input type="file" id="importVideo" accept="video/*" />
-              </div>
+
+                <input
+                  type="number"
+                  name="buyOut"
+                  value={buyOut}
+                  onChange={(e) => setbuyOut(e.target.value)}
+                  placeholder="Buy Out Price"
+                  className={styles.roundedInput}
+                />
+
+                <input
+                  type="number"
+                  name="startPrice"
+                  value={startPrice}
+                  onChange={(e) => setstartPrice(e.target.value)}
+                  placeholder="Start Price"
+                  className={styles.roundedInput}
+                />
+
+                <button type="submit" className="btn btn-outline-dark mb-3 ">
+                  Submit
+                </button>
+              </form>
+              
+              
             </div>
-
-            <div className={styles.rightColumn}>
-              <input
-                type="text"
-                name="fishName"
-                value={newRequest.fishName}
-                onChange={handleAddInputChange}
-                placeholder="Fish Name"
-                className={styles.roundedInput}
-              />
-
-              <select
-                name="method"
-                value={newRequest.method}
-                onChange={handleAddInputChange}
-                className={styles.roundedInput}
+              <button 
+                onClick={() => {
+                  setShowAddModal(false);
+                  setShowAddKoiFishModal(true);
+                }}
+                className="btn btn-outline-dark w-100"
               >
-                <option value="" disabled>
-                  Select Method
-                </option>
-                <option value="Auction">Auction</option>
-                <option value="Buy Now">Buy Now</option>
-              </select>
+                Create New Koi Fish
+              </button>
+        </div>
+      </Modal>
 
-              <input
-                type="text"
-                name="startPrice"
-                value={newRequest.startPrice}
-                onChange={handleAddInputChange}
-                placeholder="Start Price"
-                className={styles.roundedInput}
-              />
+      <Modal show={showEditModal}>
+        <div class="position-relative p-2 text-center text-muted bg-body border border-dashed rounded-5">
+          <button
+            type="button"
+            class="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill"
+            aria-label="Close"
+            onClick={() => setShowEditModal(false)}
+          ></button>
+          <h1 class="text-body-emphasis">Edit Auction Request</h1>
+          <div>
+            <form onSubmit={handleUpdateSendRequest}>
 
+                  {/* Fish ID Field */}
+                <div className="form-group mb-3">
+                  <select
+                    className="form-select form-select-lg mb-3"
+                    value={fishId}
+                    onChange={(e) => setfishId(e.target.value)}
+                    required
+                  >
+                    <option value="">Select Fish</option>
+                    {koiFishList?.map((fish) => (
+                      <option key={fish.id} value={fish.id}>
+                        {fish.name} - Size: {fish.size}cm - Age: {fish.age} months
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              {/* Method Type Field */}
+               <div className="d-flex align-items-center">
+                <h5 className="mb-0 me-2">Method:</h5>
+                <div className="form-check me-3">
+                  <input
+                    className="form-check-input"
+                    type="radio"
+                    id="TraditionalMethod"
+                    name="method"
+                    value="TRADITIONAL"
+                    checked={methodType === "TRADITIONAL"}
+                    onChange={() => setmethodType("TRADITIONAL")}
+                  />
+                  <label className="form-check-label" htmlFor="TraditionalMethod">
+                    TRADITIONAL
+                  </label>
+                </div>
+                <div className="form-check me-3">
+                  <input
+                    className="form-check-input"
+                    type="radio"
+                    id="AnonymousMethod"
+                    name="method"
+                    value="ANONYMOUS"
+                    checked={methodType === "ANONYMOUS"}
+                    onChange={() => setmethodType("ANONYMOUS")}
+                  />
+                  <label className="form-check-label" htmlFor="AnonymousMethod">
+                    ANONYMOUS
+                  </label>
+                </div>
+                <div className="form-check">
+                  <input
+                    className="form-check-input"
+                    type="radio"
+                    id="FixedPriceMethod"
+                    name="method"
+                    value="FIXED_PRICE"
+                    checked={methodType === "FIXED_PRICE"}
+                    onChange={() => setmethodType("FIXED_PRICE")}
+                  />
+                  <label className="form-check-label" htmlFor="FixedPriceMethod">
+                    FIXED PRICE
+                  </label>
+                </div>
+              </div>
+
+              
+
+              {/* Buy Out Price Field */}
               <input
-                type="text"
-                name="buyOutPrice"
-                value={newRequest.buyOutPrice}
-                onChange={handleAddInputChange}
+                type="number"
+                name="buyOut"
+                value={buyOut}
+                onChange={(e) => setbuyOut(e.target.value)}
                 placeholder="Buy Out Price"
                 className={styles.roundedInput}
               />
 
+              {/* Start Price Field */}
               <input
-                type="datetime-local"
-                name="startTime"
-                value={newRequest.startTime}
-                onChange={handleAddInputChange}
+                type="number"
+                name="startPrice"
+                value={startPrice}
+                onChange={(e) => setstartPrice(e.target.value)}
+                placeholder="Start Price"
                 className={styles.roundedInput}
               />
 
-              <input
-                type="datetime-local"
-                name="endTime"
-                value={newRequest.endTime}
-                onChange={handleAddInputChange}
-                className={styles.roundedInput}
-              />
-
-              <button className=" btn btn-danger" onClick={handleAddRequest}>
-                Create Request
+              <button type="submit" className="btn btn-outline-dark">
+                Submit
               </button>
-            </div>
+            </form>
           </div>
         </div>
       </Modal>
-      <Modal show={showEditModal}>
-        <div class="position-relative p-2 text-center text-muted bg-body border border-dashed rounded-5">
-          <button type="button" class="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill" aria-label="Close" onClick={() => setShowEditModal(false)}></button>
-          <h1 class="text-body-emphasis">Edit Request</h1>
-          <div className={styles.formContainer}>
-            <div className={styles.leftColumn}>
-              <div className={styles.importBox}>
-              <img src="https://www.acaquarium.com/wp-content/uploads/2023/02/ammonia-poisoning-in-goldfish.jpg" class="img-thumbnail" alt="..."/>
+
+      <Modal show={showDetailsModal}>
+        <div className="position-relative p-2 text-start text-muted bg-body border border-dashed rounded-5">
+          <button
+            type="button"
+            className="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill"
+            aria-label="Close"
+            onClick={() => setShowDetailsModal(false)}
+          ></button>
+          <h1 className="text-body-emphasis text-start">Auction Request Details</h1>
+          {selectedauctionrequest && (
+            <div>
+              <div>
+                <label className="form-label"><strong>Method:</strong></label>
+                <input
+                  readOnly
+                  value={selectedauctionrequest.methodType}
+                  className={styles.roundedInput}
+                />
               </div>
-              <div className={styles.importBox}>
-                <label htmlFor="importVideo">Import Video</label>
-                <input type="file" id="importVideo" accept="video/*" />
+              <div>
+                <label className="form-label"><strong>Start Price:</strong></label>
+                <input
+                  readOnly
+                  value={selectedauctionrequest.startPrice}
+                  className={styles.roundedInput}
+                />
+              </div>
+              <div>
+                <label className="form-label"><strong>Buy Out Price:</strong></label>
+                <input
+                  readOnly
+                  value={selectedauctionrequest.buyOut}
+                  className={styles.roundedInput}
+                />
               </div>
             </div>
+          )}
+        </div>
+      </Modal>
+      
+      <Modal show={showFishDetailModal}>
+        <div className="position-relative p-2 text-start text-muted bg-body border border-dashed rounded-5">
+          <button
+            type="button"
+            className="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill"
+            aria-label="Close"
+            onClick={() => setShowFishDetailModal(false)}
+          ></button>
+          <h1 className="text-body-emphasis text-start">Koi Fish Detail</h1>
+          {koifishById && (
+            <div>
+              <div>
+                <label className="form-label"><strong>Name:</strong></label>
+                <input
+                  readOnly
+                  value={koifishById.name}
+                  className={styles.roundedInput}
+                />
+              </div>
+              <div>
+                <label className="form-label"><strong>Sex:</strong></label>
+                <input
+                  readOnly
+                  value={koifishById.sex}
+                  className={styles.roundedInput}
+                />
+              </div>
+              <div>
+                <label className="form-label"><strong>Size:</strong></label>
+                <input
+                  readOnly
+                  value={koifishById.size}
+                  className={styles.roundedInput}
+                />
+              </div>
+              <div>
+                <label className="form-label"><strong>Age:</strong></label>
+                <input
+                  readOnly
+                  value={koifishById.age}
+                  className={styles.roundedInput}
+                />
+              </div>
+              <div>
+                <label className="form-label"><strong>Description:</strong></label>
+                <input
+                  readOnly
+                  value={koifishById.description}
+                  className={styles.roundedInput}
+                />
+              </div>
+              <div>
+                <label className="form-label"><strong>Status:</strong></label>
+                <input
+                  readOnly
+                  value={koifishById.status}
+                  className={styles.roundedInput}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      </Modal>
 
-            <div className={styles.rightColumn}>
-              <input
-                type="text"
-                name="id"
-                value={editForm.id}
-                onChange={(e) => setEditForm({ ...editForm, id: e.target.value })}
-                placeholder="ID"
-                className={styles.roundedInput}
-              />
-              <input
-                type="text"
-                name="fishname"
-                value={editForm.fishName}
-                onChange={(e) =>
-                  setEditForm({ ...editForm, fishName: e.target.value })
-                }
-                placeholder="Fish Name"
-                className={styles.roundedInput}
-              />
-              <input
-                type="text"
-                name="method"
-                value={editForm.method}
-                onChange={(e) => setEditForm({ ...editForm, method: e.target.value })}
-                placeholder="Method"
-                className={styles.roundedInput}
-              />
-              <input
-                className={styles.roundedInput}
-                type="text"
-                name="startPrice"
-                value={editForm.startPrice}
-                onChange={(e) =>
-                  setEditForm({ ...editForm, startPrice: e.target.value })
-                }
-                placeholder="Start Price"
-              />
-              <input
-                className={styles.roundedInput}
-                type="text"
-                name="buyOutPrice"
-                value={editForm.buyOutPrice}
-                onChange={(e) =>
-                  setEditForm({ ...editForm, buyOutPrice: e.target.value })
-                }
-                placeholder="Buy Out Price"
-              />
-              <input
-                className={styles.roundedInput}
-                type="datetime-local"
-                name="startTime"
-                value={editForm.startTime}
-                onChange={(e) =>
-                  setEditForm({ ...editForm, startTime: e.target.value })
-                }
-                placeholder="Start Time"
-              />
-              <input
-                className={styles.roundedInput}
-                type="datetime-local"
-                name="endTime"
-                value={editForm.endTime}
-                onChange={(e) =>
-                  setEditForm({ ...editForm, endTime: e.target.value })
-                }
-                placeholder="End Time"
-              />
+      <Modal show={showAddKoiFishModal}>
+        <div className="position-relative p-2 text-center text-muted bg-body border border-dashed rounded-5">
+          <button
+            type="button"
+            className="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill"
+            aria-label="Close"
+            onClick={() => setShowAddKoiFishModal(false)}
+          ></button>
+          <h1 className="text-body-emphasis">Add New Koi Fish</h1>
+          <div>
+            <form onSubmit={handleAddKoiFish}>
+              <div className="row">
+                {/* Left Column - Media Inputs */}
+                <div className="col-md-6 border-end">
+                  <div className="form-group mb-3">
+                    <input
+                      type="url"
+                      name="image_url"
+                      value={imageUrl}
+                      onChange={(e) => setimageUrl(e.target.value)}
+                      placeholder="Image URL"
+                      className={styles.roundedInput}
+                      required
+                    />
+                  </div>
 
-              <button className="btn btn-danger" onClick={handleSaveChanges}>
-                Save Changes
+                  <div className="form-group mb-3">
+                    <input
+                      type="url"
+                      name="video_url"
+                      value={videoUrl}
+                      onChange={(e) => setvideoUrl(e.target.value)}
+                      placeholder="Video URL"
+                      className={styles.roundedInput}
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Right Column - Other Fields */}
+                <div className="col-md-6">
+                  <div className="form-group mb-3">
+                    <input
+                      type="text"
+                      name="name"
+                      value={name}
+                      onChange={(e) => setname(e.target.value)}
+                      placeholder="Fish Name"
+                      className={styles.roundedInput}
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group mb-3">
+                    <select
+                      className="form-select form-select-lg mb-3"
+                      value={sex}
+                      onChange={(e) => setsex(e.target.value)}
+                      required
+                    >
+                      <option value="">Select Sex</option>
+                      <option value="MALE">Male</option>
+                      <option value="FEMALE">Female</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group mb-3">
+                    <input
+                      type="number"
+                      name="size"
+                      value={size}
+                      onChange={(e) => setsize(e.target.value)}
+                      placeholder="Size (cm)"
+                      className={styles.roundedInput}
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group mb-3">
+                    <input
+                      type="number"
+                      name="age"
+                      value={age}
+                      onChange={(e) => setage(e.target.value)}
+                      placeholder="Age (months)"
+                      className={styles.roundedInput}
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group mb-3">
+                    <textarea
+                      name="description"
+                      value={description}
+                      onChange={(e) => setdescription(e.target.value)}
+                      placeholder="Description"
+                      className={styles.roundedInput}
+                      rows="3"
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <button type="submit" className="btn btn-outline-dark mb-3">
+                Add Koi Fish
               </button>
-            </div>
+            </form>
           </div>
         </div>
-        {/* <h2>Edit Request</h2>
-        <input
-          type="text"
-          name="id"
-          value={editForm.id}
-          onChange={(e) => setEditForm({ ...editForm, id: e.target.value })}
-          placeholder="ID"
-          className={styles.roundedInput}
-        />
-        <input
-          type="text"
-          name="fishname"
-          value={editForm.fishName}
-          onChange={(e) =>
-            setEditForm({ ...editForm, fishName: e.target.value })
-          }
-          placeholder="Fish Name"
-          className={styles.roundedInput}
-        />
-        <input
-          type="text"
-          name="method"
-          value={editForm.method}
-          onChange={(e) => setEditForm({ ...editForm, method: e.target.value })}
-          placeholder="Method"
-          className={styles.roundedInput}
-        />
-        <input
-          className={styles.roundedInput}
-          type="text"
-          name="startPrice"
-          value={editForm.startPrice}
-          onChange={(e) =>
-            setEditForm({ ...editForm, startPrice: e.target.value })
-          }
-          placeholder="Start Price"
-        />
-        <input
-          className={styles.roundedInput}
-          type="text"
-          name="buyOutPrice"
-          value={editForm.buyOutPrice}
-          onChange={(e) =>
-            setEditForm({ ...editForm, buyOutPrice: e.target.value })
-          }
-          placeholder="Buy Out Price"
-        />
-        <input
-          className={styles.roundedInput}
-          type="datetime-local"
-          name="startTime"
-          value={editForm.startTime}
-          onChange={(e) =>
-            setEditForm({ ...editForm, startTime: e.target.value })
-          }
-          placeholder="Start Time"
-        />
-        <input
-          className={styles.roundedInput}
-          type="datetime-local"
-          name="endTime"
-          value={editForm.endTime}
-          onChange={(e) =>
-            setEditForm({ ...editForm, endTime: e.target.value })
-          }
-          placeholder="End Time"
-        />
-        <button className="btn btn-danger" onClick={handleSaveChanges}>
-          Save Changes
-        </button> */}
       </Modal>
     </div>
   );

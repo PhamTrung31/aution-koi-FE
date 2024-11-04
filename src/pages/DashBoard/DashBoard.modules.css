@@ -1,0 +1,59 @@
+body {
+  background-color: #f5f7fa;
+  font-family: Arial, sans-serif;
+}
+
+.stat-icon {
+  font-size: 2rem;
+}
+
+.stat-card .p-4 {
+  background: white;
+  border-radius: 12px;
+}
+
+.budget {
+  background-color: #dfe6fd;
+}
+
+.customers {
+  background-color: #e7f4ea;
+}
+
+.progress {
+  background-color: #e8e5fb;
+}
+
+.profit {
+  background-color: #fce7ec;
+}
+
+.stat-percentage {
+  font-size: 0.9rem;
+  color: gray;
+}
+.stat-card {
+  background-color: #fff;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 200px;
+}
+
+.task-progress {
+  background-color: #e6e6fa; /* Light purple background for Task Progress */
+}
+
+.task-progress {
+  background-color: #e6e6fa; /* Light purple background for Task Progress */
+}
+.dashboard .stat-cards {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center; /* Adjust alignment as needed */
+}

@@ -5,9 +5,8 @@ import {
   Routes,
   Navigate,
 } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
-
 import Header from "./components/Header/Header.jsx";
 import Home from "./pages/Home/Home.jsx";
 import Login from "./pages/Login/Login.jsx";
@@ -20,21 +19,32 @@ import AuctionView from "./pages/AuctionView/AuctionView.jsx";
 import Forbidden403 from "./pages/Forbidden403/Forbidden403.jsx";
 import DemoAxios from "./components/DemoAxios.jsx";
 import Footer from "./components/Footer/Footer.jsx";
-import Member from "./pages/Member/Member.jsx";
-import Breeder from "./pages/Breeder/Breeder.jsx";
+import Member from "./pages/ManageUser/ManageUser.jsx";
 import ManageStaff from "./pages/ManageStaff/ManageStaff.jsx";
 import Request from "./pages/Request/MRequest.jsx";
 import StaffRequest from "./pages/StaffRequest/Request.jsx";
-import Auction from "./pages/Auction/Auction.jsx";
+import StaffReview from "./pages/StaffReview/StaffReview.jsx";
+import Auction from "./pages/StaffManageAuction/Auction.jsx";
 import CreateRequest from "./pages/CreateRequest/CreateRequest.jsx";
 import FirebaseImageUpload from "./pages/FirebaseImageUpload/FirebaseImageUpload.jsx";
-
+import Dashboard from "./pages/DashBoard/DashBoard.jsx";
+import BoardChart from "./pages/DashBoard/BoardChart.jsx";
+import StatCard from "./pages/DashBoard/StatCard.jsx";
+import DonutChart from "./pages/DashBoard/DonutChart.jsx";
+import Topup from "./pages/Topup/Topup.jsx";
+import TopupSuccess from "./pages/TopupSuccess/TopupSuccess.jsx";
+import ManageKoiFish from "./pages/ManageKoiFish/ManageKoiFish.jsx";
+import { loadWebsocketPendingMessage } from "./redux/messageSlice.jsx";
+import { Client } from "@stomp/stompjs";
 function App() {
   const CURRENT_USER_ROLE = useSelector((state) =>
     state.auth.profile.currentUser
       ? state.auth.profile.currentUser.role
       : "GUEST"
   );
+
+  const dispatch = useDispatch();
+
   // const CURRENT_USER_ROLE = "customer"
 
   function PublicElement({ children }) {
@@ -53,7 +63,7 @@ function App() {
     if (CURRENT_USER_ROLE === "STAFF") {
       return <>{children}</>;
     } else {
-      return <Navigate to={"/login"} />;
+      return <Navigate to={"/forbidden403"} />;
     }
   }
 
@@ -61,7 +71,7 @@ function App() {
     if (CURRENT_USER_ROLE === "MANAGER") {
       return <>{children}</>;
     } else {
-      return <Navigate to={"/login"} />;
+      return <Navigate to={"/forbidden403"} />;
     }
   }
 
@@ -77,36 +87,72 @@ function App() {
     console.log(CURRENT_USER_ROLE);
   }, []);
 
+  useEffect(() => {
+    const client = new Client({
+      brokerURL: "ws://localhost:8081/auctionkoi/ws",
+      onConnect: () => {
+        console.log('Connected to WebSocket');
+
+        client.subscribe('/auctions/pending', (msg) => {
+          const parsedMessage = JSON.parse(msg.body);
+
+          // Lưu vào sessionStorage
+          // sessionStorage.setItem('websocketPendingMessage', JSON.stringify(parsedMessage));
+          dispatch(loadWebsocketPendingMessage(JSON.parse(msg.body)));
+        });
+        
+        client.subscribe('/auctions/start', (msg) => {
+          const parsedMessage = JSON.parse(msg.body);
+
+          // Lưu vào sessionStorage
+          sessionStorage.setItem('websocketStartMessage', JSON.stringify(parsedMessage));
+        });
+      },
+      onStompError: (frame) => {
+        console.error('Broker reported error: ' + frame.headers['message']);
+        console.error('Additional details: ' + frame.body);
+      },
+    });
+
+    client.activate();
+
+    return () => {
+      client.deactivate();
+    };
+  }, []); // Chỉ chạy một lần khi component mount
+
   return (
     <Router>
       <div className="wrapper">
         <Header userRole={CURRENT_USER_ROLE} />
         <div className="main">
           <Routes>
-            <Route path="/" element={<PublicElement><Home userRole={CURRENT_USER_ROLE} /></PublicElement>}/>
-            <Route path="/about" element={<PublicElement><About /></PublicElement>}/>
-            <Route path="/pastAuction" element={<PublicElement><PastAuction /></PublicElement>}/>
-            <Route path="/login" element={<PublicElement><Login /></PublicElement>}/>
-            <Route path="/register" element={<PublicElement><Register /></PublicElement>}/>
-            <Route path="/profile" element={<PublicElement><Profile userRole={CURRENT_USER_ROLE} /></PublicElement>}/>
-            <Route path="/uploadImage" element={<PublicElement><FirebaseImageUpload /></PublicElement>}/>
+            <Route path="/" element={<PublicElement><Home userRole={CURRENT_USER_ROLE} /></PublicElement>} />
+            <Route path="/about" element={<PublicElement><About /></PublicElement>} />
+            <Route path="/pastAuction" element={<PublicElement><PastAuction /></PublicElement>} />
+            <Route path="/login" element={<PublicElement><Login /></PublicElement>} />
+            <Route path="/register" element={<PublicElement><Register /></PublicElement>} />
+            <Route path="/profile" element={<PublicElement><Profile userRole={CURRENT_USER_ROLE} /></PublicElement>} />
+            <Route path="/uploadImage" element={<PublicElement><FirebaseImageUpload /></PublicElement>} />
 
+            <Route path="/currentAuction" element={<MemberElement><CurrentAuction /></MemberElement>} />
+            <Route path="/auctionView" element={<MemberElement><AuctionView auctionType={0} /></MemberElement>} />
+            <Route path="/topup" element={<MemberElement><Topup /></MemberElement>} />
+            <Route path="/topupSuccess" element={<MemberElement><TopupSuccess /></MemberElement>} />
 
-            <Route path="/currentAuction" element={<MemberElement><CurrentAuction /></MemberElement>}/>
-            <Route path="/auctionView" element={<MemberElement><AuctionView /></MemberElement>}/>
+            <Route path="/manageStaff" element={<ManagerElement><ManageStaff /></ManagerElement>} />
+            <Route path="/request" element={<ManagerElement><Request /></ManagerElement>} />
+            <Route path="/dashboard" element={<ManagerElement><Dashboard /></ManagerElement>} />
+            <Route path="/boardchart" element={<ManagerElement><BoardChart /></ManagerElement>} />
+            <Route path="/donutchart" element={<ManagerElement><DonutChart /></ManagerElement>} />
+            <Route path="/statcard" element={<ManagerElement><StatCard /></ManagerElement>} />
 
-
-            {/* <Route path="/member" element={<ManagerElement><Member /></ManagerElement>}/>
-            <Route path="/breeder" element={<ManagerElement><Breeder /></ManagerElement>}/> */}
-            <Route path="/manageStaff" element={<ManagerElement><ManageStaff /></ManagerElement>}/>
-            <Route path="/request" element={<ManagerElement><Request /></ManagerElement>}/>
-
-
-            <Route path="/staffrequest" element={<StaffElement><StaffRequest /></StaffElement>}/>
-            <Route path="/auction" element={<StaffElement><Auction /></StaffElement>}/>
-            <Route path="/createrequest" element={<BreederElement><CreateRequest /></BreederElement>}/>
-
-
+            <Route path="/staffrequest" element={<StaffElement><StaffRequest /></StaffElement>} />
+            <Route path="/auction" element={<StaffElement><Auction /></StaffElement>} />
+            <Route path="/member" element={<StaffElement><Member /></StaffElement>} />
+            <Route path="/staffreview" element={<StaffElement><StaffReview /></StaffElement>} />
+            <Route path="/createrequest" element={<BreederElement><CreateRequest /></BreederElement>} />
+            <Route path="/managekoifish" element={<BreederElement><ManageKoiFish /></BreederElement>} />
             <Route path="/forbidden403" element={<Forbidden403 />} />
             <Route path="*" element={<div>Page Not Found!</div>} />
           </Routes>

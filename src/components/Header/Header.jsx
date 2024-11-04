@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { logOut } from "../../redux/apiRequest";
 import { FaUsers } from "react-icons/fa";
+import { LuWallet } from "react-icons/lu";
 
 function Header({ userRole }) {
   return (
@@ -24,12 +25,12 @@ function Header({ userRole }) {
 
 const MemberHeader = () => {
   const user = useSelector((state) => state.auth.profile?.currentUser);
+  const wallet = useSelector((state) => state.wallet.currentWallet?.data);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [userTitle, setUserTitle] = useState(user ? user.fullname : null);
   const [auctionTitle, setAuctionTitle] = useState("Auction");
-  const [wallet, setWallet] = useState(100000000);
-  const formatWallet = new Intl.NumberFormat("de-DE").format(wallet);
+  const formatWallet = new Intl.NumberFormat("de-DE").format(wallet?.balance);
 
   const handleUserTitle = (title) => {
     setUserTitle(title);
@@ -99,7 +100,7 @@ const MemberHeader = () => {
               <>
                 <Navbar.Collapse id="navbar-white-example">
                   <Nav.Link className="fw-bold" style={{ color: "#eb1c24" }}>
-                    Wallet: {formatWallet} vnd
+                  <LuWallet /> Wallet: {formatWallet} vnd
                   </Nav.Link>                
                   
                   <Nav>
@@ -118,15 +119,10 @@ const MemberHeader = () => {
                       </NavDropdown.Item>
                       <NavDropdown.Item
                         as={Link}
-                        to="/profile"
+                        to="/topup"
                       // onClick={() => handleUserTitle("Your Balance")}
                       >
                         Top-Up Wallet
-                      </NavDropdown.Item>
-                      <NavDropdown.Item
-                      // onClick={() => handleUserTitle("Payment History")}
-                      >
-                        Payment History
                       </NavDropdown.Item>
                       <NavDropdown.Item onClick={handleLogout}>
                         Log out
@@ -143,9 +139,6 @@ const MemberHeader = () => {
                     />         
                   </Nav.Link>
                 </Navbar.Collapse>
-                {/* <Nav.Link id="regis">
-                  Log out
-                </Nav.Link> */}
               </>
             ) : (
               <>
@@ -187,10 +180,10 @@ const ManagerNavbar = () => {
             <Nav.Link as={Link} to="/manageStaff">
               <FaUsers /> Manage Staff
             </Nav.Link>
-            <Nav.Link as={Link} to="#">
+            <Nav.Link as={Link} to="/request">
               Auction Request
             </Nav.Link>
-            <Nav.Link as={Link} to="#">
+            <Nav.Link as={Link} to="/dashboard">
               Dashboard
             </Nav.Link>
           </Nav>
@@ -256,6 +249,13 @@ const BreederNavbar = () => {
               onClick={() => handleUserTitle(user?.fullname)}
             >
               Your Request
+            </Nav.Link>
+            <Nav.Link
+              as={Link}
+              to="/managekoifish"
+              onClick={() => handleUserTitle(user?.fullname)}
+            >
+              Manage Koi Fish
             </Nav.Link>
           </Nav>
           <Nav>
@@ -349,14 +349,29 @@ const StaffNavbar = () => {
               to="/auction"
               onClick={() => handleUserTitle(user?.fullname)}
             >
-              Auction
+              Manage Auction
             </Nav.Link>
             <Nav.Link
               as={Link}
               to="/staffrequest"
               onClick={() => handleUserTitle(user?.fullname)}
             >
-              Request
+             Manage Request
+            </Nav.Link>
+
+            <Nav.Link
+              as={Link}
+              to="/member"
+              onClick={() => handleUserTitle(user?.fullname)}
+            >
+              Manage User
+            </Nav.Link>
+            <Nav.Link
+              as={Link}
+              to="/staffreview"
+              onClick={() => handleUserTitle(user?.fullname)}
+            >
+              Review Request
             </Nav.Link>
           </Nav>
           <Nav>
