@@ -4,17 +4,20 @@ import './Home.css'
 import { getAllCategories } from "../../redux/apiRequest";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import CreateRequest from "../CreateRequest/CreateRequest";
+import ManageStaff from "../ManageStaff/ManageStaff";
+import ManageUser from "../ManageUser/ManageUser";
 
 const Home = ({userRole}) => {
-
+    
     return (
         <body>
             {userRole === "MANAGER" ? (
-                <ManagerHome />
+                <ManageStaff />
             ) : userRole === "STAFF" ? (
-                <StaffHome />
+                <ManageUser />
             ) : userRole === "BREEDER" ? (
-                <BreederHome />
+                <CreateRequest />
             ) :(
                 <MemberHome />
             )}
@@ -101,28 +104,6 @@ const MemberHome = () => {
     )
 }
 
-const StaffHome = () => {
-    return (
-        <div>
-            Staff Homepage
-        </div>
-    )
-}
 
-const ManagerHome = () => {
-    return (
-        <div>
-            Manager Homepage
-        </div>
-    )
-}
-
-const BreederHome = () => {
-    return (
-        <div>
-            Breeder Homepage
-        </div>
-    )
-}
 
 export default Home
