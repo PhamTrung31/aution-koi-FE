@@ -114,7 +114,22 @@ import {
 import {
   getallTransactionStart,
   getallTransactionSuccess,
-  getallTransactionFailed
+  getallTransactionFailed,
+  requestWithdrawalsStart,
+  requestWithdrawalsSuccess,
+  requestWithdrawalsFailed,
+  pendingWithDrawalsStart,
+  pendingWithDrawalsSuccess,
+  pendingWithDrawalsFailed,
+  paymentApprovalStart,
+  paymentApprovalSuccess,
+  paymentApprovalFailed,
+  paymentRejectedStart,
+  paymentRejectedSuccess,
+  paymentRejectedFailed,
+  getallPaymentOfBreederStart,
+  getallPaymentOfBreederSuccess,
+  getallPaymentOfBreederFailed
 } from "./transactionSlice";
 import {
   topupWalletStart,
@@ -956,6 +971,7 @@ export const getTransaction = async (accessToken, dispatch) => {
   }
 };
 
+
 export const getKoiFishWithStatusNew = async (accessToken, breederId, dispatch) => {
   dispatch(getKoiFishWithStatusNewStart());
   try {
@@ -971,53 +987,83 @@ export const getKoiFishWithStatusNew = async (accessToken, breederId, dispatch) 
   }
 };
 
-// export const addUser = async (dispatch, staffData, accessToken) => {
-//   dispatch(addUserStart());
-//   try {
-//     const res = await axios.post(
-//       "http://localhost:8081/auctionkoi/staffs/create",
-//       staffData,
-//       {
-//         headers: { Authorization: `Bearer ${accessToken}` },
-//       }
-//     );
-//     dispatch(addUserSuccess(res.data));
-//     getAllUser(accessToken, dispatch);
-//   } catch (err) {
-//     dispatch(addUserFailed());
-//   }
-// };
+export const paymentApproval = async (dispatch, accessToken, paymentId) => {
+  dispatch(paymentApprovalStart());
+  try {
+    const res = await axios.post(
+      `http://localhost:8081/auctionkoi/payments/approve/${paymentId}`,
+      {},
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+    dispatch(paymentApprovalSuccess(res.data));
+    getPendingWithdrawals(accessToken, dispatch);
+  } catch (err) {
+    dispatch(paymentApprovalFailed());
+  }
+};
 
-// export const requestWithdrawals = async (dispatch, requestWithdrawalsData, accessToken, userId, amount) => {
-//   dispatch(requestWithdrawalsStart());
-//   try {
-//     const res = await axios.post(
-//       `http://localhost:8081/auctionkoi/payments/withdraw/${userId}/${amount}`,
-//       requestWithdrawalsData,
-//       {
-//         headers: { Authorization: `Bearer ${accessToken}` },
-//       }
-//     );
-//     dispatch(requestWithdrawalsSuccess(res.data));
-//     getTransaction(accessToken, dispatch);
-//   } catch (err) {
-//     dispatch(requestWithdrawalsFailed());
-//   }
-// };
+export const paymentRejected   = async (dispatch, accessToken, paymentId) => {
+  dispatch(paymentRejectedStart());
+  try {
+    const res = await axios.post(
+      `http://localhost:8081/auctionkoi/payments/reject/${paymentId}`,
+      {},
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+    dispatch(paymentRejectedSuccess(res.data));
+    getPendingWithdrawals(accessToken, dispatch);
+  } catch (err) {
+    dispatch(paymentRejectedFailed());
+  }
+};
 
-// export const addUser = async (dispatch, staffData, accessToken) => {
-//   dispatch(addUserStart());
-//   try {
-//     const res = await axios.post(
-//       "http://localhost:8081/auctionkoi/staffs/create",
-//       staffData,
-//       {
-//         headers: { Authorization: `Bearer ${accessToken}` },
-//       }
-//     );
-//     dispatch(addUserSuccess(res.data));
-//     getAllUser(accessToken, dispatch);
-//   } catch (err) {
-//     dispatch(addUserFailed());
-//   }
-// };
+export const getPendingWithdrawals = async (accessToken, dispatch) => {
+  dispatch(pendingWithDrawalsStart());
+  try {
+    const res = await axios.get(
+      `http://localhost:8081/auctionkoi/payments/pending-withdrawals`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+    dispatch(pendingWithDrawalsSuccess(res.data.result));
+  } catch (err) {
+    dispatch(pendingWithDrawalsFailed());
+  }
+};
+
+export const requestWithdrawals  = async (dispatch, accessToken, userId, amount) => {
+  dispatch(requestWithdrawalsStart());
+  try {
+    const res = await axios.post(
+      `http://localhost:8081/auctionkoi/payments/withdraw/${userId}/${amount}`,
+      {},
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+    dispatch(requestWithdrawalsSuccess(res.data));
+    getPendingWithdrawals(accessToken, dispatch);
+  } catch (err) {
+    dispatch(requestWithdrawalsFailed());
+  }
+};
+
+export const getallPaymentOfBreeder = async (accessToken, breederId, dispatch) => {
+  dispatch(getallPaymentOfBreederStart());
+  try {
+    const res = await axios.get(
+      `http://localhost:8081/auctionkoi/payments/breeder/${breederId}`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+    dispatch(getallPaymentOfBreederSuccess(res.data.result));
+  } catch (err) {
+    dispatch(getallPaymentOfBreederFailed());
+  }
+};

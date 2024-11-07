@@ -203,10 +203,12 @@ const ManagerNavbar = () => {
 
 const BreederNavbar = () => {
   const user = useSelector((state) => state.auth.profile?.currentUser);
+  const wallet = useSelector((state) => state.wallet.currentWallet?.data);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [userTitle, setUserTitle] = useState(user ? user.fullname : null);
   const [auctionTitle, setAuctionTitle] = useState("Auction");
+  const formatWallet = new Intl.NumberFormat("de-DE").format(wallet?.balance);
 
   const handleUserTitle = (title) => {
     setUserTitle(title);
@@ -224,7 +226,7 @@ const BreederNavbar = () => {
   return (
     <Navbar collapseOnSelect expand="lg">
       <Container>
-        <Navbar.Brand as={Link} to="/">
+        <Navbar.Brand as={Link} to="/createrequest">
           <img
             src="/logo/betokoi.png"
             alt="Logo Betokoi"
@@ -236,32 +238,42 @@ const BreederNavbar = () => {
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto">
-            <Nav.Link
-              as={Link}
-              to="/"
-              onClick={() => handleUserTitle(user?.fullname)}
+            <NavDropdown
+              id="nav-dropdown-dark-example"
+              title="Management"
+              menuVariant="dark"
             >
-              Home
-            </Nav.Link>
-            <Nav.Link
-              as={Link}
-              to="/createrequest"
-              onClick={() => handleUserTitle(user?.fullname)}
-            >
-              Your Request
-            </Nav.Link>
-            <Nav.Link
-              as={Link}
-              to="/managekoifish"
-              onClick={() => handleUserTitle(user?.fullname)}
+              <NavDropdown.Item
+                as={Link}
+                to="/createrequest"
+                onClick={() => handleUserTitle(user?.fullname)}
+              >
+                Manage Request
+              </NavDropdown.Item>
+              <NavDropdown.Item
+                as={Link}
+                to="/managekoifish"
+                onClick={() => handleUserTitle(user?.fullname)}
             >
               Manage Koi Fish
+              </NavDropdown.Item>
+            </NavDropdown>
+            
+            <Nav.Link
+              as={Link}
+              to="/requestWithDrawals"
+              onClick={() => handleUserTitle(user?.fullname)}
+            >
+              Request Withdrawals
             </Nav.Link>
           </Nav>
           <Nav>
             {user?.fullname ? (
               <>
                 <Navbar.Collapse id="navbar-white-example">
+                  <Nav.Link className="fw-bold" style={{ color: "#eb1c24" }}>
+                    <LuWallet /> Wallet: {formatWallet} vnd
+                  </Nav.Link>
                   <Nav>
                     <NavDropdown
                       id="nav-dropdown-dark-example"
@@ -276,6 +288,8 @@ const BreederNavbar = () => {
                         Profile
                       </NavDropdown.Item>
                       <NavDropdown.Item
+                        as={Link}
+                        to="/topup"
                         onClick={() => handleUserTitle("Your Balance")}
                       >
                         Your Balance
@@ -358,17 +372,25 @@ const StaffNavbar = () => {
               </NavDropdown.Item>
               <NavDropdown.Item
                 as={Link}
-                to="/staffrequest"
+                to="/managePendingWithDrawal"
                 onClick={() => handleUserTitle(user?.fullname)}
               >
-                Manage Request
+                Manage Pending Withdrawal
               </NavDropdown.Item>
               <NavDropdown.Item
                 as={Link}
-                to="/member"
+                to="/manageDelivery"
                 onClick={() => handleUserTitle(user?.fullname)}
               >
-                Manage User
+                Manage Delivery
+              </NavDropdown.Item>
+
+              <NavDropdown.Item
+                as={Link}
+                to="/managetransaction"
+                onClick={() => handleUserTitle(user?.fullname)}
+              >
+                Manage Transaction
               </NavDropdown.Item>
               
             </NavDropdown>
@@ -381,17 +403,18 @@ const StaffNavbar = () => {
               </NavLink>
               <NavLink
                 as={Link}
-                to="/manageDelivery"
+                to="/member"
                 onClick={() => handleUserTitle(user?.fullname)}
               >
-                Manage Delivery
+                Manage User
               </NavLink>
+              
               <NavLink
                 as={Link}
-                to="/managetransaction"
+                to="/staffrequest"
                 onClick={() => handleUserTitle(user?.fullname)}
               >
-                Manage Transaction
+                Manage Request
               </NavLink>
           </Nav>
           <Nav>

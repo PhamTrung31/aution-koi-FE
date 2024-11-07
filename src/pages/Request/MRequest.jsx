@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { useDispatch, useSelector } from "react-redux";
-import { getAuctionRequestForManager, managerReject,  assignStaff, getKoiFishById } from "../../redux/apiRequest";
+import { getAuctionRequestForManager, managerReject,  assignStaff, getKoiFishById, getAllStaffs } from "../../redux/apiRequest";
 
 import styles from "./Request.module.css";
 const Modal = ({ show, children }) => {
@@ -20,6 +20,7 @@ function MRequest() {
   const aucionRequestList = useSelector(
     (state) => state.auctionrequest.auctionrequestformanager?.auctionrequestformanagers
   );
+  const staffList = useSelector((state) => state.staff.staffs?.allStaffs);
   const koifishById = useSelector(
     (state) => state.koifish.koifishs?.koifishById
   );
@@ -28,8 +29,9 @@ function MRequest() {
   const {currentUser} = useSelector((state) => state.auth.profile); 
   useEffect(() => {
     getAuctionRequestForManager(token, dispatch);
+    getAllStaffs(token, dispatch);
   }, []);
-  console.log(aucionRequestList);
+  console.log(staffList);
 
 
   const [infoKoiFishModal, setinfoKoiFishModal] = useState(false);
@@ -262,13 +264,20 @@ function MRequest() {
           <h1 className="text-body-emphasis">Assign Staff</h1>
           <div>
             <form onSubmit={handleAssignStaff}>
-              <input
-                type="text"
-                name="staffId"
-                onChange={(e) => setstaffId(e.target.value)}
-                placeholder="Staff ID"
-                className={styles.roundedInput}
-              />
+            <div className="form-group mb-3">
+                  <select
+                    className="form-select form-select-lg mb-3"
+                    onChange={(e) => setstaffId(e.target.value)}
+                    required
+                  >
+                    <option value="">Select Staff</option>
+                    {staffList?.map((staff) => (
+                      <option key={staff.id} value={staff.id}>
+                        {staff.id} -  Name: {staff.fullname} 
+                      </option>
+                    ))}
+                  </select>
+                </div>
               <button type="submit" className="btn btn-outline-dark">
                 Submit
               </button>

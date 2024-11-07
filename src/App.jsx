@@ -39,6 +39,8 @@ import {
   loadWebsocketStartMessage } from "./redux/messageSlice.jsx";
 import ManageDelivery from "./pages/ManageDelivery/ManageDelivery.jsx";
 import ManageTransaction from "./pages/ManageTransaction/ManageTransaction.jsx";
+import ManagePendingWithDrawal from "./pages/ManagePendingWithDrawal/ManagePendingWithDrawal.jsx";
+import RequestWithDrawals from "./pages/RequestWithDrawals/RequestWithDrawals.jsx";
 import AuctionPreview from "./pages/AuctionPreview/auctionPreview.jsx";
 import { Client } from "@stomp/stompjs";
 
@@ -170,8 +172,11 @@ function App() {
             <Route path="/staffreview" element={<StaffElement><StaffReview /></StaffElement>} />
             <Route path="/manageDelivery" element={<StaffElement><ManageDelivery /></StaffElement>} />
             <Route path="/managetransaction" element={<StaffElement><ManageTransaction /></StaffElement>} />
+            <Route path="/managePendingWithDrawal" element={<StaffElement><ManagePendingWithDrawal /></StaffElement>} />
+
             <Route path="/createrequest" element={<BreederElement><CreateRequest /></BreederElement>} />
             <Route path="/managekoifish" element={<BreederElement><ManageKoiFish /></BreederElement>} />
+            <Route path="/requestWithDrawals" element={<BreederElement><RequestWithDrawals /></BreederElement>} />
             <Route path="/forbidden403" element={<Forbidden403 />} />
             <Route path="*" element={<div>Page Not Found!</div>} />
           </Routes>

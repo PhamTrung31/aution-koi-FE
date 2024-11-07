@@ -421,22 +421,30 @@ function CreateRequest() {
           <div>
             <form onSubmit={handleUpdateSendRequest}>
 
-              {/* Fish ID Field */}
-              <div className="form-group mb-3">
+                <div className="form-group mb-3">
                 <select
-                  className="form-select form-select-lg mb-3"
-                  value={fishId}
-                  onChange={(e) => setfishId(e.target.value)}
-                  required
-                >
-                  <option value="">Select Fish</option>
-                  {koiFishList?.map((fish) => (
-                    <option key={fish.id} value={fish.id}>
-                      {fish.name} - Size: {fish.size}cm - Age: {fish.age} years
+                    className="form-select form-select-lg mb-3"
+                    value={fishId}
+                    onChange={(e) => setfishId(e.target.value)}
+                    required
+                  >
+                    <option value="">Select Fish</option>
+
+                    {koiFishList?.filter(fish => fish.id === parseInt(fishId))
+                      .map((fish) => (
+                        <option key={fish.id} value={fish.id}>
+                        {fish.name} - Size: {fish.size}cm - Age: {fish.age} years (Current)
+                        </option>
+                    ))}
+
+                    {koiFishWithStatusNew?.filter(fish => fish.id !== parseInt(fishId))
+                      .map((fish) => (
+                        <option key={fish.id} value={fish.id}>
+                          {fish.name} - Size: {fish.size}cm - Age: {fish.age} years (Available)
                     </option>
                   ))}
                 </select>
-              </div>
+                </div>
               {/* Method Type Field */}
               <div className="d-flex align-items-center">
                 <h5 className="mb-0 me-2">Method:</h5>
