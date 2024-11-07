@@ -1,4 +1,4 @@
-import { Nav, NavDropdown, Navbar, Container, Alert } from "react-bootstrap";
+import { Nav, NavDropdown, Navbar, Container, Alert, NavLink } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import "./Header.css";
 import { useEffect, useState } from "react";
@@ -344,35 +344,55 @@ const StaffNavbar = () => {
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto">
-            <Nav.Link
-              as={Link}
-              to="/auction"
-              onClick={() => handleUserTitle(user?.fullname)}
+            <NavDropdown
+              title="Management"
+              id="collapsible-nav-dropdown"
+              menuVariant="dark"
             >
-              Manage Auction
-            </Nav.Link>
-            <Nav.Link
-              as={Link}
-              to="/staffrequest"
-              onClick={() => handleUserTitle(user?.fullname)}
-            >
-             Manage Request
-            </Nav.Link>
-
-            <Nav.Link
-              as={Link}
-              to="/member"
-              onClick={() => handleUserTitle(user?.fullname)}
-            >
-              Manage User
-            </Nav.Link>
-            <Nav.Link
-              as={Link}
-              to="/staffreview"
-              onClick={() => handleUserTitle(user?.fullname)}
-            >
-              Review Request
-            </Nav.Link>
+              <NavDropdown.Item
+                as={Link}
+                to="/auction"
+                onClick={() => handleUserTitle(user?.fullname)}
+              >
+                Manage Auction
+              </NavDropdown.Item>
+              <NavDropdown.Item
+                as={Link}
+                to="/staffrequest"
+                onClick={() => handleUserTitle(user?.fullname)}
+              >
+                Manage Request
+              </NavDropdown.Item>
+              <NavDropdown.Item
+                as={Link}
+                to="/member"
+                onClick={() => handleUserTitle(user?.fullname)}
+              >
+                Manage User
+              </NavDropdown.Item>
+              
+            </NavDropdown>
+            <NavLink
+                as={Link}
+                to="/staffreview"
+                onClick={() => handleUserTitle(user?.fullname)}
+              >
+                Review Request
+              </NavLink>
+              <NavLink
+                as={Link}
+                to="/manageDelivery"
+                onClick={() => handleUserTitle(user?.fullname)}
+              >
+                Manage Delivery
+              </NavLink>
+              <NavLink
+                as={Link}
+                to="/managetransaction"
+                onClick={() => handleUserTitle(user?.fullname)}
+              >
+                Manage Transaction
+              </NavLink>
           </Nav>
           <Nav>
             {user?.fullname ? (

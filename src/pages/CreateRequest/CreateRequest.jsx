@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef} from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark, faPen } from "@fortawesome/free-solid-svg-icons";
 import styles from "./CreateRequest.module.css";
 import { useDispatch, useSelector } from "react-redux";
-import dayjs from "dayjs";
-import utc from "dayjs-plugin-utc";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import uploadImage from "../../utils/firebase/uploadImage.jsx";
+
 import {
   getAllAuctionRequestByBreederID,
   addAuctionRequest,
@@ -12,7 +14,8 @@ import {
   cancelAuctionRequest,
   getKoiFishById,
   getKoiFishByBreederId,
-  addKoiFish
+  addKoiFish,
+  getKoiFishWithStatusNew
 } from "../../redux/apiRequest";
 const Modal = ({ show, children }) => {
   if (!show) {
@@ -25,23 +28,17 @@ const Modal = ({ show, children }) => {
   );
 };
 function CreateRequest() {
-  dayjs.extend(utc);
-  const [userId, setuserId] = useState("");
   const [fishId, setfishId] = useState("");
   const [buyOut, setbuyOut] = useState("");
-  const [incrementStep, setincrementStep] = useState("");
   const [startPrice, setstartPrice] = useState("");
   const [methodType, setmethodType] = useState("");
-  const [start_time, setstartTime] = useState("");
-  const [end_time, setendTime] = useState("");
-
   const [name, setname] = useState("");
   const [sex, setsex] = useState("");
   const [size, setsize] = useState("");
   const [age, setage] = useState("");
   const [description, setdescription] = useState("");
-  const [imageUrl, setimageUrl] = useState("");
-  const [videoUrl, setvideoUrl] = useState("");
+  const [img, setImg] = useState("");
+  const [vid, setVid] = useState("");
 
   const [selectedauctionrequest, setSelectedAuctionRequest] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -49,18 +46,24 @@ function CreateRequest() {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showFishDetailModal, setShowFishDetailModal] = useState(false);
   const [showAddKoiFishModal, setShowAddKoiFishModal] = useState(false);
-
-
+  const inputImgRef = useRef(null);
+  const inputVidRef = useRef(null);
 
   const resetForm = () => {
-    setuserId("");
     setfishId("");
     setbuyOut("");
-    setincrementStep("");
     setstartPrice("");
     setmethodType("");
-    setstartTime("");
-    setendTime("");
+  };
+
+  const resetKoiFishForm = () => {
+    setname("");
+    setsex("");
+    setsize("");
+    setage("");
+    setdescription("");
+    setImg("");
+    setVid("");
   };
 
   const token = useSelector(
@@ -70,65 +73,67 @@ function CreateRequest() {
   const aucionRequestList = useSelector(
     (state) => state.auctionrequest.auctionrequestbybreederid?.auctionrequestbybreederids
   );
+
   const koifishById = useSelector(
     (state) => state.koifish.koifishs?.koifishById
   );
+
   const koiFishList = useSelector(
     (state) => state.koifish.koifishByBreederId?.koifishByBreederId
+  );
+
+  const koiFishWithStatusNew = useSelector(
+    (state) => state.koifish.koifishWithStatusNew?.koifishWithStatusNew
   );
   const { currentUser } = useSelector((state) => state.auth.profile);
   const dispatch = useDispatch();
   console.log(token);
 
- 
   useEffect(() => {
     getAllAuctionRequestByBreederID(token, currentUser.id, dispatch);
     getKoiFishByBreederId(token, currentUser.id, dispatch);
   }, []);
-  
- 
+  useEffect(() => {
+    getKoiFishWithStatusNew(token, currentUser.id, dispatch);
+  }, []);
+  console.log(koiFishList);
+  console.log(koiFishWithStatusNew);
   
   const handleSendRequest = async (e) => {
     e.preventDefault();
     const RequestData = {
-      userId: parseInt(currentUser.id),
+      userId: currentUser.id,
       fishId: parseInt(fishId),
       buyOut: parseFloat(buyOut),
       startPrice: parseFloat(startPrice),
       methodType: methodType,
     };
-    console.log(RequestData)
-    await addAuctionRequest(dispatch, RequestData, token);
+    console.log(RequestData);
     resetForm();
+    await addAuctionRequest(dispatch, RequestData, token, currentUser.id);
     setShowAddModal(false);
   };
+
   const handleUpdateSendRequest = async (e) => {
     e.preventDefault();
     const RequestData = {
-      userId: parseInt(currentUser.id),
+      userId: currentUser.id,
       fishId: parseInt(fishId),
       buyOut: parseFloat(buyOut),
-      incrementStep: parseInt(incrementStep),
       startPrice: parseFloat(startPrice),
       methodType: methodType,
-      start_time: start_time,
-      end_time: end_time,
     };
-    await updateAuctionRequest(dispatch, selectedauctionrequest.id, RequestData, token);
-    resetForm();
+    resetForm(); 
+    await updateAuctionRequest(dispatch, selectedauctionrequest.id, RequestData, token, currentUser.id);
     setShowEditModal(false);
   };
 
   const openEditModal = (auctionrequest) => {
     setSelectedAuctionRequest(auctionrequest);
-    setuserId(auctionrequest.user);
     setfishId(auctionrequest.fish);
     setbuyOut(auctionrequest.buyOut);
-    setincrementStep(auctionrequest.incrementStep);
     setstartPrice(auctionrequest.startPrice);
     setmethodType(auctionrequest.methodType);
-    setstartTime(auctionrequest.start_time);
-    setendTime(auctionrequest.end_time);
     setShowEditModal(true);
   };
 
@@ -136,6 +141,7 @@ function CreateRequest() {
     setSelectedAuctionRequest(auctionrequest);
     setShowDetailsModal(true);
   };
+
   const openFishDetailModal = (auctionrequest) => {
     setSelectedAuctionRequest(auctionrequest);
     getKoiFishById(token, auctionrequest.fish, dispatch);
@@ -150,18 +156,72 @@ function CreateRequest() {
 
   const handleAddKoiFish = async (e) => {
     e.preventDefault();
-    const koiFishData = {
-      name: name,
-      sex: sex,
-      size: size,
-      age: age,
-      description: description,
-      imageUrl: imageUrl,
-      videoUrl: videoUrl,
-    };
-    await addKoiFish(dispatch, koiFishData, currentUser.id, token);
-    setShowAddKoiFishModal(false);
+    if (!img) {
+      toast.error("Please add koi fish image");
+      return;
+    }
+    if (!vid) {
+      toast.error("Please add koi fish video");
+      return;
+    }
+
+    const url = await uploadImage(img);
+    const videoUrl = await uploadImage(vid);
+    if (url && videoUrl) {
+      const koiFishData = {
+        name: name,
+        sex: sex,
+        size: size,
+        age: age,
+        description: description,
+        imageUrl: url,
+        videoUrl: videoUrl,
+      };
+      await addKoiFish(dispatch, koiFishData, currentUser.id, token);
+      toast.success("Koi fish added successfully!");
+      setImg("");
+      resetKoiFishForm();
+      setShowAddKoiFishModal(false);
+      
+    }
   };
+
+  const handleImageClick = () => {
+    inputImgRef.current.click();
+  }
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    console.log(file);
+    setImg(file);
+  }
+
+  const handleVideoClick = () => {
+    inputVidRef.current.click();
+  }
+
+  const handleVideoChange = (e) => {
+    const file = e.target.files[0];
+    console.log(file);
+    setVid(file);
+  }
+
+  const openAddModal = () => {
+    resetForm();
+    setShowAddModal(true);
+  };
+
+  useEffect(() => {
+    if (!showAddModal) {
+      resetForm();
+    }
+  }, [showAddModal]);
+
+  useEffect(() => {
+    if (!showEditModal) {
+      resetForm();
+    }
+  }, [showEditModal]);
 
   return (
     <div className="container py-3 table">
@@ -221,7 +281,7 @@ function CreateRequest() {
 
       <button
         className={styles.buttonkoi + " btn btn-outline-dark"}
-        onClick={() => setShowAddModal(true)}
+        onClick={openAddModal}
       >
         Create New Request
       </button>
@@ -239,14 +299,13 @@ function CreateRequest() {
                 <div className="form-group mb-3">
                   <select
                     className="form-select form-select-lg mb-3"
-                    value={fishId}
                     onChange={(e) => setfishId(e.target.value)}
                     required
                   >
                     <option value="">Select Fish</option>
-                    {koiFishList?.map((fish) => (
+                    {koiFishWithStatusNew?.map((fish) => (
                       <option key={fish.id} value={fish.id}>
-                        {fish.name} - Size: {fish.size}cm - Age: {fish.age} months
+                        {fish.name} - Size: {fish.size}cm - Age: {fish.age} years
                       </option>
                     ))}
                   </select>
@@ -301,7 +360,6 @@ function CreateRequest() {
                 <input
                   type="number"
                   name="buyOut"
-                  value={buyOut}
                   onChange={(e) => setbuyOut(e.target.value)}
                   placeholder="Buy Out Price"
                   className={styles.roundedInput}
@@ -310,7 +368,6 @@ function CreateRequest() {
                 <input
                   type="number"
                   name="startPrice"
-                  value={startPrice}
                   onChange={(e) => setstartPrice(e.target.value)}
                   placeholder="Start Price"
                   className={styles.roundedInput}
@@ -358,7 +415,7 @@ function CreateRequest() {
                     <option value="">Select Fish</option>
                     {koiFishList?.map((fish) => (
                       <option key={fish.id} value={fish.id}>
-                        {fish.name} - Size: {fish.size}cm - Age: {fish.age} months
+                        {fish.name} - Size: {fish.size}cm - Age: {fish.age} years
                       </option>
                     ))}
                   </select>
@@ -431,7 +488,6 @@ function CreateRequest() {
                 placeholder="Start Price"
                 className={styles.roundedInput}
               />
-
               <button type="submit" className="btn btn-outline-dark">
                 Submit
               </button>
@@ -481,7 +537,7 @@ function CreateRequest() {
       </Modal>
       
       <Modal show={showFishDetailModal}>
-        <div className="position-relative p-2 text-start text-muted bg-body border border-dashed rounded-5">
+      <div className="position-relative p-2 text-start text-muted bg-body border border-dashed rounded-5">
           <button
             type="button"
             className="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill"
@@ -490,54 +546,78 @@ function CreateRequest() {
           ></button>
           <h1 className="text-body-emphasis text-start">Koi Fish Detail</h1>
           {koifishById && (
-            <div>
-              <div>
-                <label className="form-label"><strong>Name:</strong></label>
-                <input
-                  readOnly
-                  value={koifishById.name}
-                  className={styles.roundedInput}
-                />
+            <div className="row">
+              <div className="col-md-6">
+                <div className="form-group mb-3">
+                  <img 
+                    src={koifishById.imageUrl}
+                    alt={koifishById.name}
+                    className="img-fluid rounded"
+                    style={{ width: '100%', height: '300px', objectFit: 'contain' }}
+                  />
+                  {koifishById.videoUrl && (
+                    <div className="mt-3">
+                      <video 
+                        controls
+                        className="img-fluid rounded"
+                        style={{ width: '100%', height: '250px', objectFit: 'contain' }}
+                      >
+                        <source src={koifishById.videoUrl} type="video/mp4" />
+                        Your browser does not support the video tag.
+                      </video>
+                    </div>
+                  )}
+                </div>
               </div>
-              <div>
-                <label className="form-label"><strong>Sex:</strong></label>
-                <input
-                  readOnly
-                  value={koifishById.sex}
-                  className={styles.roundedInput}
-                />
-              </div>
-              <div>
-                <label className="form-label"><strong>Size:</strong></label>
-                <input
-                  readOnly
-                  value={koifishById.size}
-                  className={styles.roundedInput}
-                />
-              </div>
-              <div>
-                <label className="form-label"><strong>Age:</strong></label>
-                <input
-                  readOnly
-                  value={koifishById.age}
-                  className={styles.roundedInput}
-                />
-              </div>
-              <div>
-                <label className="form-label"><strong>Description:</strong></label>
-                <input
-                  readOnly
-                  value={koifishById.description}
-                  className={styles.roundedInput}
-                />
-              </div>
-              <div>
-                <label className="form-label"><strong>Status:</strong></label>
-                <input
-                  readOnly
-                  value={koifishById.status}
-                  className={styles.roundedInput}
-                />
+              <div className="col-md-6">
+                <div>
+                  <label className="form-label"><strong>Name:</strong></label>
+                  <input
+                    readOnly
+                    value={koifishById.name}
+                    className={styles.roundedInput}
+                  />
+                </div>
+                <div>
+                  <label className="form-label"><strong>Sex:</strong></label>
+                  <input
+                    readOnly
+                    value={koifishById.sex}
+                    className={styles.roundedInput}
+                  />
+                </div>
+                <div>
+                  <label className="form-label"><strong>Size:</strong></label>
+                  <input
+                    readOnly
+                    value={koifishById.size}
+                    className={styles.roundedInput}
+                  />
+                </div>
+                <div>
+                  <label className="form-label"><strong>Age:</strong></label>
+                  <input
+                    readOnly
+                    value={koifishById.age}
+                    className={styles.roundedInput}
+                  />
+                </div>
+                <div>
+                  <label className="form-label"><strong>Description:</strong></label>
+                  <input
+                    readOnly
+                    value={koifishById.description}
+                    className={styles.roundedInput}
+                  />
+                </div>
+                <div>
+                  <label className="form-label"><strong>Status:</strong></label>
+                  <input
+                    readOnly
+                    value={koifishById.status}
+                    className={styles.roundedInput}
+                  />
+                </div>
               </div>
             </div>
           )}
@@ -556,34 +636,36 @@ function CreateRequest() {
           <div>
             <form onSubmit={handleAddKoiFish}>
               <div className="row">
-                {/* Left Column - Media Inputs */}
                 <div className="col-md-6 border-end">
-                  <div className="form-group mb-3">
-                    <input
-                      type="url"
-                      name="image_url"
-                      value={imageUrl}
-                      onChange={(e) => setimageUrl(e.target.value)}
-                      placeholder="Image URL"
-                      className={styles.roundedInput}
-                      required
-                    />
-                  </div>
-
-                  <div className="form-group mb-3">
-                    <input
-                      type="url"
-                      name="video_url"
-                      value={videoUrl}
-                      onChange={(e) => setvideoUrl(e.target.value)}
-                      placeholder="Video URL"
-                      className={styles.roundedInput}
-                      required
-                    />
-                  </div>
+                <div className={styles.importBox} onClick={handleImageClick}>
+                {img ? (
+                          <img src={URL.createObjectURL(img)} alt="upload" style={{ height: '100%', width: '100%', objectFit: 'contain' }} />
+                        ) : (
+                          <img src="\logo\blankfish.webp" alt="upload" style={{ height: '100%', width: '100%', objectFit: 'contain' }} />
+                        )}
+                        <input type="file" ref={inputImgRef} onChange={handleImageChange} style={{ display: 'none' }} />
                 </div>
 
-                {/* Right Column - Other Fields */}
+                <div className={styles.importBox} onClick={handleVideoClick}>
+                {vid ? (
+                    <video
+                        className="img-fluid border rounded-3 shadow-lg"
+                        style={{ height: '100%', width: '100%' }}
+                        controls
+                        muted
+                        loop
+                        autoPlay
+                    >
+                        <source src={URL.createObjectURL(vid)} type="video/mp4" />
+                        Your browser does not support the video tag.
+                    </video>
+                ) : (
+                    <img src="\logo\blankvideo.webp" alt="upload" style={{ height: '100%', width: '100%', objectFit: 'contain' }} />
+                )}
+                <input type="file" ref={inputVidRef} onChange={handleVideoChange} style={{ display: 'none' }} />
+                </div>                  
+                </div>
+
                 <div className="col-md-6">
                   <div className="form-group mb-3">
                     <input
@@ -599,7 +681,7 @@ function CreateRequest() {
 
                   <div className="form-group mb-3">
                     <select
-                      className="form-select form-select-lg mb-3"
+                      className={`form-select ${styles.roundedInput}`}
                       value={sex}
                       onChange={(e) => setsex(e.target.value)}
                       required
@@ -628,7 +710,7 @@ function CreateRequest() {
                       name="age"
                       value={age}
                       onChange={(e) => setage(e.target.value)}
-                      placeholder="Age (months)"
+                      placeholder="Age (years)"
                       className={styles.roundedInput}
                       required
                     />
@@ -646,7 +728,7 @@ function CreateRequest() {
                     />
                   </div>
                 </div>
-              </div>
+              </div>  
 
               <button type="submit" className="btn btn-outline-dark mb-3">
                 Add Koi Fish
@@ -655,6 +737,19 @@ function CreateRequest() {
           </div>
         </div>
       </Modal>
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition:Bounce
+      />
     </div>
   );
 }

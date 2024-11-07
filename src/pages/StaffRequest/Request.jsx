@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import styles from "./Request.module.css";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllAuction, apporve, getKoiFishById } from "../../redux/apiRequest";
+import { getAllAuction, apporve, getKoiFishById, sendToManager } from "../../redux/apiRequest";
 
 
 const Modal = ({ show, children }) => {
@@ -28,6 +28,7 @@ function Request() {
   const koifishById = useSelector(
     (state) => state.koifish.koifishs?.koifishById
   );
+  const {currentUser} = useSelector((state) => state.auth.profile);
   const dispatch = useDispatch();
   console.log(token);
 
@@ -38,29 +39,30 @@ function Request() {
     
   const [infoKoiFishModal, setinfoKoiFishModal] = useState(false);
   const [infoAuctionModal, setinfoAuctionModal] = useState(false);
-  const [showApproveModal, setshowApproveModal] = useState(false);
   const [selectedAuctionRequest, setSelectedAuctionRequest] = useState(null);
-  const [auctionRequestId, setauctionRequestId] = useState("");
-  const [staffId, setstaffId] = useState("");
-  const [isSendToManager, setisSendToManager] = useState(false);
 
   
   
-  const handleApprove = async () => {
+  const handleApprove = async (id) => {
     const ApproveData = {
-      auctionRequestId: auctionRequestId,
-      staffId: staffId,
-      isSendToManager: isSendToManager,
+      auctionRequestId: id,
+      staffId: currentUser.id,
     };
-    await apporve(dispatch, ApproveData, token);
-    resetForm();
-    setshowApproveModal(false);
+    console.log(ApproveData);
+    if (window.confirm("Are you sure you want to approve this auction request?")) {
+      await apporve(dispatch, ApproveData, token);
+    }
   };
-
-  const resetForm = () => {
-    setauctionRequestId("");
-    setstaffId("");
-    setisSendToManager("");
+  
+  const handleSendToManager = async (id) => {
+    const sendToManagerData = {
+      auctionRequestId: id,
+      staffId: currentUser.id,
+    };
+    console.log(sendToManagerData);
+    if (window.confirm("Are you sure you want to send this auction request to manager?")) {
+      await sendToManager(dispatch, sendToManagerData, token);
+    }
   };
 
   const handleOpenKoiFishModal = (AuctionRequest) => {
@@ -111,10 +113,17 @@ function Request() {
               <td>
                <button 
                className={styles.actionBtn }
-               onClick={() => setshowApproveModal(true)}
+               onClick={() => handleApprove(aucionRequest.id)}
                 >
                  <FontAwesomeIcon icon={faCheck} />
                 </button> 
+
+                <button 
+                className={styles.actionBtn }
+                onClick={() => handleSendToManager(aucionRequest.id)}
+                >
+                  <FontAwesomeIcon icon={faArrowRight} />
+                </button>
               </td>
             </tr>
           );
@@ -122,7 +131,7 @@ function Request() {
       </table>
 
       <Modal show={infoKoiFishModal}>
-        <div className="position-relative p-4 text-start text-muted bg-body border border-dashed rounded-5"> 
+      <div className="position-relative p-2 text-start text-muted bg-body border border-dashed rounded-5">
           <button
             type="button"
             className="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill"
@@ -131,56 +140,79 @@ function Request() {
           ></button>
           <h1 className="text-body-emphasis text-start">Koi Fish Detail</h1>
           {koifishById && (
-            <div>
-              <div>
-                <label className="form-label"><strong>Name:</strong></label>
-                <input
-                  readOnly
-                  value={koifishById.name}
-                  className={styles.roundedInput}
-                />
+            <div className="row">
+              <div className="col-md-6">
+                <div className="form-group mb-3">
+                  <img 
+                    src={koifishById.imageUrl}
+                    alt={koifishById.name}
+                    className="img-fluid rounded"
+                    style={{ width: '100%', height: '300px', objectFit: 'contain' }}
+                  />
+                  {koifishById.videoUrl && (
+                    <div className="mt-3">
+                      <video 
+                        controls
+                        className="img-fluid rounded"
+                        style={{ width: '100%', height: '250px', objectFit: 'contain' }}
+                      >
+                        <source src={koifishById.videoUrl} type="video/mp4" />
+                        Your browser does not support the video tag.
+                      </video>
+                    </div>
+                  )}
+                </div>
               </div>
-              <div>
-                <label className="form-label"><strong>Sex:</strong></label>
-                <input
-                  readOnly
-                  value={koifishById.sex}
-                  className={styles.roundedInput}
-                />
+              <div className="col-md-6">
+                <div>
+                  <label className="form-label"><strong>Name:</strong></label>
+                  <input
+                    readOnly
+                    value={koifishById.name}
+                    className={styles.roundedInput}
+                  />
+                </div>
+                <div>
+                  <label className="form-label"><strong>Sex:</strong></label>
+                  <input
+                    readOnly
+                    value={koifishById.sex}
+                    className={styles.roundedInput}
+                  />
+                </div>
+                <div>
+                  <label className="form-label"><strong>Size:</strong></label>
+                  <input
+                    readOnly
+                    value={koifishById.size}
+                    className={styles.roundedInput}
+                  />
+                </div>
+                <div>
+                  <label className="form-label"><strong>Age:</strong></label>
+                  <input
+                    readOnly
+                    value={koifishById.age}
+                    className={styles.roundedInput}
+                  />
+                </div>
+                <div>
+                  <label className="form-label"><strong>Description:</strong></label>
+                  <input
+                    readOnly
+                    value={koifishById.description}
+                    className={styles.roundedInput}
+                  />
+                </div>
+                <div>
+                  <label className="form-label"><strong>Status:</strong></label>
+                  <input
+                    readOnly
+                    value={koifishById.status}
+                    className={styles.roundedInput}
+                  />
+                </div>
               </div>
-              <div>
-                <label className="form-label"><strong>Size:</strong></label>
-                <input
-                  readOnly
-                  value={koifishById.size}
-                  className={styles.roundedInput}
-                />
-              </div>
-              <div>
-                <label className="form-label"><strong>Age:</strong></label>
-                <input
-                  readOnly
-                  value={koifishById.age}
-                  className={styles.roundedInput}
-                />
-              </div>
-              <div>
-                <label className="form-label"><strong>Description:</strong></label>
-                <input
-                  readOnly
-                  value={koifishById.description}
-                  className={styles.roundedInput}
-                />
-              </div>
-              <div>
-                <label className="form-label"><strong>Status:</strong></label>
-                <input
-                  readOnly
-                  value={koifishById.status}
-                  className={styles.roundedInput}
-                />
-              </div>
-             
             </div>
           )}
         </div>
@@ -221,80 +253,12 @@ function Request() {
                     className={styles.roundedInput}
                   />
                 </div>
-                <div>
-                  <label className="form-label"><strong>Start Time:</strong></label>
-                  <input
-                    readOnly
-                    value={selectedAuctionRequest.startTime}
-                    className={styles.roundedInput}
-                  />
-                </div>
-                <div>
-                  <label className="form-label"><strong>End Time:</strong></label>
-                  <input
-                    readOnly
-                    value={selectedAuctionRequest.endTime}
-                    className={styles.roundedInput}
-                  />
-                </div>
+                
               </div>
             )}</div>
       </div>
-        </Modal>
-      
-
-      <Modal show={showApproveModal}>
-        <div className="position-relative p-2 text-center text-muted bg-body border border-dashed rounded-5">
-          <button
-            type="button"
-            className="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill"
-            aria-label="Close"
-            onClick={() => setshowApproveModal(false)}
-          ></button>
-          <h1 className="text-body-emphasis">Create Request</h1>
-          <div>
-            <form onSubmit={handleApprove}>
-            <input
-                type="text"
-                name="auctionRequestId"
-                onChange={(e) => setauctionRequestId(e.target.value)}
-                placeholder="AuctionRequest ID"
-                className={styles.roundedInput}
-              />
-              
-              <input
-                type="text"
-                name="staffId"
-                onChange={(e) => setstaffId(e.target.value)}
-                placeholder="Staff ID"
-                className={styles.roundedInput}
-              />
-              
-              <div className="col-auto d-flex align-items-center">
-                    <h5 className="mb-0 me-2">Send To Manager:</h5>
-                    <div className="form-check">
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        id="YesNoCheckbox"
-                        checked={isSendToManager}
-                        onChange={(e) => setisSendToManager(e.target.checked)}
-                      />
-                      <label
-                        className="form-check-label"
-                        htmlFor="YesNoCheckbox"
-                      >
-                        {isSendToManager ? "true" : "false"}
-                      </label>
-                    </div>
-                  </div>
-              <button type="submit" className="btn btn-outline-dark">
-                Submit
-              </button>
-      </form>
-    </div>
-  </div>
       </Modal>
+     
     </div>
   );
 }

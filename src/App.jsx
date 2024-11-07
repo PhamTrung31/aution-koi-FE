@@ -35,6 +35,8 @@ import Topup from "./pages/Topup/Topup.jsx";
 import TopupSuccess from "./pages/TopupSuccess/TopupSuccess.jsx";
 import ManageKoiFish from "./pages/ManageKoiFish/ManageKoiFish.jsx";
 import { loadWebsocketPendingMessage } from "./redux/messageSlice.jsx";
+import ManageDelivery from "./pages/ManageDelivery/ManageDelivery.jsx";
+import ManageTransaction from "./pages/ManageTransaction/ManageTransaction.jsx";
 import { Client } from "@stomp/stompjs";
 function App() {
   const CURRENT_USER_ROLE = useSelector((state) =>
@@ -151,6 +153,8 @@ function App() {
             <Route path="/auction" element={<StaffElement><Auction /></StaffElement>} />
             <Route path="/member" element={<StaffElement><Member /></StaffElement>} />
             <Route path="/staffreview" element={<StaffElement><StaffReview /></StaffElement>} />
+            <Route path="/manageDelivery" element={<StaffElement><ManageDelivery /></StaffElement>} />
+            <Route path="/managetransaction" element={<StaffElement><ManageTransaction /></StaffElement>} />
             <Route path="/createrequest" element={<BreederElement><CreateRequest /></BreederElement>} />
             <Route path="/managekoifish" element={<BreederElement><ManageKoiFish /></BreederElement>} />
             <Route path="/forbidden403" element={<Forbidden403 />} />

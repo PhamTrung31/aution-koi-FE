@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { faPen, faLock, faLockOpen } from "@fortawesome/free-solid-svg-icons";
 import styles from "./Member.module.css";
 import { useDispatch, useSelector } from "react-redux";

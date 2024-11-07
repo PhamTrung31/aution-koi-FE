@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
 import styles from "./StaffReview.module.css";
 import { useDispatch, useSelector } from "react-redux";
-import {  getKoiFishById, getAuctionRequestForStaffToAssign, staffReview } from "../../redux/apiRequest";
+import {  getKoiFishById, getAuctionRequestForStaffToAssign, staffReject, assignStaffApprove } from "../../redux/apiRequest";
 
 const Modal = ({ show, children }) => {
   if (!show) {
@@ -33,28 +33,27 @@ function StaffReview() {
 
   const [infoKoiFishModal, setinfoKoiFishModal] = useState(false);
   const [infoAuctionModal, setinfoAuctionModal] = useState(false);
-  const [showReviewModal, setshowReviewModal] = useState(false);
   const [selectedAuctionRequest, setSelectedAuctionRequest] = useState(null);
-  const [auctionRequestId, setauctionRequestId] = useState("");
-  const [staffId, setstaffId] = useState("");
-  const [isApproved, setisApproved] = useState(false);
 
 
-  const handleReview = async () => {
-    const ReviewData = {
-      auctionRequestId: auctionRequestId,
-      staffId: staffId,
-      isApproved: isApproved,
-    };
-    await staffReview(dispatch, ReviewData, token);
-    resetForm();
-    setshowReviewModal(false);
+  const handleApprove = async (id) => {
+    const ApproveData = {
+      auctionRequestId: id,
+      staffId: currentUser.id,
+    };  
+    console.log(ApproveData);
+    if (window.confirm("Are you sure you want to approve this auction request?")) {
+      await assignStaffApprove(dispatch, ApproveData, token, currentUser.id);
+    }
   };
-
-  const resetForm = () => {
-    setauctionRequestId("");
-    setstaffId("");
-    setisApproved(false);
+  const handleReject = async (id) => {
+    const RejectData = {
+      auctionRequestId: id,
+      staffId: currentUser.id,
+    };
+    if (window.confirm("Are you sure you want to reject this auction request?")) {
+      await staffReject(dispatch, RejectData, token, currentUser.id);
+    }
   };
 
   const handleOpenKoiFishModal = (AuctionRequest) => {
@@ -103,9 +102,15 @@ function StaffReview() {
               <td>
                 <button
                   className={styles.actionBtn}
-                  onClick={() => setshowReviewModal(true)}
+                  onClick={() => handleApprove(aucionRequest.id)}
                 >
                   <FontAwesomeIcon icon={faCheck} />
+                </button>
+                <button
+                  className={styles.actionBtn}
+                  onClick={() => handleReject(aucionRequest.id)}
+                >
+                  <FontAwesomeIcon icon={faXmark} />
                 </button>
               </td>
             </tr>
@@ -114,17 +119,39 @@ function StaffReview() {
       </table>
 
       <Modal show={infoKoiFishModal}>
-        <div class="position-relative p-2 text-start text-muted bg-body border border-dashed rounded-5">
+      <div className="position-relative p-2 text-start text-muted bg-body border border-dashed rounded-5">
           <button
             type="button"
-            class="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill"
+            className="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill"
             aria-label="Close"
             onClick={() => setinfoKoiFishModal(false)}
           ></button>
-          <h1 class="text-body-emphasis text-start">Koi Fish Detail</h1>
-          <div>
-            {koifishById && (
-              <div>
+          <h1 className="text-body-emphasis text-start">Koi Fish Detail</h1>
+          {koifishById && (
+            <div className="row">
+              <div className="col-md-6">
+                <div className="form-group mb-3">
+                  <img 
+                    src={koifishById.imageUrl}
+                    alt={koifishById.name}
+                    className="img-fluid rounded"
+                    style={{ width: '100%', height: '300px', objectFit: 'contain' }}
+                  />
+                  {koifishById.videoUrl && (
+                    <div className="mt-3">
+                      <video 
+                        controls
+                        className="img-fluid rounded"
+                        style={{ width: '100%', height: '250px', objectFit: 'contain' }}
+                      >
+                        <source src={koifishById.videoUrl} type="video/mp4" />
+                        Your browser does not support the video tag.
+                      </video>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="col-md-6">
                 <div>
                   <label className="form-label"><strong>Name:</strong></label>
                   <input
@@ -174,8 +201,8 @@ function StaffReview() {
                   />
                 </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </Modal>
       <Modal show={infoAuctionModal}>
@@ -213,73 +240,10 @@ function StaffReview() {
                     value={selectedAuctionRequest.methodType}
                     className={styles.roundedInput}
                   />
-                </div>
-                <div>
-                  <label className="form-label"><strong>Start Time:</strong></label>
-                  <input
-                    readOnly
-                    value={selectedAuctionRequest.startTime}
-                    className={styles.roundedInput}
-                  />
-                </div>
-                <div>
-                  <label className="form-label"><strong>End Time:</strong></label>
-                  <input
-                    readOnly
-                    value={selectedAuctionRequest.endTime}
-                    className={styles.roundedInput}
-                  />
-                </div>
+                </div>  
               </div>
             )}
           </div>
-        </div>
-      </Modal>
-
-      <Modal show={showReviewModal}>
-        <div className="position-relative p-2 text-center text-muted bg-body border border-dashed rounded-5">
-          <button
-            type="button"
-            className="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill"
-            aria-label="Close"
-            onClick={() => setshowReviewModal(false)}
-          ></button>
-          <h1 className="text-body-emphasis">Review Request</h1>
-          <form onSubmit={handleReview}>
-            <input
-              type="text"
-              name="auctionRequestId"
-              onChange={(e) => setauctionRequestId(e.target.value)}
-              placeholder="AuctionRequest ID"
-              className={styles.roundedInput}
-            />
-            <input
-              type="text"
-              name="staffId"
-              onChange={(e) => setstaffId(e.target.value)}
-              placeholder="Staff ID"
-              className={styles.roundedInput}
-            />
-
-            <div className="col-auto d-flex align-items-center">
-              <h5 className="mb-0 me-2">Approve:</h5>
-              <div className="form-check">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  id="ApproveCheckbox"
-                  checked={isApproved}
-                  onChange={(e) => setisApproved(e.target.checked)}
-                />
-                <label className="form-check-label" htmlFor="ApproveCheckbox">
-                  {isApproved ? "true" : "false"}
-                </label>
-              </div>
-            </div>
-            <button type="submit" className="btn btn-outline-dark">
-              Submit Review
-            </button>
-          </form>
         </div>
       </Modal>
     </div>

@@ -9,6 +9,8 @@ import auctionReducer from "./auctionSlice";
 import koifishReducer from "./koifishSlice";
 import walletReducer from "./walletSlice";
 import messageReducer from "./messageSlice";
+import deliveryReducer from "./deliverySlice";
+import transactionReducer from "./transactionSlice";
 import {
   persistStore,
   persistReducer,
@@ -54,7 +56,9 @@ const store = configureStore({
     auction: auctionReducer,
     koifish: koifishReducer,
     wallet: persistedWalletReducer,
-    message: persistMessageReducer
+    message: persistMessageReducer,
+    delivery: deliveryReducer,
+    transaction: transactionReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

@@ -13,6 +13,11 @@ const koifishSlice = createSlice({
       isFetching: false,
       error: false,
     },
+    koifishWithStatusNew: {
+      koifishWithStatusNew: [],
+      isFetching: false,
+      error: false,
+    },
     addkoifish: {
       addKoifish: [],
       isFetching: false,
@@ -88,6 +93,17 @@ const koifishSlice = createSlice({
       state.updatekoifish.isFetching = false;
       state.updatekoifish.error = true;
     },
+    getKoiFishWithStatusNewStart: (state) => {
+      state.koifishWithStatusNew.isFetching = true;
+    },
+    getKoiFishWithStatusNewSuccess: (state, action) => {
+      state.koifishWithStatusNew.isFetching = false;
+      state.koifishWithStatusNew.koifishWithStatusNew = action.payload;
+    },
+    getKoiFishWithStatusNewFailed: (state) => {
+      state.koifishWithStatusNew.isFetching = false;
+      state.koifishWithStatusNew.error = true;
+    },
    
   },
 });
@@ -106,7 +122,10 @@ export const {
   updateKoiFishFailed,
   getKoiFishByBreederIdStart,
   getKoiFishByBreederIdSuccess,
-  getKoiFishByBreederIdFailed
+  getKoiFishByBreederIdFailed,
+  getKoiFishWithStatusNewStart,
+  getKoiFishWithStatusNewSuccess,
+  getKoiFishWithStatusNewFailed,
 } = koifishSlice.actions;
 
 export default koifishSlice.reducer;

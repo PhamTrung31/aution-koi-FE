@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { managerReject } from "./apiRequest";
 
 const auctionrequestSlice = createSlice({
   name: "auctionrequest",
@@ -53,17 +54,36 @@ const auctionrequestSlice = createSlice({
       isFetching: false,
       error: false,
     },
-    managerreview: {
-      managerreviews: [],
+    sendToManager: {
+      sendToManagers: [],
       isFetching: false,
       error: false,
     },
-    staffreview: {
-      staffreviews: [],
+    managerreject: {
+      managerrejects: [],
       isFetching: false,
       error: false,
     },
-    
+    staffreject: {
+      staffrejects: [],
+      isFetching: false,
+      error: false,
+    },
+    assignstaff: {
+      assignstaffs: [],
+      isFetching: false,
+      error: false,
+    },
+    assignstaffapprove: {
+      assignstaffapproves: [],
+      isFetching: false,
+      error: false,
+    },
+    setTime: {
+      setTimes: [],
+      isFetching: false,
+      error: false,
+    },
   },
   reducers: {
     getAuctionRequestStart: (state) => {
@@ -197,37 +217,106 @@ const auctionrequestSlice = createSlice({
       state.approve.error = true;
     },
 
-    managerReviewStart: (state) => {
-      state.managerreview.isFetching = true;
+    sendToManagerStart: (state) => {
+      state.sendToManager.isFetching = true;
     },
-    managerReviewSuccess: (state, action) => {
-      state.managerreview.isFetching = false;
-      state.managerreview.managerreviews = state.managerreview.managerreviews.map(
+    sendToManagerSuccess: (state, action) => {
+      state.sendToManager.isFetching = false;
+      state.sendToManager.sendToManagers = state.sendToManager.sendToManagers.map(
         (auctionrequest) =>
           auctionrequest.id === action.payload.id
             ? action.payload
             : auctionrequest
       );
     },
-    managerReviewFailed: (state) => {
-      state.managerreview.isFetching = false;
-      state.managerreview.error = true;
+    sendToManagerFailed: (state) => {
+      state.sendToManager.isFetching = false;
+      state.sendToManager.error = true;
     },
-    staffReviewStart: (state) => {
-      state.staffreview.isFetching = true;
+
+    managerRejectStart: (state) => {
+      state.managerreject.isFetching = true;
     },
-    staffReviewSuccess: (state, action) => {
-      state.staffreview.isFetching = false;
-      state.staffreview.staffreviews = state.staffreview.staffreviews.map(
+    managerRejectSuccess: (state, action) => {
+      state.managerreject.isFetching = false;
+      state.managerreject.managerrejects = state.managerreject.managerrejects.map(
         (auctionrequest) =>
           auctionrequest.id === action.payload.id
             ? action.payload
             : auctionrequest
       );
     },
-    staffReviewFailed: (state) => {
-      state.staffreview.isFetching = false;
-      state.staffreview.error = true;
+
+    managerRejectFailed: (state) => {
+      state.managerreject.isFetching = false;
+      state.managerreject.error = true;
+    },
+
+    assignStaffStart: (state) => {
+      state.assignstaff.isFetching = true;
+    },
+    assignStaffSuccess: (state, action) => {
+      state.assignstaff.isFetching = false;
+      state.assignstaff.assignstaffs = state.assignstaff.assignstaffs.map(
+        (auctionrequest) =>
+          auctionrequest.id === action.payload.id
+            ? action.payload
+            : auctionrequest
+      );
+    },
+    assignStaffFailed: (state) => {
+      state.assignstaff.isFetching = false;
+      state.assignstaff.error = true;
+    },
+
+    staffRejectStart: (state) => {
+      state.staffreject.isFetching = true;
+    },
+    staffRejectSuccess: (state, action) => {
+      state.staffreject.isFetching = false;
+      state.staffreject.staffrejects = state.staffreject.staffrejects.map(
+        (auctionrequest) =>
+          auctionrequest.id === action.payload.id
+            ? action.payload
+            : auctionrequest
+      );
+    },
+    staffRejectFailed: (state) => {
+      state.staffreject.isFetching = false;
+      state.staffreject.error = true;
+    },
+
+    assignStaffApproveStart: (state) => {
+      state.assignstaffapprove.isFetching = true;
+    },
+    assignStaffApproveSuccess: (state, action) => {
+      state.assignstaffapprove.isFetching = false;
+      state.assignstaffapprove.assignstaffapproves = state.assignstaffapprove.assignstaffapproves.map(
+        (auctionrequest) =>
+          auctionrequest.id === action.payload.id
+            ? action.payload
+            : auctionrequest
+      );
+    },
+    assignStaffApproveFailed: (state) => {
+      state.assignstaffapprove.isFetching = false;
+      state.assignstaffapprove.error = true;
+    },
+    setTimeStart: (state) => {
+      state.setTime.isFetching = true;
+    },
+    setTimeSuccess: (state, action) => {
+      state.setTime.isFetching = false;
+      state.setTime.setTimes = state.setTime.setTimes.map(
+        (auctionrequest) =>
+          auctionrequest.id === action.payload.id
+            ? action.payload
+            : auctionrequest
+      );
+    },
+    setTimeFailed: (state) => {
+      state.setTime.isFetching = false;
+      state.setTime.error = true;
     },
   },
 });
@@ -256,17 +345,29 @@ export const {
   getAuctionRequestForManagerStart,
   getAuctionRequestForManagerSuccess,
   getAuctionRequestForManagerFailed,
-  managerReviewStart,
-  managerReviewSuccess,
-  managerReviewFailed,
+  managerRejectStart,
+  managerRejectSuccess,
+  managerRejectFailed,
   getAuctionRequestForStaffToAssignStart,
   getAuctionRequestForStaffToAssignSuccess,
   getAuctionRequestForStaffToAssignFailed,
-  staffReviewStart,
-  staffReviewSuccess,
-  staffReviewFailed,
+  staffRejectStart,
+  staffRejectSuccess,
+  staffRejectFailed,
   getAuctionRequestByAssignedStaffStart,
   getAuctionRequestByAssignedStaffSuccess,
   getAuctionRequestByAssignedStaffFailed,
+  sendToManagerStart,
+  sendToManagerSuccess,
+  sendToManagerFailed,
+  assignStaffStart,
+  assignStaffSuccess,
+  assignStaffFailed,
+  assignStaffApproveStart,
+  assignStaffApproveSuccess,
+  assignStaffApproveFailed,
+  setTimeStart,
+  setTimeSuccess,
+  setTimeFailed,
 } = auctionrequestSlice.actions;
 export default auctionrequestSlice.reducer;
