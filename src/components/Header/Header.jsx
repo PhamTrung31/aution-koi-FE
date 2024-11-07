@@ -257,6 +257,13 @@ const BreederNavbar = () => {
             >
               Manage Koi Fish
             </Nav.Link>
+            <Nav.Link
+              as={Link}
+              to="/requestWithDrawals"
+              onClick={() => handleUserTitle(user?.fullname)}
+            >
+              Request Withdrawals
+            </Nav.Link>
           </Nav>
           <Nav>
             {user?.fullname ? (
@@ -370,6 +377,14 @@ const StaffNavbar = () => {
               >
                 Manage User
               </NavDropdown.Item>
+
+              <NavDropdown.Item
+                as={Link}
+                to="/managetransaction"
+                onClick={() => handleUserTitle(user?.fullname)}
+              >
+                Manage Transaction
+              </NavDropdown.Item>
               
             </NavDropdown>
             <NavLink
@@ -386,12 +401,13 @@ const StaffNavbar = () => {
               >
                 Manage Delivery
               </NavLink>
+              
               <NavLink
                 as={Link}
-                to="/managetransaction"
+                to="/managePendingWithDrawal"
                 onClick={() => handleUserTitle(user?.fullname)}
               >
-                Manage Transaction
+                Manage Pending Withdrawal
               </NavLink>
           </Nav>
           <Nav>

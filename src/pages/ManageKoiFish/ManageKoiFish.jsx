@@ -31,9 +31,10 @@ function KoiFish() {
   const [size, setSize] = useState("");
   const [age, setAge] = useState("");
   const [description, setDescription] = useState("");
-  const [img, setImg] = useState("");
-  const [videoUrl, setVideoUrl] = useState("");
-  const [vid, setVid] = useState("");
+  const [img, setImg] = useState(null);
+  const [vid, setVid] = useState(null);
+  const [imgUrl, setImgUrl] = useState("");
+  const [vidUrl, setVidUrl] = useState("");
 
 
   const [selectedKoiFish, setSelectedKoiFish] = useState(null);
@@ -41,7 +42,7 @@ function KoiFish() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showMediaModal, setShowMediaModal] = useState(false);
   const [selectedKoiFishMedia, setSelectedKoiFishMedia] = useState(null);
-  const inputRef = useRef(null);
+  const inputImgRef = useRef(null);
   const inputVidRef = useRef(null);
 
 
@@ -132,8 +133,10 @@ function KoiFish() {
     setSize(koiFish.size);
     setAge(koiFish.age);
     setDescription(koiFish.description);
-    setImg(koiFish.imageUrl);
-    setVid(koiFish.videoUrl);
+    setImgUrl(koiFish.imageUrl);
+    setVidUrl(koiFish.videoUrl);
+    setImg("");
+    setVid("");
     setShowEditModal(true);
   };
 
@@ -149,23 +152,27 @@ function KoiFish() {
   };
   
   const handleImageClick = () => {
-    inputRef.current.click();
+    inputImgRef.current.click();
   }
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     console.log(file);
     setImg(file);
+    console.log(img);
   }
 
   const handleVideoClick = () => {
     inputVidRef.current.click();
   }
 
-  const handleVideoChange = (e) => {
+  const handleVideoChange = async (e) => {
     const file = e.target.files[0];
     console.log(file);
-    setVid(file);
+    if (file) {
+      setVid(file);
+      e.target.value = null;  // Clear the input to ensure re-selection works
+    }
   }
   
 
@@ -243,18 +250,54 @@ function KoiFish() {
           <div>
             <form onSubmit={handleUpdateKoiFish}>
               <div className="row">
-                <div className="col-md-6 border-end">
+                {/* <div className="col-md-6 border-end">
                   <div className={styles.importBox} onClick={handleImageClick}>
-                  {img instanceof File ? (
+                  {img ? (
+                          <img src={URL.createObjectURL(img)} alt="img" style={{ height: '100%', width: '100%', objectFit: 'contain' }} />
+                        ) : (
+                          <img src={imgUrl} alt="imgUrl" style={{ height: '100%', width: '100%', objectFit: 'contain' }} />
+                        )}
+                    <input type="file" ref={inputImgRef} onChange={handleImageChange} style={{ display: 'none' }} />
+                  </div>
+                  <div className={styles.importBox} onClick={handleVideoClick}>
+                {vid ? (
+                    <video
+                        className="img-fluid border rounded-3 shadow-lg"
+                        style={{ height: '100%', width: '100%' }}
+                        controls
+                        muted
+                        loop
+                        autoPlay
+                    >
+                        <source src={URL.createObjectURL(vid)} type="video/mp4" />
+                    </video>
+                ) : (
+                  <video
+                  className="img-fluid border rounded-3 shadow-lg"
+                  style={{ height: '100%', width: '100%' }}
+                  controls
+                  muted
+                  loop
+                  autoPlay
+              >
+                  <source src={vidUrl} type="video/mp4" />
+              </video>
+                )}
+                <input type="file" ref={inputVidRef} onChange={handleVideoChange} style={{ display: 'none' }} />
+                </div>
+                </div> */}
+                <div className="col-md-6 border-end">
+                <div className={styles.importBox} onClick={handleImageClick}>
+                {img ? (
                           <img src={URL.createObjectURL(img)} alt="upload" style={{ height: '100%', width: '100%', objectFit: 'contain' }} />
                         ) : (
-                          <img src={img} alt="upload" style={{ height: '100%', width: '100%', objectFit: 'contain' }} />
+                          <img src={imgUrl} alt="upload" style={{ height: '100%', width: '100%', objectFit: 'contain' }} />
                         )}
-                    <input type="file" ref={inputRef} onChange={handleImageChange} style={{ display: 'none' }} />
-                  </div>
+                        <input type="file" ref={inputImgRef} onChange={handleImageChange} style={{ display: 'none' }} />
+                </div>
 
-                  <div className={styles.importBox} onClick={handleVideoClick}>
-                {vid instanceof File ? (
+                <div className={styles.importBox} onClick={handleVideoClick}>
+                {vid ? (
                     <video
                         className="img-fluid border rounded-3 shadow-lg"
                         style={{ height: '100%', width: '100%' }}
@@ -266,24 +309,20 @@ function KoiFish() {
                         <source src={URL.createObjectURL(vid)} type="video/mp4" />
                         Your browser does not support the video tag.
                     </video>
-                ) : videoUrl ? (
-                    <video
-                        controls
-                        className="img-fluid border rounded-3 shadow-lg"
-                        style={{ height: '100%', width: '100%', objectFit: 'contain' }}
-                    >
-                        <source src={videoUrl} type="video/mp4" />
-                        Your browser does not support the video tag.
-                    </video>
                 ) : (
-                    <img 
-                        src="/logo/blankvideo.webp" 
-                        alt="upload" 
-                        style={{ height: '100%', width: '100%', objectFit: 'contain' }} 
-                    />
-                )}
+                    <video
+                        className="img-fluid border rounded-3 shadow-lg"
+                        style={{ height: '100%', width: '100%' }}
+                        controls
+                        muted
+                        loop
+                        autoPlay
+                    >
+                        <source src={vidUrl} type="video/mp4" />
+                        Your browser does not support the video tag.
+                    </video>                )}
                 <input type="file" ref={inputVidRef} onChange={handleVideoChange} style={{ display: 'none' }} />
-                </div> 
+                </div>                  
                 </div>
 
                 <div className="col-md-6">
@@ -370,17 +409,17 @@ function KoiFish() {
           <div>
             <form onSubmit={handleAddKoiFish}>
               <div className="row">
-                <div className="col-md-6 border-end">
+              <div className="col-md-6 border-end">
                 <div className={styles.importBox} onClick={handleImageClick}>
-                {img instanceof File ? (
+                {img ? (
                           <img src={URL.createObjectURL(img)} alt="upload" style={{ height: '100%', width: '100%', objectFit: 'contain' }} />
                         ) : (
                           <img src="\logo\blankfish.webp" alt="upload" style={{ height: '100%', width: '100%', objectFit: 'contain' }} />
                         )}
-                        <input type="file" ref={inputRef} onChange={handleImageChange} style={{ display: 'none' }} />
+                        <input type="file" ref={inputImgRef} onChange={handleImageChange} style={{ display: 'none' }} />
                 </div>
 
-                  <div className={styles.importBox} onClick={handleVideoClick}>
+                <div className={styles.importBox} onClick={handleVideoClick}>
                 {vid ? (
                     <video
                         className="img-fluid border rounded-3 shadow-lg"
@@ -397,7 +436,7 @@ function KoiFish() {
                     <img src="\logo\blankvideo.webp" alt="upload" style={{ height: '100%', width: '100%', objectFit: 'contain' }} />
                 )}
                 <input type="file" ref={inputVidRef} onChange={handleVideoChange} style={{ display: 'none' }} />
-                </div> 
+                </div>                  
                 </div>
 
                 <div className="col-md-6">

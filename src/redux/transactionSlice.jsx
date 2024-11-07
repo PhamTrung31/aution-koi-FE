@@ -24,6 +24,11 @@ const transactionSlice = createSlice ({
             isFetching: false,
             error: false
         },
+        getallPaymentOfBreeder: {
+            getallPaymentOfBreeder: [],
+            isFetching: false,
+            error: false
+        },
         pendingWithDrawals: {
             pendingWithDrawals: [],
             isFetching: false,
@@ -43,6 +48,17 @@ const transactionSlice = createSlice ({
             state.getallTransaction.isFetching = false,
             state.getallTransaction.error = true
         },
+        getallPaymentOfBreederStart: (state) => {
+            state.getallPaymentOfBreeder.isFetching = true
+        },
+        getallPaymentOfBreederSuccess: (state, action) => {
+            state.getallPaymentOfBreeder.isFetching = false,
+            state.getallPaymentOfBreeder.getallPaymentOfBreeder = action.payload
+        },
+        getallPaymentOfBreederFailed: (state) => {
+            state.getallPaymentOfBreeder.isFetching = false,
+            state.getallPaymentOfBreeder.error = true
+        },  
         paymentApprovalStart: (state) => {
             state.paymentApproval.isFetching = true;
           },
@@ -106,6 +122,9 @@ export const {
     pendingWithDrawalsStart,
     pendingWithDrawalsSuccess,
     pendingWithDrawalsFailed,
+    getallPaymentOfBreederStart,
+    getallPaymentOfBreederSuccess,
+    getallPaymentOfBreederFailed,
 } = transactionSlice.actions
 
 export default transactionSlice.reducer
