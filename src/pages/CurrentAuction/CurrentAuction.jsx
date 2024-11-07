@@ -16,7 +16,6 @@ function CurrentAuction() {
     const message = useSelector((state) => state.message.websocketPendingMessage);
     const joinValid = useSelector((state) => state.auction.joinValidate.currentStatus);
     const timeLeft = useSelector((state) => state.message.pendingTimeLeft);
-    const [isTimerCompleted, setIsTimerCompleted] = useState(false); // Cờ để kiểm tra xem countdown đã kết thúc chưa
 
     const [timerDays, setTimerDays] = useState("0");
     const [timerHours, setTimerHours] = useState("0");
@@ -30,7 +29,7 @@ function CurrentAuction() {
     let interval = useRef(null);
 
     const startTimer = async () => {
-        if (!message?.start_time || isTimerCompleted) return;
+        if (!message?.start_time) return;
         const countdownDate = new Date(message.start_time).getTime();
 
         await new Promise((resolve) => {
@@ -113,7 +112,7 @@ function CurrentAuction() {
                 {message ? (
                     <>
                         <div className="lead mb-4 fs-1 fw-light">
-                            { timeLeft !== 0 ?
+                            {timeLeft !== 0 ?
                                 <span>
                                     {
                                         timerDays == 1
@@ -151,14 +150,25 @@ function CurrentAuction() {
 
                             {
                                 joinValid === "Joined auction" ? (
-                                    <Link
-                                        type="button"
-                                        className="btn btn-success btn-lg px-4 me-sm-3"
-                                        // onClick={handleJoinAuction}
-                                        to={"/auctionView"}
-                                    >
-                                        View Auction
-                                    </Link>
+                                    timeLeft == 0 ? (
+                                        <Link
+                                            type="button"
+                                            className="btn btn-success btn-lg px-4 me-sm-3"
+                                            // onClick={handleJoinAuction}
+                                            to={"/auctionView"}
+                                        >
+                                            View Auction
+                                        </Link>
+                                    ) : (
+                                        <Link
+                                            type="button"
+                                            className="btn btn-success btn-lg px-4 me-sm-3"
+                                            // onClick={handleJoinAuction}
+                                            to={"/auctionPreview"}
+                                        >
+                                            Preview Koi Fish
+                                        </Link>
+                                    )
                                 ) : (
                                     <Link
                                         type="button"

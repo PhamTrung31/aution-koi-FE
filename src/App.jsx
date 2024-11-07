@@ -34,16 +34,23 @@ import DonutChart from "./pages/DashBoard/DonutChart.jsx";
 import Topup from "./pages/Topup/Topup.jsx";
 import TopupSuccess from "./pages/TopupSuccess/TopupSuccess.jsx";
 import ManageKoiFish from "./pages/ManageKoiFish/ManageKoiFish.jsx";
-import { loadWebsocketPendingMessage } from "./redux/messageSlice.jsx";
+import { 
+  loadWebsocketPendingMessage,
+  loadWebsocketStartMessage } from "./redux/messageSlice.jsx";
 import ManageDelivery from "./pages/ManageDelivery/ManageDelivery.jsx";
 import ManageTransaction from "./pages/ManageTransaction/ManageTransaction.jsx";
+import AuctionPreview from "./pages/AuctionPreview/auctionPreview.jsx";
 import { Client } from "@stomp/stompjs";
+
+
 function App() {
   const CURRENT_USER_ROLE = useSelector((state) =>
     state.auth.profile.currentUser
       ? state.auth.profile.currentUser.role
       : "GUEST"
   );
+
+  const CURRENT_AUCTION_TYPE = useSelector((state) => state.message.websocketPendingMessage?.methodType);
 
   const dispatch = useDispatch();
 
@@ -87,6 +94,7 @@ function App() {
 
   useEffect(() => {
     console.log(CURRENT_USER_ROLE);
+    console.log(CURRENT_AUCTION_TYPE);
   }, []);
 
   useEffect(() => {
@@ -95,19 +103,25 @@ function App() {
       onConnect: () => {
         console.log('Connected to WebSocket');
 
+        // Gửi yêu cầu lấy lại các thông báo cũ
+        client.publish({
+          destination: '/app/request-pending',
+          body: JSON.stringify({ request: "pending-messages" })
+        });
+
         client.subscribe('/auctions/pending', (msg) => {
           const parsedMessage = JSON.parse(msg.body);
-
+          console.log(parsedMessage);
           // Lưu vào sessionStorage
-          // sessionStorage.setItem('websocketPendingMessage', JSON.stringify(parsedMessage));
           dispatch(loadWebsocketPendingMessage(JSON.parse(msg.body)));
         });
-        
+
         client.subscribe('/auctions/start', (msg) => {
           const parsedMessage = JSON.parse(msg.body);
-
+          console.log(parsedMessage);
           // Lưu vào sessionStorage
-          sessionStorage.setItem('websocketStartMessage', JSON.stringify(parsedMessage));
+          dispatch(loadWebsocketStartMessage(parsedMessage));
+          // sessionStorage.setItem('websocketStartMessage', JSON.stringify(parsedMessage));
         });
       },
       onStompError: (frame) => {
@@ -138,7 +152,8 @@ function App() {
             <Route path="/uploadImage" element={<PublicElement><FirebaseImageUpload /></PublicElement>} />
 
             <Route path="/currentAuction" element={<MemberElement><CurrentAuction /></MemberElement>} />
-            <Route path="/auctionView" element={<MemberElement><AuctionView auctionType={0} /></MemberElement>} />
+            <Route path="/auctionView" element={<MemberElement><AuctionView auctionType={CURRENT_AUCTION_TYPE} /></MemberElement>} />
+            <Route path="/auctionPreview" element={<MemberElement><AuctionPreview auctionType={CURRENT_AUCTION_TYPE} /></MemberElement>} />
             <Route path="/topup" element={<MemberElement><Topup /></MemberElement>} />
             <Route path="/topupSuccess" element={<MemberElement><TopupSuccess /></MemberElement>} />
 

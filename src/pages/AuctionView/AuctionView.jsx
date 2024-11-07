@@ -1,17 +1,20 @@
 import "./AuctionView.css";
 import { Link } from "react-router-dom";
 import React, { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Button } from "bootstrap";
 import { Client } from "@stomp/stompjs";
+import { countStartTimeLeft } from "../../redux/messageSlice";
+
 
 function AuctionView({ auctionType }) {
   return (
     <body>
-      {auctionType === 0 ? (
+      {auctionType === "TRADITIONAL" ? (
         <IncreasingAuction />
-      ) : auctionType === 1 ? (
+      ) : auctionType === "ANONYMOUS" ? (
         <AnonymousAuction />
-      ) : auctionType === 2 ? (
+      ) : auctionType === "FIXED_PRICE" ? (
         <BuyOutAuction />
       ) : (
         <div>Page Not Found!</div>
@@ -28,10 +31,7 @@ const IncreasingAuction = () => {
   const [autoBid, setAutoBid] = useState(0);
   const [maxBid, setMaxBid] = useState(0);
   const [countdown, setCountdown] = useState();
-
-  const [message, setMessage] = useState(
-    JSON.parse(sessionStorage.getItem('websocketStartMessage')) || null
-  );
+  const message = useSelector((state) => state.message.websocketStartMessage);
 
   const [timerDays, setTimerDays] = useState("00");
   const [timerHours, setTimerHours] = useState("00");
@@ -40,37 +40,43 @@ const IncreasingAuction = () => {
 
   let interval = useRef();
 
-  const startTimer = () => {
+  const startTimer = async () => {
     if (!message?.end_time) return;
 
     const countdownDate = new Date(message.end_time).getTime();
 
-    interval = setInterval(() => {
-      const now = new Date().getTime();
-      const distance = countdownDate - now - (7 * 60 * 60 * 1000);
+    await new Promise((resolve) => {
+      interval = setInterval(() => {
+        const now = new Date().getTime();
+        const distance = countdownDate - now - (7 * 60 * 60 * 1000);
 
-      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-      const hours = Math.floor(
-        (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-      );
-      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor(
+          (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+        );
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-      if (distance < 0) {
-        //stop our timer
-        clearInterval(interval.current);
-      } else {
-        // update timer
-        setTimerDays(days);
-        setTimerHours(hours);
-        setTimerMinutes(minutes);
-        setTimerSeconds(seconds);
-      }
-    }, 1000);
+        if (distance < 0) {
+          //stop our timer
+          clearInterval(interval.current);
+        } else {
+          // update timer
+          setTimerDays(days);
+          setTimerHours(hours);
+          setTimerMinutes(minutes);
+          setTimerSeconds(seconds);
+        }
+      }, 1000);
+    });
+
+    dispatch(countStartTimeLeft(0));
   };
 
   useEffect(() => {
-    startTimer();
+    if (message?.end_time) {
+      startTimer();
+    }
     return () => {
       clearInterval(interval.current);
     };
@@ -139,42 +145,42 @@ const IncreasingAuction = () => {
                   <h6 className="my-0">User #5</h6>
                   <small className="text-body-secondary">30 minutes ago</small>
                 </div>
-                <span>{highestBid} vnd</span>
+                <span>{highestBid} $</span>
               </li>
               <li className="list-group-item d-flex justify-content-between lh-sm">
                 <div>
                   <h6 className="my-0">User #8</h6>
                   <small className="text-body-secondary">2 hours ago</small>
                 </div>
-                <span className="text-body-secondary">2500000 vnd</span>
+                <span className="text-body-secondary">2500000 $</span>
               </li>
               <li className="list-group-item d-flex justify-content-between lh-sm">
                 <div>
                   <h6 className="my-0">User #3</h6>
                   <small className="text-body-secondary">1 day ago</small>
                 </div>
-                <span className="text-body-secondary">2000000 vnd</span>
+                <span className="text-body-secondary">2000000 $</span>
               </li>
               <li className="list-group-item d-flex justify-content-between lh-sm">
                 <div>
                   <h6 className="my-0">User #3</h6>
                   <small className="text-body-secondary">1 day ago</small>
                 </div>
-                <span className="text-body-secondary">1500000 vnd</span>
+                <span className="text-body-secondary">1500000 $</span>
               </li>
               <li className="list-group-item d-flex justify-content-between lh-sm">
                 <div>
                   <h6 className="my-0">User #3</h6>
                   <small className="text-body-secondary">1 day ago</small>
                 </div>
-                <span className="text-body-secondary">1000000 vnd</span>
+                <span className="text-body-secondary">1000000 $</span>
               </li>
               <li className="list-group-item d-flex justify-content-between lh-sm">
                 <div>
                   <h6 className="my-0">User #3</h6>
                   <small className="text-body-secondary">1 day ago</small>
                 </div>
-                <span className="text-body-secondary">500000 vnd</span>
+                <span className="text-body-secondary">500000 $</span>
               </li>
             </ul>
 
@@ -183,7 +189,7 @@ const IncreasingAuction = () => {
               className="p-2 btn btn-outline-success btn-lg w-100"
             >
               <div>
-                <span className="fw-bold">Buy Out</span>: {message.buy_out} vnd
+                <span className="fw-bold">Buy Out</span>: {Intl.NumberFormat("de-DE").format(message.buy_out)} $
               </div>
             </div>
             <br />
@@ -193,7 +199,7 @@ const IncreasingAuction = () => {
             <div>
               <h4 className="mt-4">
                 Auction's Increment:{" "}
-                <span className="text-danger">{incre}</span> vnd
+                <span className="text-danger">{Intl.NumberFormat("de-DE").format(incre)}</span> $
               </h4>
               <form className="needs-validation" noValidate>
                 <div className="row g-3">
@@ -214,7 +220,7 @@ const IncreasingAuction = () => {
                             }}
                             onClick={() => setIncre(0)}
                           />
-                          <label for="floatingBid">Your Bid ( vnd )</label>
+                          <label for="floatingBid">Your Bid ( $ )</label>
                         </div>
                       </div>
                       <div className="col-md-4">
@@ -223,7 +229,7 @@ const IncreasingAuction = () => {
                           type="number"
                           className="form-control rounded-3"
                           id="floatingBid"
-                          value={step}
+                          value={Intl.NumberFormat("de-DE").format(step)}
                           onChange={(e) => {
                             setStep(e.target.value);
                             setBid(highestBid + incre * e.target.value);
@@ -260,7 +266,7 @@ const IncreasingAuction = () => {
                             value={bid}
                           />
                           <label for="floatingBid">
-                            Your Bid ( vnd ) - View Only
+                            Your Bid ( $ ) - View Only
                           </label>
                         </div>
                       </div>
@@ -283,7 +289,7 @@ const IncreasingAuction = () => {
                             placeholder="name@example.com"
                             onChange={(e) => setMaxBid(e.target.value)}
                           />
-                          <label for="floatingInput">Maximum ( vnd )</label>
+                          <label for="floatingInput">Maximum ( $ )</label>
                         </div>
                       </div>
                       <div className="col-md-4 mt-2">
@@ -324,7 +330,7 @@ const IncreasingAuction = () => {
                     className="h-100 w-100 p-5 rounded-3 koi-image shadow"
                     style={{
                       backgroundImage:
-                        "url(https://gatwickkoi.com/wp-content/uploads/2023/10/A1048-1-scaled.jpg)",
+                        `url(${message.imageUrl})`,
                       backgroundSize:
                         "50%" /* Thu nhỏ hình nền còn 50% kích thước gốc */,
                       backgroundPosition: "center", // Canh giữa ảnh
@@ -444,7 +450,7 @@ const IncreasingAuction = () => {
                     loop
                     autoPlay
                   >
-                    <source src="koi-pond-video.mp4" type="video/mp4" />
+                    <source src={message.videoUrl} type="video/mp4" />
                     Your browser does not support the video tag.
                   </video>
                 </div>
@@ -526,7 +532,7 @@ const AnonymousAuction = () => {
         <div className="row g-5">
           <div className="col-md-5 col-lg-4 order-md-last">
             <h4 className="mt-4 fw-bold fs-3">
-              Start Price: <span className="text-danger">{startPrice}</span> vnd
+              Start Price: <span className="text-danger">{startPrice}</span> $
             </h4>
 
             <hr className="my-4" />
@@ -535,7 +541,7 @@ const AnonymousAuction = () => {
             <div>
               <h4 className="mt-4 fs-4">
                 Auction's Increment:{" "}
-                <span className="text-danger fst-italic">{incre}</span> vnd
+                <span className="text-danger fst-italic">{incre}</span> $
               </h4>
               <form className="needs-validation" noValidate>
                 <div className="row g-3">
@@ -551,7 +557,7 @@ const AnonymousAuction = () => {
                           setBid(e.target.value);
                         }}
                       />
-                      <label for="floatingBid">Your Bid ( vnd )</label>
+                      <label for="floatingBid">Your Bid ( $ )</label>
                     </div>
                   </div>
 
@@ -868,7 +874,7 @@ const BuyOutAuction = () => {
                   <h6 className="my-0">User #5</h6>
                   <small className="text-body-secondary">30 minutes ago</small>
                 </div>
-                <span>{auctionStartInfo.highestBid} vnd</span>
+                <span>{auctionStartInfo.highestBid} $</span>
               </li>
               {/* Additional leaderboard items */}
             </ul>
@@ -879,7 +885,7 @@ const BuyOutAuction = () => {
             >
               <div>
                 <span className="fw-bold">Buy Out</span>:{" "}
-                {auctionStartInfo.buy_out} vnd
+                {auctionStartInfo.buy_out} $
               </div>
             </div>
             <br />
@@ -901,7 +907,7 @@ const BuyOutAuction = () => {
                           value={bid}
                           onChange={(e) => setBid(e.target.value)}
                         />
-                        <label htmlFor="floatingBid">Your Bid ( vnd )</label>
+                        <label htmlFor="floatingBid">Your Bid ( $ )</label>
                       </div>
                       <div className="col-md-4">
                         <label htmlFor="form-label">Increment</label>
@@ -953,7 +959,7 @@ const BuyOutAuction = () => {
                           readOnly
                         />
                         <label htmlFor="floatingBid">
-                          Your Bid ( vnd ) - View Only
+                          Your Bid ( $ ) - View Only
                         </label>
                       </div>
                       <div className="col-md-5">
@@ -972,7 +978,7 @@ const BuyOutAuction = () => {
                           placeholder="Maximum Bid"
                           onChange={(e) => setMaxBid(e.target.value)}
                         />
-                        <label htmlFor="floatingInput">Maximum ( vnd )</label>
+                        <label htmlFor="floatingInput">Maximum ( $ )</label>
                       </div>
                       <div className="col-md-4 mt-2">
                         <label htmlFor="form-label">Increment</label>
@@ -1024,15 +1030,15 @@ const BuyOutAuction = () => {
                     <ul className="list-unstyled mt-4">
                       <li>
                         <strong>Current Bid:</strong>{" "}
-                        {auctionStartInfo.highestBid} vnd
+                        {auctionStartInfo.highestBid} $
                       </li>
                       <li>
                         <strong>Buyout Price:</strong> {auctionStartInfo.buyOut}{" "}
-                        vnd
+                        $
                       </li>
                       <li>
                         <strong>Bid Increment:</strong>{" "}
-                        {auctionStartInfo.highestBid * 0.1} vnd
+                        {auctionStartInfo.highestBid * 0.1} $
                       </li>
                       <li>
                         <strong>Starting Date:</strong>{" "}

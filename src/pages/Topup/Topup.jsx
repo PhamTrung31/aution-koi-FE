@@ -70,7 +70,7 @@ function Topup() {
                         </div>
                         <form class="card p-3 mt-4">
                             <div class="input-group">
-                                <span class="input-group-text">vnd</span>
+                                <span class="input-group-text">$</span>
                                 <input type="number" class="form-control" placeholder="Enter Money Here" onChange={(e) => setMoney(e.target.value)}/>
                                 <button type="submit" class="btn btn-outline-danger" onClick={handleTopup}>Top-up</button>
                             </div>
