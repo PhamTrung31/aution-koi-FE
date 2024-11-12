@@ -433,7 +433,7 @@ export const joinNewAuction = async (accessToken, userid, auctionid, dispatch, n
     console.log(userid);
     console.log(auctionid);
     dispatch(joinAuctionSuccess(res.data));
-    navigate("/auctionView");
+    navigate("/auctionPreview");
   } catch (err) {
     console.log(err);
     const error = err.response?.data || 'An error occured';

@@ -100,7 +100,7 @@ const MemberHeader = () => {
               <>
                 <Navbar.Collapse id="navbar-white-example">
                   <Nav.Link className="fw-bold" style={{ color: "#eb1c24" }}>
-                  <LuWallet /> Wallet: {formatWallet} vnd
+                  <LuWallet /> Wallet: {formatWallet} $
                   </Nav.Link>                
                   
                   <Nav>

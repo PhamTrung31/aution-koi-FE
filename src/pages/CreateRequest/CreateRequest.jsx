@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef} from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark, faPen } from "@fortawesome/free-solid-svg-icons";
 import styles from "./CreateRequest.module.css";
@@ -6,6 +6,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import uploadImage from "../../utils/firebase/uploadImage.jsx";
+import { ProgressBar } from 'react-loader-spinner';
+
 
 import {
   getAllAuctionRequestByBreederID,
@@ -28,6 +30,7 @@ const Modal = ({ show, children }) => {
   );
 };
 function CreateRequest() {
+  const [loading, setLoading] = useState(false);
   const [fishId, setfishId] = useState("");
   const [buyOut, setbuyOut] = useState("");
   const [startPrice, setstartPrice] = useState("");
@@ -69,7 +72,7 @@ function CreateRequest() {
   const token = useSelector(
     (state) => state.auth.login?.currentToken.token
   );
-  
+
   const aucionRequestList = useSelector(
     (state) => state.auctionrequest.auctionrequestbybreederid?.auctionrequestbybreederids
   );
@@ -98,7 +101,7 @@ function CreateRequest() {
   }, []);
   console.log(koiFishList);
   console.log(koiFishWithStatusNew);
-  
+
   const handleSendRequest = async (e) => {
     e.preventDefault();
     const RequestData = {
@@ -110,7 +113,9 @@ function CreateRequest() {
     };
     console.log(RequestData);
     resetForm();
+    setLoading(true);
     await addAuctionRequest(dispatch, RequestData, token, currentUser.id);
+    setLoading(false);
     setShowAddModal(false);
   };
 
@@ -123,7 +128,7 @@ function CreateRequest() {
       startPrice: parseFloat(startPrice),
       methodType: methodType,
     };
-    resetForm(); 
+    resetForm();
     await updateAuctionRequest(dispatch, selectedauctionrequest.id, RequestData, token, currentUser.id);
     setShowEditModal(false);
   };
@@ -165,6 +170,7 @@ function CreateRequest() {
       return;
     }
 
+    setLoading(true);
     const url = await uploadImage(img);
     const videoUrl = await uploadImage(vid);
     if (url && videoUrl) {
@@ -178,11 +184,11 @@ function CreateRequest() {
         videoUrl: videoUrl,
       };
       await addKoiFish(dispatch, koiFishData, currentUser.id, token);
+      setLoading(false);
       toast.success("Koi fish added successfully!");
       setImg("");
       resetKoiFishForm();
       setShowAddKoiFishModal(false);
-      
     }
   };
 
@@ -248,7 +254,7 @@ function CreateRequest() {
                 >
                   Detail
                 </button>
-                </td>
+              </td>
               <td>
                 <button
                   className={`${styles.actionBtn} ${styles.viewBtn}`}
@@ -256,7 +262,7 @@ function CreateRequest() {
                 >
                   Detail
                 </button>
-                </td>
+              </td>
               <td>{request.requestStatus}</td>
               <td>{request.assignedStaff}</td>
               <td>{request.auction}</td>
@@ -294,24 +300,35 @@ function CreateRequest() {
             onClick={() => setShowAddModal(false)}
           ></button>
           <h1 className="text-body-emphasis">Create New Request</h1>
-            <div>
-              <form onSubmit={handleSendRequest}>
-                <div className="form-group mb-3">
-                  <select
-                    className="form-select form-select-lg mb-3"
-                    onChange={(e) => setfishId(e.target.value)}
-                    required
-                  >
-                    <option value="">Select Fish</option>
-                    {koiFishWithStatusNew?.map((fish) => (
-                      <option key={fish.id} value={fish.id}>
-                        {fish.name} - Size: {fish.size}cm - Age: {fish.age} years
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                
-                <div className="d-flex align-items-center">
+          {loading && (
+            <ProgressBar
+              visible={true}
+              height="80"
+              width="80"
+              color="#4fa94d"
+              ariaLabel="progress-bar-loading"
+              wrapperStyle={{}}
+              wrapperClass=""
+            />
+          )}
+          <div>
+            <form onSubmit={handleSendRequest}>
+              <div className="form-group mb-3">
+                <select
+                  className="form-select form-select-lg mb-3"
+                  onChange={(e) => setfishId(e.target.value)}
+                  required
+                >
+                  <option value="">Select Fish</option>
+                  {koiFishWithStatusNew?.map((fish) => (
+                    <option key={fish.id} value={fish.id}>
+                      {fish.name} - Size: {fish.size}cm - Age: {fish.age} years
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="d-flex align-items-center">
                 <h5 className="mb-0 me-2">Method:</h5>
                 <div className="form-check me-3">
                   <input
@@ -357,38 +374,38 @@ function CreateRequest() {
                 </div>
               </div>
 
-                <input
-                  type="number"
-                  name="buyOut"
-                  onChange={(e) => setbuyOut(e.target.value)}
-                  placeholder="Buy Out Price"
-                  className={styles.roundedInput}
-                />
+              <input
+                type="number"
+                name="buyOut"
+                onChange={(e) => setbuyOut(e.target.value)}
+                placeholder="Buy Out Price"
+                className={styles.roundedInput}
+              />
 
-                <input
-                  type="number"
-                  name="startPrice"
-                  onChange={(e) => setstartPrice(e.target.value)}
-                  placeholder="Start Price"
-                  className={styles.roundedInput}
-                />
+              <input
+                type="number"
+                name="startPrice"
+                onChange={(e) => setstartPrice(e.target.value)}
+                placeholder="Start Price"
+                className={styles.roundedInput}
+              />
 
-                <button type="submit" className="btn btn-outline-dark mb-3 ">
-                  Submit
-                </button>
-              </form>
-              
-              
-            </div>
-              <button 
-                onClick={() => {
-                  setShowAddModal(false);
-                  setShowAddKoiFishModal(true);
-                }}
-                className="btn btn-outline-dark w-100"
-              >
-                Create New Koi Fish
+              <button type="submit" className="btn btn-outline-dark mb-3 ">
+                Submit
               </button>
+            </form>
+
+
+          </div>
+          <button
+            onClick={() => {
+              setShowAddModal(false);
+              setShowAddKoiFishModal(true);
+            }}
+            className="btn btn-outline-dark w-100"
+          >
+            Create New Koi Fish
+          </button>
         </div>
       </Modal>
 
@@ -429,7 +446,7 @@ function CreateRequest() {
                 </select>
                 </div>
               {/* Method Type Field */}
-               <div className="d-flex align-items-center">
+              <div className="d-flex align-items-center">
                 <h5 className="mb-0 me-2">Method:</h5>
                 <div className="form-check me-3">
                   <input
@@ -475,7 +492,7 @@ function CreateRequest() {
                 </div>
               </div>
 
-              
+
 
               {/* Buy Out Price Field */}
               <input
@@ -543,9 +560,9 @@ function CreateRequest() {
           )}
         </div>
       </Modal>
-      
+
       <Modal show={showFishDetailModal}>
-      <div className="position-relative p-2 text-start text-muted bg-body border border-dashed rounded-5">
+        <div className="position-relative p-2 text-start text-muted bg-body border border-dashed rounded-5">
           <button
             type="button"
             className="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill"
@@ -557,7 +574,7 @@ function CreateRequest() {
             <div className="row">
               <div className="col-md-6">
                 <div className="form-group mb-3">
-                  <img 
+                  <img
                     src={koifishById.imageUrl}
                     alt={koifishById.name}
                     className="img-fluid rounded"
@@ -565,7 +582,7 @@ function CreateRequest() {
                   />
                   {koifishById.videoUrl && (
                     <div className="mt-3">
-                      <video 
+                      <video
                         controls
                         className="img-fluid rounded"
                         style={{ width: '100%', height: '250px', objectFit: 'contain' }}
@@ -641,37 +658,48 @@ function CreateRequest() {
             onClick={() => setShowAddKoiFishModal(false)}
           ></button>
           <h1 className="text-body-emphasis">Add New Koi Fish</h1>
+          {loading && (
+            <ProgressBar
+              visible={true}
+              height="80"
+              width="80"
+              color="#4fa94d"
+              ariaLabel="progress-bar-loading"
+              wrapperStyle={{}}
+              wrapperClass=""
+            />
+          )}
           <div>
             <form onSubmit={handleAddKoiFish}>
               <div className="row">
                 <div className="col-md-6 border-end">
-                <div className={styles.importBox} onClick={handleImageClick}>
-                {img ? (
-                          <img src={URL.createObjectURL(img)} alt="upload" style={{ height: '100%', width: '100%', objectFit: 'contain' }} />
-                        ) : (
-                          <img src="\logo\blankfish.webp" alt="upload" style={{ height: '100%', width: '100%', objectFit: 'contain' }} />
-                        )}
-                        <input type="file" ref={inputImgRef} onChange={handleImageChange} style={{ display: 'none' }} />
-                </div>
+                  <div className={styles.importBox} onClick={handleImageClick}>
+                    {img ? (
+                      <img src={URL.createObjectURL(img)} alt="upload" style={{ height: '100%', width: '100%', objectFit: 'contain' }} />
+                    ) : (
+                      <img src="\logo\blankfish.webp" alt="upload" style={{ height: '100%', width: '100%', objectFit: 'contain' }} />
+                    )}
+                    <input type="file" ref={inputImgRef} onChange={handleImageChange} style={{ display: 'none' }} />
+                  </div>
 
-                <div className={styles.importBox} onClick={handleVideoClick}>
-                {vid ? (
-                    <video
+                  <div className={styles.importBox} onClick={handleVideoClick}>
+                    {vid ? (
+                      <video
                         className="img-fluid border rounded-3 shadow-lg"
                         style={{ height: '100%', width: '100%' }}
                         controls
                         muted
                         loop
                         autoPlay
-                    >
+                      >
                         <source src={URL.createObjectURL(vid)} type="video/mp4" />
                         Your browser does not support the video tag.
-                    </video>
-                ) : (
-                    <img src="\logo\blankvideo.webp" alt="upload" style={{ height: '100%', width: '100%', objectFit: 'contain' }} />
-                )}
-                <input type="file" ref={inputVidRef} onChange={handleVideoChange} style={{ display: 'none' }} />
-                </div>                  
+                      </video>
+                    ) : (
+                      <img src="\logo\blankvideo.webp" alt="upload" style={{ height: '100%', width: '100%', objectFit: 'contain' }} />
+                    )}
+                    <input type="file" ref={inputVidRef} onChange={handleVideoChange} style={{ display: 'none' }} />
+                  </div>
                 </div>
 
                 <div className="col-md-6">
@@ -736,7 +764,7 @@ function CreateRequest() {
                     />
                   </div>
                 </div>
-              </div>  
+              </div>
 
               <button type="submit" className="btn btn-outline-dark mb-3">
                 Add Koi Fish
@@ -758,6 +786,7 @@ function CreateRequest() {
         theme="light"
         transition:Bounce
       />
+
     </div>
   );
 }
