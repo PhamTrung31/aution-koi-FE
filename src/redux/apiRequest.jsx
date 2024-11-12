@@ -180,6 +180,14 @@ import {
   updateDeliveryStatusSuccess,
   updateDeliveryStatusFailed
 } from "./deliverySlice";
+import {
+  getStatCardStart,
+  getStatCardSuccess,
+  getStatCardFailed,
+  getBoardChartStart,
+  getBoardChartSuccess,
+  getBoardChartFailed
+} from "./dashboard";
 
 export const loginPayload = async (payload, dispatch, navigate) => {
   dispatch(loginStart());
@@ -1067,3 +1075,33 @@ export const getallPaymentOfBreeder = async (accessToken, breederId, dispatch) =
     dispatch(getallPaymentOfBreederFailed());
   }
 };
+
+export const getStatCard = async (accessToken, dispatch) => {
+  dispatch(getStatCardStart());
+  try {
+    const res = await axios.get(
+      `http://localhost:8081/auctionkoi/dashboard`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+    dispatch(getStatCardSuccess(res.data.result));
+  } catch (err) {
+    dispatch(getStatCardFailed());
+  }
+}
+
+export const getBoardChart = async (accessToken, dispatch) => {
+  dispatch(getBoardChartStart());
+  try {
+    const res = await axios.get(
+      `http://localhost:8081/auctionkoi/dashboard/monthly-auctions`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+    dispatch(getBoardChartSuccess(res.data.result));
+  } catch (err) {
+    dispatch(getBoardChartFailed());
+  }
+}

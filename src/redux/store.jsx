@@ -11,6 +11,7 @@ import walletReducer from "./walletSlice";
 import messageReducer from "./messageSlice";
 import deliveryReducer from "./deliverySlice";
 import transactionReducer from "./transactionSlice";
+import dashboardReducer from "./dashboard";
 import {
   persistStore,
   persistReducer,
@@ -58,7 +59,8 @@ const store = configureStore({
     wallet: persistedWalletReducer,
     message: persistMessageReducer,
     delivery: deliveryReducer,
-    transaction: transactionReducer
+    transaction: transactionReducer,
+    dashboard: dashboardReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
