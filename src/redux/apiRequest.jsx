@@ -219,7 +219,7 @@ export const getUserProfile = async (accessToken, dispatch) => {
       }
     );
     dispatch(getProfileSuccess(res.data));
-    getUserWallet(accessToken, res.data.id, dispatch);
+    getUserWallet(accessToken, dispatch);
   } catch (err) {
     dispatch(getProfileFailed());
   }
@@ -393,11 +393,11 @@ export const deleteUser = async (dispatch, userId, accessToken) => {
   }
 };
 
-export const changeAvatarImage = async (accessToken, userid, payload, dispatch, navigate) => {
+export const changeAvatarImage = async (accessToken, payload, dispatch, navigate) => {
   dispatch(changeAvatarStart());
   try {
     const res = await axios.put(
-      `http://localhost:8081/auctionkoi/users/${userid}/avatar`,
+      `http://localhost:8081/auctionkoi/users/avatar`,
       payload,
       {
         headers: { Authorization: `Bearer ${accessToken}` }
@@ -701,10 +701,10 @@ export const topupWalletRequest = async (payload, dispatch, navigate) => {
   }
 };
 
-export const getUserWallet = async (accessToken, userid, dispatch) => {
+export const getUserWallet = async (accessToken, dispatch) => {
   dispatch(getUserWalletStart());
   try {
-    const res = await axios.get(`http://localhost:8081/auctionkoi/wallet/${userid}`,
+    const res = await axios.get(`http://localhost:8081/auctionkoi/wallet`,
       {
         headers: { Authorization: `Bearer ${accessToken}` },
       }
