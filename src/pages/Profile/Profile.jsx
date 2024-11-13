@@ -57,7 +57,7 @@ const MemberProfile = () => {
       const payload = {
         avatarUrl: url
       };
-      changeAvatarImage(token, payload, dispatch, navigate);
+      changeAvatarImage(token, currentUser.id, payload, dispatch, navigate);
       toast.success("Avatar updated successfully!");
     }
   };
