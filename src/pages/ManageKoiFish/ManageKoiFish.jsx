@@ -171,10 +171,20 @@ function KoiFish() {
     console.log(file);
     if (file) {
       setVid(file);
-      e.target.value = null;  // Clear the input to ensure re-selection works
+      e.target.value = null; 
     }
   }
   
+
+  const handleCloseEditModal = () => {
+    clearForm();
+    setShowEditModal(false);
+  };
+
+  const handleCloseAddModal = () => {
+    clearForm();
+    setShowAddModal(false);
+  };
 
   return (
     <div>
@@ -244,7 +254,7 @@ function KoiFish() {
             type="button"
             className="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill"
             aria-label="Close"
-            onClick={() => setShowEditModal(false)}
+            onClick={handleCloseEditModal}
           ></button>
           <h1 className="text-body-emphasis">Edit Koi Fish</h1>
           <div>
@@ -403,7 +413,7 @@ function KoiFish() {
             type="button"
             className="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill"
             aria-label="Close"
-            onClick={() => setShowAddModal(false)}
+            onClick={handleCloseAddModal}
           ></button>
           <h1 className="text-body-emphasis">Add New Koi Fish</h1>
           <div>
@@ -483,7 +493,7 @@ function KoiFish() {
                       name="age"
                       value={age}
                       onChange={(e) => setAge(e.target.value)}
-                      placeholder="Age (months)"
+                      placeholder="Age (Years)"
                       className={styles.roundedInput}
                       required
                     />

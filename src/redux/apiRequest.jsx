@@ -180,6 +180,17 @@ import {
   updateDeliveryStatusSuccess,
   updateDeliveryStatusFailed
 } from "./deliverySlice";
+import {
+  getStatCardStart,
+  getStatCardSuccess,
+  getStatCardFailed,
+  getBoardChartStart,
+  getBoardChartSuccess,
+  getBoardChartFailed,
+  getDonutChartStart,
+  getDonutChartSuccess,
+  getDonutChartFailed
+} from "./dashboard";
 
 export const loginPayload = async (payload, dispatch, navigate) => {
   dispatch(loginStart());
@@ -488,7 +499,7 @@ export const getAllAuction = async (accessToken, dispatch) => {
   dispatch(getAuctionRequestStart());
   try {
     const res = await axios.get(
-      "http://localhost:8081/auctionkoi/auctions/wait",
+      "http://localhost:8081/auctionkoi/auction-request/wait",
       {
         headers: { Authorization: `Bearer ${accessToken}` },
       }
@@ -612,7 +623,7 @@ export const apporve = async (dispatch, approvedata, accessToken) => {
   dispatch(approveAuctionRequestStart());
   try {
     const res = await axios.put(
-      `http://localhost:8081/auctionkoi/auctions/staff/approve`,
+      `http://localhost:8081/auctionkoi/auction-request/staff/approve`,
       approvedata,
       {
         headers: { Authorization: `Bearer ${accessToken}` },
@@ -657,7 +668,7 @@ export const getAuctionRequestForManager = async (accessToken, dispatch) => {
   dispatch(getAuctionRequestForManagerStart());
   try {
     const res = await axios.get(
-      "http://localhost:8081/auctionkoi/auctions/manager-review",
+      "http://localhost:8081/auctionkoi/auction-request/manager-review",
       {
         headers: { Authorization: `Bearer ${accessToken}` },
       }
@@ -672,7 +683,7 @@ export const getAuctionRequestForStaffToAssign = async (accessToken, staffId, di
   dispatch(getAuctionRequestForStaffToAssignStart());
   try {
     const res = await axios.get(
-      `http://localhost:8081/auctionkoi/auctions/assigned-staff/${staffId}`,
+      `http://localhost:8081/auctionkoi/auction-request/assigned-staff/${staffId}`,
       {
         headers: { Authorization: `Bearer ${accessToken}` },
       }
@@ -721,7 +732,7 @@ export const assignStaff = async (dispatch, assigndata, accessToken) => {
   dispatch(assignStaffStart());
   try {
     const res = await axios.put(
-      `http://localhost:8081/auctionkoi/auctions/manager/assign-staff`,
+      `http://localhost:8081/auctionkoi/auction-request/manager/assign-staff`,
       assigndata,
       {
         headers: { Authorization: `Bearer ${accessToken}` },
@@ -738,7 +749,7 @@ export const managerReject = async (dispatch, rejectdata, accessToken) => {
   dispatch(managerRejectStart());
   try {
     const res = await axios.put(
-      `http://localhost:8081/auctionkoi/auctions/manager/reject`,
+      `http://localhost:8081/auctionkoi/auction-request/manager/reject`,
       rejectdata,
       {
         headers: { Authorization: `Bearer ${accessToken}` },
@@ -755,7 +766,7 @@ export const staffReject = async (dispatch, rejectdata, accessToken, staffId) =>
   dispatch(staffRejectStart());
   try {
     const res = await axios.put(
-      `http://localhost:8081/auctionkoi/auctions/assignedstaff/reject`,
+      `http://localhost:8081/auctionkoi/auction-request/assignedstaff/reject`,
       rejectdata,
       {
         headers: { Authorization: `Bearer ${accessToken}` },
@@ -771,7 +782,7 @@ export const staffReject = async (dispatch, rejectdata, accessToken, staffId) =>
 export const getAuctionRequestByAssignedStaff = async (accessToken, staffId, dispatch) => {
   dispatch(getAuctionRequestByAssignedStaffStart());
   try {
-    const res = await axios.get(`http://localhost:8081/auctionkoi/auctions/awaiting-schedule/${staffId}`, 
+    const res = await axios.get(`http://localhost:8081/auctionkoi/auction-request/awaiting-schedule/${staffId}`, 
       {
         headers: { Authorization: `Bearer ${accessToken}` },
       }
@@ -872,7 +883,7 @@ export const sendToManager = async (dispatch, sendToManagerData, accessToken) =>
   dispatch(sendToManagerStart());
   try {
     const res = await axios.put(
-      `http://localhost:8081/auctionkoi/auctions/staff/send-to-manager`,
+      `http://localhost:8081/auctionkoi/auction-request/staff/send-to-manager`,
       sendToManagerData,
       {
         headers: { Authorization: `Bearer ${accessToken}` },
@@ -889,7 +900,7 @@ export const assignStaffApprove = async (dispatch, approvedata, accessToken, sta
   dispatch(assignStaffApproveStart());
   try {
     const res = await axios.put(
-      `http://localhost:8081/auctionkoi/auctions/assignedstaff/approve`,
+      `http://localhost:8081/auctionkoi/auction-request/assignedstaff/approve`,
       approvedata,
       {
         headers: { Authorization: `Bearer ${accessToken}` },
@@ -907,7 +918,7 @@ export const setTime = async (dispatch, setTimeData, staffId, accessToken) => {
   console.log(setTimeData);
   try {
     const res = await axios.put(
-      `http://localhost:8081/auctionkoi/auctions/schedule`,
+      `http://localhost:8081/auctionkoi/auction-request/schedule`,
       setTimeData,
       {
         headers: { Authorization: `Bearer ${accessToken}` },
@@ -1067,3 +1078,48 @@ export const getallPaymentOfBreeder = async (accessToken, breederId, dispatch) =
     dispatch(getallPaymentOfBreederFailed());
   }
 };
+
+export const getStatCard = async (accessToken, dispatch) => {
+  dispatch(getStatCardStart());
+  try {
+    const res = await axios.get(
+      `http://localhost:8081/auctionkoi/dashboard`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+    dispatch(getStatCardSuccess(res.data.result));
+  } catch (err) {
+    dispatch(getStatCardFailed());
+  }
+}
+
+export const getBoardChart = async (accessToken, dispatch) => {
+  dispatch(getBoardChartStart());
+  try {
+    const res = await axios.get(
+      `http://localhost:8081/auctionkoi/dashboard/monthly-auctions`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+    dispatch(getBoardChartSuccess(res.data.result));
+  } catch (err) {
+    dispatch(getBoardChartFailed());
+  }
+}
+
+export const getDonutChart = async (accessToken, dispatch) => {
+  dispatch(getDonutChartStart());
+  try {
+    const res = await axios.get(
+      `http://localhost:8081/auctionkoi/dashboard/auction-type-percentage`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+    dispatch(getDonutChartSuccess(res.data.result));
+  } catch (err) {
+    dispatch(getDonutChartFailed());
+  } 
+}

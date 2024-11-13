@@ -131,7 +131,7 @@ function ManageStaff() {
                 <td>{staff.fullname}</td>
                 <td>{staff.phone}</td>
                 <td>{staff.address}</td>
-                <td>{staff.userCreatedDate}</td>
+                <td>{new Date(staff.userCreatedDate).toLocaleDateString()}</td>
                 <td>
                   <button
                     className={styles.actionBtn + " " + styles.editBtn}

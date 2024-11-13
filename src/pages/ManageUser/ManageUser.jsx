@@ -71,7 +71,7 @@ function User() {
   const handleUpdateUser = async (e) => {
     e.preventDefault();
     const userData = {
-      userId: id,
+      userId: selectedUser.id,
       username: username,
       password: password,
       fullname: fullname,
@@ -82,7 +82,6 @@ function User() {
       isBreeder: isBreeder,
     };
     await updateUser(dispatch, selectedUser.id, userData, token);
-    setId("");
     setUsername("");
     setPassword("");
     setFullname("");
@@ -93,13 +92,11 @@ function User() {
 
   const openEditModal = (user) => {
     setSelectedUser(user);
-    setId(user.id);
     setUsername(user.username);
     setPassword(user.password);
     setFullname(user.fullname);
     setPhone(user.phone);
     setAddress(user.address);
-    setAvatarUrl(user.avatar_url);
     setIsActive(user.isActive);
     setIsBreeder(user.isBreeder);
     setShowEditModal(true);
@@ -170,7 +167,7 @@ function User() {
         className={styles.buttonkoi + " btn btn-outline-dark"}
         onClick={() => setShowAddModal(true)}
       >
-        Create New Staff
+        Create New User
       </button>
 
       <Modal show={showEditModal}>
@@ -184,14 +181,6 @@ function User() {
           <h1 class="text-body-emphasis">Edit User</h1>
           <div>
             <form onSubmit={handleUpdateUser}>
-              <input
-                type="text"
-                name="userId"
-                placeholder="ID"
-                value={id}
-                onChange={(e) => setId(e.target.value)}
-                className={styles.roundedInput}
-              />
 
               <input
                 type="text"
@@ -279,15 +268,6 @@ function User() {
                 className={styles.roundedInput}
               />
 
-              <input
-                type="text"
-                name="avatar_url"
-                value={avatarurl}
-                onChange={(e) => setAvatarUrl(e.target.value)}
-                placeholder="Avatar URL"
-                className={styles.roundedInput}
-              />
-
               <button type="submit" className="btn btn-dark">
                 Submit
               </button>
@@ -364,15 +344,6 @@ function User() {
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 placeholder="Address"
-                className={styles.roundedInput}
-              />
-
-              <input
-                type="text"
-                name="avatar_url"
-                value={avatarurl}
-                onChange={(e) => setAvatarUrl(e.target.value)}
-                placeholder="Avatar URL"
                 className={styles.roundedInput}
               />
 
