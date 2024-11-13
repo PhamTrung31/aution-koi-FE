@@ -1,47 +1,4 @@
-.tableContainer {
-  width: 100%;
-  max-width: 80%;
-  margin: auto;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  overflow-x: auto;
-}
 
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-}
-
-.table thead th {
-  text-align: left;
-  padding: 10px;
-  background-color: #f4f4f4;
-  position: sticky;
-  top: 0;
-  z-index: 1;
-}
-
-.table tbody td {
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
-}
-
-.table tbody {
-  display: block;
-  max-height: 400px;
-  overflow-y: auto;
-  width: 100%;
-}
-
-.table thead,
-tbody tr {
-  display: table;
-  width: 100%;
-  table-layout: fixed;
-}
 .viewBtn {
   padding: 5px 10px;
   background-color: #f0f0f0;
@@ -93,6 +50,18 @@ tbody tr {
   border-radius: 10px;
   width: 50%;
   max-width: 100%;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .closeModal {

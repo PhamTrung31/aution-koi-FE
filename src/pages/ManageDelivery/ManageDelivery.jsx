@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPen } from "@fortawesome/free-solid-svg-icons";
+import { faTruckFast } from "@fortawesome/free-solid-svg-icons";
 import styles from "./ManageDelivery.module.css";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -51,7 +51,7 @@ function ManageDelivery() {
 
   return (
     <div className="container py-3 table">
-        <h2 className="mb-5 text-center">Manage Koi Fish</h2>
+        <h2 className="mb-5 text-center">Manage Delivery</h2>
         <table class="table table-light table-bordered border border-dark shadow p-3 mb-5 rounded-4">
           <tr className="table-dark">
             <th>ID</th>
@@ -78,7 +78,7 @@ function ManageDelivery() {
                     className={styles.actionBtn + " " + styles.editBtn}
                     onClick={() => openEditModal(delivery)}
                   >
-                    <FontAwesomeIcon icon={faPen} />
+                    <FontAwesomeIcon icon={faTruckFast} />
                   </button>
                 </td>
               </tr>
@@ -102,6 +102,7 @@ function ManageDelivery() {
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
                 className={styles.roundedInput}
+                required
               >
                 <option value="">Select Status</option>
                 <option value="PREPARING_SHIPMENT">PREPARING SHIPMENT</option>

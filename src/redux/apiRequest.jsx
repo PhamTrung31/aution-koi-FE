@@ -59,7 +59,10 @@ import {
   unbanUserFailed,
   changeAvatarStart,
   changeAvatarSuccess,
-  changeAvatarFailed
+  changeAvatarFailed,
+  getUserByUserIdStart,
+  getUserByUserIdSuccess,
+  getUserByUserIdFailed,
 } from "./userSlice";
 import {
   getAuctionRequestStart,
@@ -236,6 +239,18 @@ export const getUserProfile = async (accessToken, dispatch) => {
   }
 };
 
+export const getUserByUserId = async (accessToken, userId, dispatch) => {
+  dispatch(getUserByUserIdStart());
+  try {
+    const res = await axios.get(`http://localhost:8081/auctionkoi/staffs/${userId}`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    dispatch(getUserByUserIdSuccess(res.data.result));
+  } catch (err) {
+    dispatch(getUserByUserIdFailed(err.response?.data));
+  }
+}
+
 export const getAllCategories = async (dispatch) => {
   dispatch(getCategoriesStart());
   try {
@@ -285,7 +300,8 @@ export const addStaff = async (dispatch, staffData, accessToken) => {
     dispatch(addStaffSuccess(res.data));
     getAllStaffs(accessToken, dispatch);
   } catch (err) {
-    dispatch(addStaffFailed());
+    dispatch(addStaffFailed(err.response?.data.result));
+    console.log(err.response?.data.result);
   }
 };
 
@@ -322,8 +338,9 @@ export const updateStaff = async (
     );
     dispatch(updateStaffSuccess(res.data));
     getAllStaffs(accessToken, dispatch);
-  } catch {
-    dispatch(updateStaffFailed());
+  } catch (err) {
+    dispatch(updateStaffFailed(err.response?.data.result));
+    console.log(err.response?.data.result);
   }
 };
 
@@ -384,7 +401,8 @@ export const addUser = async (dispatch, staffData, accessToken) => {
     dispatch(addUserSuccess(res.data));
     getAllUser(accessToken, dispatch);
   } catch (err) {
-    dispatch(addUserFailed());
+    dispatch(addUserFailed(err.response?.data));
+    console.log(err.response?.data);
   }
 };
 
@@ -456,8 +474,8 @@ export const updateUser = async (dispatch, userId, updatedata, accessToken) => {
     );
     dispatch(updateUserSuccess(res.data));
     getAllUser(accessToken, dispatch);
-  } catch {
-    dispatch(updateUserFailed());
+  } catch (err)  {
+    dispatch(updateUserFailed(err.response?.data));
   }
 };
 
@@ -547,6 +565,7 @@ console.log(auctionRequestData);
     dispatch(addAuctionRequestSuccess(res.data));
     getAllAuctionRequestByBreederID(accessToken, breederId, dispatch);
     getKoiFishByBreederId(accessToken, breederId, dispatch);
+    getKoiFishWithStatusNew(accessToken, breederId, dispatch);
   } catch (err) {
     dispatch(addAuctionRequestFailed());
   }
@@ -569,8 +588,8 @@ export const cancelAuctionRequest = async (
     );
     dispatch(deleteAuctionRequestSuccess(res.data.result));
     getAllAuctionRequestByBreederID(accessToken, breederID, dispatch);
-  } catch {
-    dispatch(deleteAuctionRequestFailed());
+  } catch (err) {
+    dispatch(deleteAuctionRequestFailed(err.response?.data));
   }
 };
 
@@ -592,6 +611,7 @@ export const updateAuctionRequest = async (
     );
     dispatch(updateAuctionRequestSuccess(res.data));
     getAllAuctionRequestByBreederID(accessToken, breederId, dispatch);
+    getKoiFishWithStatusNew(accessToken, breederId, dispatch);
   } catch {
     dispatch(updateAuctionRequestFailed());
   }
@@ -819,8 +839,10 @@ export const addKoiFish = async (dispatch, koifishData, breederId, accessToken) 
     );
     dispatch(addKoiFishSuccess(res.data));
     getKoiFishByBreederId(accessToken, breederId, dispatch);
+    getKoiFishWithStatusNew(accessToken, breederId, dispatch);
   } catch (err) {
-    dispatch(addKoiFishFailed());
+    dispatch(addKoiFishFailed(err.response?.data));
+    console.log(err.response?.data);
   }
 };
 
@@ -832,14 +854,13 @@ export const cancelKoiFish = async (
 ) => {
   dispatch(deleteKoiFishStart());
   try {
-    const res = await axios.put(
-      `http://localhost:8081/auctionkoi/koifish/cancel/${koiFishId}`,
-      {},
+    const res = await axios.delete(
+      `http://localhost:8081/auctionkoi/koifish/delete/${koiFishId}`,
       {
         headers: { Authorization: `Bearer ${accessToken}` },
       }
     );
-    dispatch(deleteKoiFishSuccess(res.data.result));
+    dispatch(deleteKoiFishSuccess(res.data));
     getKoiFishByBreederId(accessToken, breederId, dispatch);
   } catch {
     dispatch(deleteKoiFishFailed());
@@ -858,8 +879,8 @@ export const updateKoiFish = async (dispatch, koiFishId, updatedata, accessToken
     );
     dispatch(updateKoiFishSuccess(res.data));
     getKoiFishByBreederId(accessToken, breederId, dispatch);
-  } catch {
-    dispatch(updateKoiFishFailed());
+  } catch (err) {
+    dispatch(updateKoiFishFailed(err.response?.data));
   }
 };
 
@@ -926,8 +947,9 @@ export const setTime = async (dispatch, setTimeData, staffId, accessToken) => {
     );
     dispatch(setTimeSuccess(res.data.result));
     getAuctionRequestByAssignedStaff(accessToken, staffId, dispatch);
-  } catch {
-    dispatch(setTimeFailed());
+  } catch (err) {
+    dispatch(setTimeFailed(err.response?.data));
+    console.log(err.response?.data);
   }
 };
 
@@ -971,7 +993,7 @@ export const getTransaction = async (accessToken, dispatch) => {
   dispatch(getallTransactionStart());
   try {
     const res = await axios.get(
-      `http://localhost:8081/auctionkoi/transactions/sort`,
+      `http://localhost:8081/auctionkoi/transactions/all`,
       {
         headers: { Authorization: `Bearer ${accessToken}` },
       }
@@ -1058,7 +1080,7 @@ export const requestWithdrawals  = async (dispatch, accessToken, userId, amount)
       }
     );
     dispatch(requestWithdrawalsSuccess(res.data));
-    getPendingWithdrawals(accessToken, dispatch);
+    getallPaymentOfBreeder(accessToken,userId, dispatch);
   } catch (err) {
     dispatch(requestWithdrawalsFailed());
   }

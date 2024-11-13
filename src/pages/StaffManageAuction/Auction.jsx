@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAuctionRequestByAssignedStaff, getKoiFishById, setTime } from "../../redux/apiRequest";
+import { getAuctionRequestByAssignedStaff, getKoiFishById, setTime ,getUserByUserId} from "../../redux/apiRequest";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import styles from "./Auction.module.css";
 const Modal = ({ show, children }) => {
@@ -18,9 +20,15 @@ function Auction() {
   const aucionRequestList = useSelector(
     (state) => state.auctionrequest.auctionrequestbyassignedstaff?.auctionrequestbyassignedstaffs
   );
+  const setTimeError = useSelector(
+    (state) => state.auctionrequest.setTime.error
+  );
 
   const koifishById = useSelector(
     (state) => state.koifish.koifishs?.koifishById
+  );
+  const breederUser = useSelector(
+    (state) => state.user.getUserByUserId?.user
   );
   const { currentUser } = useSelector((state) => state.auth.profile);
   const dispatch = useDispatch();
@@ -30,10 +38,18 @@ function Auction() {
   }, []);
   console.log(aucionRequestList);
 
+  useEffect(() => {
+    if (setTimeError != null) {
+      toast.error(setTimeError.message);
+    }
+  }, [setTimeError]);
+  console.log(setTimeError);
+
 
 
   const [infoKoiFishModal, setinfoKoiFishModal] = useState(false);
   const [infoAuctionModal, setinfoAuctionModal] = useState(false);
+  const [showBreederModal, setShowBreederModal] = useState(false);
   const [setTimeModal, setSetTimeModal] = useState(false);
   const [timeForm, setTimeForm] = useState({
     startTime: '',
@@ -61,6 +77,7 @@ function Auction() {
 
   const handleSetTime = async (e) => {
     e.preventDefault();
+    
     const data = {
       auctionRequestId: selectedAuction.id,
       staffId: currentUser.id,
@@ -68,15 +85,21 @@ function Auction() {
       end_time: new Date(timeForm.endTime).toISOString(),
       incrementStep: incrementStep
     };
-    setTime(dispatch, data, currentUser.id, token);
-    setSetTimeModal(false);
-    setSelectedAuction(null);
-    setTimeForm({ startTime: '', endTime: '' });
+
+     setTime(dispatch, data, currentUser.id, token);
+      setSetTimeModal(false);
+      setSelectedAuction(null);
+      setTimeForm({ startTime: '', endTime: '' });
+    
+  };
+  const handleOpenBreederModal = (userId) => {
+    getUserByUserId(token, userId, dispatch);
+    setShowBreederModal(true);
   };
 
   return (
     <div className="container py-3 table">
-      <h2 className="mb-5 text-center">Manage Auction Request</h2>
+      <h2 className="mb-5 text-center">Set Auction Time</h2>
       <table class="table table-light table-bordered border border-dark shadow p-3 mb-5 rounded-4">
         <tr className="table-dark">
           <th>ID</th>
@@ -89,14 +112,19 @@ function Auction() {
         {aucionRequestList?.map((aucionRequest) => (
           <tr key={aucionRequest.id}>
             <td>{aucionRequest.id}</td>
-            <td>{aucionRequest.user}</td>
+            <td>
+              <button className={styles.viewBtn}
+               onClick={() => handleOpenBreederModal(aucionRequest.user)}>
+                View Breeder
+                </button>
+              </td>
             <td>{aucionRequest.requestStatus}</td>
             <td>
               <button
                 className={styles.viewBtn}
                 onClick={() => handleOpenKoiFishModal(aucionRequest)}
               >
-                Detail
+                View
               </button>
             </td>
             <td>
@@ -104,7 +132,7 @@ function Auction() {
                 className={styles.viewBtn}
                 onClick={() => handleOpenAuctionModal(aucionRequest)}
               >
-                Detail
+                View
               </button>
             </td>
             <td>
@@ -297,11 +325,67 @@ function Auction() {
               />
             </div>
 
-            <button type="submit" className="btn btn-primary">Submit</button>
+            <button type="submit" className="btn btn-dark d-block mx-auto">Submit</button>
           </form>
         </div>
       </Modal>
+      <Modal show={showBreederModal}>
+        <div class="position-relative p-2 text-start text-muted bg-body border border-dashed rounded-5">
+          <button
+            type="button"
+            class="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill"
+            aria-label="Close"
+            onClick={() => setShowBreederModal(false)}
+          ></button>
+          <h1 class="text-body-emphasis">User Profile</h1>
+          <div>
+          <label className="form-label"><strong>Fullname:</strong></label>
+              <input
+                type="text"
+                value={breederUser?.fullname}
+                className={styles.roundedInput}
+                readOnly
+              />
+              <label className="form-label"><strong>Phone:</strong></label>
+              <input
+                type="text"
+                value={breederUser?.phone}
+                className={styles.roundedInput}
+                readOnly
+              />
+              <label className="form-label"><strong>Role:</strong></label>
+              <input
+                type="text"
+                value={breederUser?.role}
+                className={styles.roundedInput}
+                readOnly
+              />
+              <label className="form-label"><strong>Address:</strong></label>
+              <input
+                type="text"
+                value={breederUser?.address}
+                className={styles.roundedInput}
+                readOnly
+              />
+
+          </div>
+        </div>
+      </Modal>
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition:Bounce
+      />
     </div>
+    
   );
 }
 

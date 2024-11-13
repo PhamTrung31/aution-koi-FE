@@ -287,18 +287,7 @@ const BreederNavbar = () => {
                       >
                         Profile
                       </NavDropdown.Item>
-                      <NavDropdown.Item
-                        as={Link}
-                        to="/topup"
-                        onClick={() => handleUserTitle("Your Balance")}
-                      >
-                        Your Balance
-                      </NavDropdown.Item>
-                      <NavDropdown.Item
-                        onClick={() => handleUserTitle("Payment History")}
-                      >
-                        Payment History
-                      </NavDropdown.Item>
+      
                     </NavDropdown>
                   </Nav>
                 </Navbar.Collapse>
@@ -368,7 +357,7 @@ const StaffNavbar = () => {
                 to="/auction"
                 onClick={() => handleUserTitle(user?.fullname)}
               >
-                Manage Auction
+                Set Auction Time
               </NavDropdown.Item>
               <NavDropdown.Item
                 as={Link}
@@ -434,16 +423,7 @@ const StaffNavbar = () => {
                       >
                         Profile
                       </NavDropdown.Item>
-                      <NavDropdown.Item
-                        onClick={() => handleUserTitle("Your Balance")}
-                      >
-                        Your Balance
-                      </NavDropdown.Item>
-                      <NavDropdown.Item
-                        onClick={() => handleUserTitle("Payment History")}
-                      >
-                        Payment History
-                      </NavDropdown.Item>
+
                     </NavDropdown>
                   </Nav>
                 </Navbar.Collapse>

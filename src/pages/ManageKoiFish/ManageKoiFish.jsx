@@ -12,6 +12,9 @@ import {
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import uploadImage from "../../utils/firebase/uploadImage.jsx";
+import { clearError } from "../../redux/koifishSlice";
+
+
 
 
 const Modal = ({ show, children }) => {
@@ -45,7 +48,8 @@ function KoiFish() {
   const inputImgRef = useRef(null);
   const inputVidRef = useRef(null);
 
-
+  const addKoiFishError = useSelector((state) => state.koifish.addkoifish.error);
+  const updateKoiFishError = useSelector((state) => state.koifish.updatekoifish.error);
   const token = useSelector((state) => state.auth.login?.currentToken.token);
   const koiFishList = useSelector((state) => state.koifish.koifishByBreederId?.koifishByBreederId);
   const {currentUser} = useSelector((state) => state.auth.profile);
@@ -55,8 +59,30 @@ function KoiFish() {
     getKoiFishByBreederId(token, currentUser.id, dispatch);
   }, []);
 
+  useEffect(() => {
+    if (addKoiFishError) {
+      toast.error(addKoiFishError.message);
+      dispatch(clearError());
+    }
+  }, [addKoiFishError]);
+
+  useEffect(() => {
+    if (updateKoiFishError) {
+      toast.error(updateKoiFishError.message);
+      dispatch(clearError());
+    }
+  }, [updateKoiFishError]);
+
   const handleAddKoiFish = async (e) => {
     e.preventDefault();
+    if(size < 10 || size > 80){
+      toast.error("Size must be between 10 and 80 cm");
+      return;
+    }
+    if(age < 1 || age > 20){
+      toast.error("Age must be between 1 and 20 years");
+      return;
+    }
     if (!img) {
       toast.error("Please add koi fish image");
       return;
@@ -79,7 +105,6 @@ function KoiFish() {
       };
 
     await addKoiFish(dispatch, koiFishData, currentUser.id, token);
-    toast.success("Koi fish added successfully!");
       setImg("");
       clearForm();
       setShowAddModal(false);
@@ -109,7 +134,6 @@ function KoiFish() {
       videoUrl: videoUrl,
     };
     await updateKoiFish(dispatch, selectedKoiFish.id, koiFishData, token,currentUser.id);
-      toast.success("Koi fish updated successfully!");
       setImg("");
       clearForm();
       setShowEditModal(false);
@@ -173,8 +197,7 @@ function KoiFish() {
       setVid(file);
       e.target.value = null; 
     }
-  }
-  
+  } 
 
   const handleCloseEditModal = () => {
     clearForm();
@@ -189,7 +212,13 @@ function KoiFish() {
   return (
     <div>
       <div className="container py-3 table">
-        <h2 className="mb-5 text-center">Manage Koi Fish</h2>
+        <h2 className="text-center">Manage Koi Fish</h2>
+        <button
+        className={styles.buttonkoi + " btn btn-dark mb-4"}
+        onClick={() => setShowAddModal(true)}
+      >
+        Add New Koi Fish
+      </button>
         <table class="table table-light table-bordered border border-dark shadow p-3 mb-5 rounded-4">
           <tr className="table-dark">
             <th>ID</th>
@@ -241,13 +270,6 @@ function KoiFish() {
         </table>
       </div>
 
-      <button
-        className={styles.buttonkoi + " btn btn-outline-dark"}
-        onClick={() => setShowAddModal(true)}
-      >
-        Add New Koi Fish
-      </button>
-
       <Modal show={showEditModal}>
         <div className="position-relative p-2 text-center text-muted bg-body border border-dashed rounded-5">
           <button
@@ -260,42 +282,6 @@ function KoiFish() {
           <div>
             <form onSubmit={handleUpdateKoiFish}>
               <div className="row">
-                {/* <div className="col-md-6 border-end">
-                  <div className={styles.importBox} onClick={handleImageClick}>
-                  {img ? (
-                          <img src={URL.createObjectURL(img)} alt="img" style={{ height: '100%', width: '100%', objectFit: 'contain' }} />
-                        ) : (
-                          <img src={imgUrl} alt="imgUrl" style={{ height: '100%', width: '100%', objectFit: 'contain' }} />
-                        )}
-                    <input type="file" ref={inputImgRef} onChange={handleImageChange} style={{ display: 'none' }} />
-                  </div>
-                  <div className={styles.importBox} onClick={handleVideoClick}>
-                {vid ? (
-                    <video
-                        className="img-fluid border rounded-3 shadow-lg"
-                        style={{ height: '100%', width: '100%' }}
-                        controls
-                        muted
-                        loop
-                        autoPlay
-                    >
-                        <source src={URL.createObjectURL(vid)} type="video/mp4" />
-                    </video>
-                ) : (
-                  <video
-                  className="img-fluid border rounded-3 shadow-lg"
-                  style={{ height: '100%', width: '100%' }}
-                  controls
-                  muted
-                  loop
-                  autoPlay
-              >
-                  <source src={vidUrl} type="video/mp4" />
-              </video>
-                )}
-                <input type="file" ref={inputVidRef} onChange={handleVideoChange} style={{ display: 'none' }} />
-                </div>
-                </div> */}
                 <div className="col-md-6 border-end">
                 <div className={styles.importBox} onClick={handleImageClick}>
                 {img ? (
@@ -424,7 +410,7 @@ function KoiFish() {
                 {img ? (
                           <img src={URL.createObjectURL(img)} alt="upload" style={{ height: '100%', width: '100%', objectFit: 'contain' }} />
                         ) : (
-                          <img src="\logo\blankfish.webp" alt="upload" style={{ height: '100%', width: '100%', objectFit: 'contain' }} />
+                          <img src="https://cdn-icons-png.flaticon.com/512/25/25666.png" alt="upload" style={{ height: '60%', width: '100%', objectFit: 'contain' }} />
                         )}
                         <input type="file" ref={inputImgRef} onChange={handleImageChange} style={{ display: 'none' }} />
                 </div>

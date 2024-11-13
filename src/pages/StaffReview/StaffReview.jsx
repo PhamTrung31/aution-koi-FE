@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
 import styles from "./StaffReview.module.css";
 import { useDispatch, useSelector } from "react-redux";
-import {  getKoiFishById, getAuctionRequestForStaffToAssign, staffReject, assignStaffApprove } from "../../redux/apiRequest";
+import {  getKoiFishById, getAuctionRequestForStaffToAssign, staffReject, assignStaffApprove,getUserByUserId } from "../../redux/apiRequest";
 
 const Modal = ({ show, children }) => {
   if (!show) {
@@ -24,6 +24,9 @@ function StaffReview() {
   const koifishById = useSelector(
     (state) => state.koifish.koifishs?.koifishById
   );
+  const breederUser = useSelector(
+    (state) => state.user.getUserByUserId?.user
+  );
   const { currentUser } = useSelector((state) => state.auth.profile);
   const dispatch = useDispatch();
 
@@ -33,6 +36,7 @@ function StaffReview() {
 
   const [infoKoiFishModal, setinfoKoiFishModal] = useState(false);
   const [infoAuctionModal, setinfoAuctionModal] = useState(false);
+  const [showBreederModal, setShowBreederModal] = useState(false);
   const [selectedAuctionRequest, setSelectedAuctionRequest] = useState(null);
 
 
@@ -66,6 +70,10 @@ function StaffReview() {
     setSelectedAuctionRequest(AuctionRequest);
     setinfoAuctionModal(true);
   };
+  const handleOpenBreederModal = (userId) => {
+    getUserByUserId(token, userId, dispatch);
+    setShowBreederModal(true);
+  };
 
   return (
     <div className="container py-3 table">
@@ -82,13 +90,18 @@ function StaffReview() {
           return (
             <tr key={aucionRequest.id}>
               <td>{aucionRequest.id}</td>
-              <td>{aucionRequest.user}</td>
+              <td>
+              <button className={styles.viewBtn}
+               onClick={() => handleOpenBreederModal(aucionRequest.user)}>
+                View Breeder
+                </button>
+              </td>
               <td>
                 <button
                   className={styles.viewBtn}
                   onClick={() => handleOpenKoiFishModal(aucionRequest)}
                 >
-                  Detail
+                  View
                 </button>
               </td>
               <td>
@@ -96,7 +109,7 @@ function StaffReview() {
                   className={styles.viewBtn}
                   onClick={() => handleOpenAuctionModal(aucionRequest)}
                 >
-                  Detail
+                  View
                 </button>
               </td>
               <td>
@@ -243,6 +256,48 @@ function StaffReview() {
                 </div>  
               </div>
             )}
+          </div>
+        </div>
+      </Modal>
+      <Modal show={showBreederModal}>
+        <div class="position-relative p-2 text-start text-muted bg-body border border-dashed rounded-5">
+          <button
+            type="button"
+            class="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill"
+            aria-label="Close"
+            onClick={() => setShowBreederModal(false)}
+          ></button>
+          <h1 class="text-body-emphasis">User Profile</h1>
+          <div>
+          <label className="form-label"><strong>Fullname:</strong></label>
+              <input
+                type="text"
+                value={breederUser?.fullname}
+                className={styles.roundedInput}
+                readOnly
+              />
+              <label className="form-label"><strong>Phone:</strong></label>
+              <input
+                type="text"
+                value={breederUser?.phone}
+                className={styles.roundedInput}
+                readOnly
+              />
+              <label className="form-label"><strong>Role:</strong></label>
+              <input
+                type="text"
+                value={breederUser?.role}
+                className={styles.roundedInput}
+                readOnly
+              />
+              <label className="form-label"><strong>Address:</strong></label>
+              <input
+                type="text"
+                value={breederUser?.address}
+                className={styles.roundedInput}
+                readOnly
+              />
+
           </div>
         </div>
       </Modal>

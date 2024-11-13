@@ -7,6 +7,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import uploadImage from "../../utils/firebase/uploadImage.jsx";
 import { ProgressBar } from 'react-loader-spinner';
+import { clearError } from "../../redux/auctionRequestSlice";
 
 
 import {
@@ -17,7 +18,8 @@ import {
   getKoiFishById,
   getKoiFishByBreederId,
   addKoiFish,
-  getKoiFishWithStatusNew
+  getKoiFishWithStatusNew,
+  getUserByUserId
 } from "../../redux/apiRequest";
 const Modal = ({ show, children }) => {
   if (!show) {
@@ -88,9 +90,24 @@ function CreateRequest() {
   const koiFishWithStatusNew = useSelector(
     (state) => state.koifish.koifishWithStatusNew?.koifishWithStatusNew
   );
+  const userByUserId = useSelector(
+    (state) => state.user.getUserByUserId?.user
+  );
+  const error = useSelector(
+    (state) => state.auctionrequest.deleteauctionrequest?.error
+  );
+  
   const { currentUser } = useSelector((state) => state.auth.profile);
+  const addKoiFishError = useSelector((state) => state.koifish.addkoifish.error);
+  const [showStaffDetailModal, setShowStaffDetailModal] = useState(false);
   const dispatch = useDispatch();
   console.log(token);
+  useEffect(() => {
+    if (addKoiFishError) {
+      toast.error(addKoiFishError.message);
+      dispatch(clearError());
+    }
+  }, [addKoiFishError]);
 
   useEffect(() => {
     getAllAuctionRequestByBreederID(token, currentUser.id, dispatch);
@@ -99,9 +116,18 @@ function CreateRequest() {
   useEffect(() => {
     getKoiFishWithStatusNew(token, currentUser.id, dispatch);
   }, []);
-  console.log(koiFishList);
-  console.log(koiFishWithStatusNew);
-
+  useEffect(() => {
+    if (error) {
+      toast.error(error.message);
+      dispatch(clearError());
+    }
+  }, [error]);
+  useEffect(() => {
+    if (addKoiFishError) {
+      toast.error(addKoiFishError.message);
+      dispatch(clearError());
+    }
+  }, [addKoiFishError]);
   const handleSendRequest = async (e) => {
     e.preventDefault();
     const RequestData = {
@@ -161,6 +187,14 @@ function CreateRequest() {
 
   const handleAddKoiFish = async (e) => {
     e.preventDefault();
+    if(size < 10 || size > 80){
+      toast.error("Size must be between 10 and 80 cm");
+      return;
+    }
+    if(age < 1 || age > 20){
+      toast.error("Age must be between 1 and 20 years");
+      return;
+    }
     if (!img) {
       toast.error("Please add koi fish image");
       return;
@@ -185,7 +219,6 @@ function CreateRequest() {
       };
       await addKoiFish(dispatch, koiFishData, currentUser.id, token);
       setLoading(false);
-      toast.success("Koi fish added successfully!");
       setImg("");
       resetKoiFishForm();
       setShowAddKoiFishModal(false);
@@ -229,9 +262,21 @@ function CreateRequest() {
     }
   }, [showEditModal]);
 
+  const openStaffDetailModal = (staffID) => {
+    getUserByUserId(token, staffID, dispatch);
+    setShowStaffDetailModal(true);
+  };
+  console.log(userByUserId);
+  
   return (
     <div className="container py-3 table">
-      <h2 className="mb-5 text-center">Your Auction Request</h2>
+      <h2 className="text-center">Your Auction Request</h2>
+      <button
+        className={styles.buttonkoi + " btn btn-dark mb-4"}
+        onClick={openAddModal}
+      >
+        Create New Request
+      </button>
       <table class="table table-light table-bordered border border-dark shadow p-3 mb-5 rounded-4 overflow-auto">
         <tr className="table-dark ">
           <th>ID</th>
@@ -252,7 +297,7 @@ function CreateRequest() {
                   className={`${styles.actionBtn} ${styles.viewBtn}`}
                   onClick={() => openFishDetailModal(request)}
                 >
-                  Detail
+                  View
                 </button>
               </td>
               <td>
@@ -260,11 +305,22 @@ function CreateRequest() {
                   className={`${styles.actionBtn} ${styles.viewBtn}`}
                   onClick={() => openDetailsModal(request)}
                 >
-                  Detail
+                  View
                 </button>
               </td>
               <td>{request.requestStatus}</td>
-              <td>{request.assignedStaff}</td>
+              <td>
+                {request.assignedStaff ? (
+                  <button
+                    className={`${styles.actionBtn} ${styles.viewBtn}`}
+                    onClick={() => openStaffDetailModal(request.assignedStaff)}
+                  >
+                    View
+                  </button>
+                ) : (
+                  "Not Assigned"
+                )}
+              </td>
               <td>{request.auction}</td>
               <td>
                 <button
@@ -285,14 +341,9 @@ function CreateRequest() {
         })}
       </table>
 
-      <button
-        className={styles.buttonkoi + " btn btn-outline-dark"}
-        onClick={openAddModal}
-      >
-        Create New Request
-      </button>
+      
       <Modal show={showAddModal}>
-        <div className="position-relative p-2 text-center text-muted bg-body border border-dashed rounded-5">
+        <div className="position-relative p-2 text-start text-muted bg-body border border-dashed rounded-5">
           <button
             type="button"
             className="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill"
@@ -314,6 +365,7 @@ function CreateRequest() {
           <div>
             <form onSubmit={handleSendRequest}>
               <div className="form-group mb-3">
+                <label className="form-label"><strong>Fish:</strong></label>
                 <select
                   className="form-select form-select-lg mb-3"
                   onChange={(e) => setfishId(e.target.value)}
@@ -328,69 +380,65 @@ function CreateRequest() {
                 </select>
               </div>
 
-              <div className="d-flex align-items-center">
-                <h5 className="mb-0 me-2">Method:</h5>
-                <div className="form-check me-3">
-                  <input
-                    className="form-check-input"
-                    type="radio"
-                    id="TraditionalMethod"
-                    name="method"
-                    value="TRADITIONAL"
-                    checked={methodType === "TRADITIONAL"}
-                    onChange={() => setmethodType("TRADITIONAL")}
-                  />
-                  <label className="form-check-label" htmlFor="TraditionalMethod">
-                    TRADITIONAL
-                  </label>
-                </div>
-                <div className="form-check me-3">
-                  <input
-                    className="form-check-input"
-                    type="radio"
-                    id="AnonymousMethod"
-                    name="method"
-                    value="ANONYMOUS"
-                    checked={methodType === "ANONYMOUS"}
-                    onChange={() => setmethodType("ANONYMOUS")}
-                  />
-                  <label className="form-check-label" htmlFor="AnonymousMethod">
-                    ANONYMOUS
-                  </label>
-                </div>
-                <div className="form-check">
-                  <input
-                    className="form-check-input"
-                    type="radio"
-                    id="FixedPriceMethod"
-                    name="method"
-                    value="FIXED_PRICE"
-                    checked={methodType === "FIXED_PRICE"}
-                    onChange={() => setmethodType("FIXED_PRICE")}
-                  />
-                  <label className="form-check-label" htmlFor="FixedPriceMethod">
-                    FIXED PRICE
-                  </label>
+              <div className="form-group mb-3">
+                <label className="form-label"><strong>Method:</strong></label>
+                <div className="d-flex align-items-center">
+                  <div className="form-check me-3">
+                    <input
+                      className="form-check-input"
+                      type="radio"
+                      id="TraditionalMethod"
+                      name="method"
+                      value="TRADITIONAL"
+                      checked={methodType === "TRADITIONAL"}
+                      onChange={() => setmethodType("TRADITIONAL")}
+                    />
+                    <label className="form-check-label" htmlFor="TraditionalMethod">
+                      TRADITIONAL
+                    </label>
+                  </div>
+                  <div className="form-check me-3">
+                    <input
+                      className="form-check-input"
+                      type="radio"
+                      id="AnonymousMethod"
+                      name="method"
+                      value="ANONYMOUS"
+                      checked={methodType === "ANONYMOUS"}
+                      onChange={() => setmethodType("ANONYMOUS")}
+                    />
+                    <label className="form-check-label" htmlFor="AnonymousMethod">
+                      ANONYMOUS
+                    </label>
+                  </div>
                 </div>
               </div>
 
-              <input
-                type="number"
-                name="buyOut"
-                onChange={(e) => setbuyOut(e.target.value)}
-                placeholder="Buy Out Price"
-                className={styles.roundedInput}
-              />
+              <div className="form-group mb-3">
+                <label className="form-label"><strong>Buy Out Price:</strong></label>
+                <input
+                  type="number"
+                  name="buyOut"
+                  onChange={(e) => setbuyOut(e.target.value)}
+                  placeholder="Buy Out Price"
+                  className={styles.roundedInput}
+                  required
+                />
+              </div>
 
-              <input
-                type="number"
-                name="startPrice"
-                onChange={(e) => setstartPrice(e.target.value)}
-                placeholder="Start Price"
-                className={styles.roundedInput}
-              />
+              <div className="form-group mb-3">
+                <label className="form-label"><strong>Start Price:</strong></label>
+                <input
+                  type="number"
+                  name="startPrice"
+                  onChange={(e) => setstartPrice(e.target.value)}
+                  placeholder="Start Price"
+                  className={styles.roundedInput}
+                  required
+                />
+              </div>
 
-              <button type="submit" className="btn btn-outline-dark mb-3 ">
+              <button type="submit" className="btn btn-outline-dark mb-3 mx-auto d-block">
                 Submit
               </button>
             </form>
@@ -402,7 +450,7 @@ function CreateRequest() {
               setShowAddModal(false);
               setShowAddKoiFishModal(true);
             }}
-            className="btn btn-outline-dark w-100"
+            className="btn btn-outline-dark w-75 mx-auto d-block"
           >
             Create New Koi Fish
           </button>
@@ -410,7 +458,7 @@ function CreateRequest() {
       </Modal>
 
       <Modal show={showEditModal}>
-        <div class="position-relative p-2 text-center text-muted bg-body border border-dashed rounded-5">
+        <div class="position-relative p-2 text-start text-muted bg-body border border-dashed rounded-5">
           <button
             type="button"
             class="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill"
@@ -420,100 +468,93 @@ function CreateRequest() {
           <h1 class="text-body-emphasis">Edit Auction Request</h1>
           <div>
             <form onSubmit={handleUpdateSendRequest}>
-
-                <div className="form-group mb-3">
+              <div className="form-group mb-3">
+                <label className="form-label"><strong>Fish:</strong></label>
                 <select
                     className="form-select form-select-lg mb-3"
                     value={fishId}
                     onChange={(e) => setfishId(e.target.value)}
                     required
-                  >
-                    <option value="">Select Fish</option>
+                >
+                  <option value="">Select Fish</option>
 
-                    {koiFishList?.filter(fish => fish.id === parseInt(fishId))
-                      .map((fish) => (
-                        <option key={fish.id} value={fish.id}>
-                        {fish.name} - Size: {fish.size}cm - Age: {fish.age} years (Current)
-                        </option>
-                    ))}
-
-                    {koiFishWithStatusNew?.filter(fish => fish.id !== parseInt(fishId))
-                      .map((fish) => (
-                        <option key={fish.id} value={fish.id}>
-                          {fish.name} - Size: {fish.size}cm - Age: {fish.age} years (Available)
-                    </option>
+                  {koiFishList?.filter(fish => fish.id === parseInt(fishId))
+                    .map((fish) => (
+                      <option key={fish.id} value={fish.id}>
+                      {fish.name} - Size: {fish.size}cm - Age: {fish.age} years (Current)
+                      </option>
                   ))}
-                </select>
-                </div>
-              {/* Method Type Field */}
-              <div className="d-flex align-items-center">
-                <h5 className="mb-0 me-2">Method:</h5>
-                <div className="form-check me-3">
-                  <input
-                    className="form-check-input"
-                    type="radio"
-                    id="TraditionalMethod"
-                    name="method"
-                    value="TRADITIONAL"
-                    checked={methodType === "TRADITIONAL"}
-                    onChange={() => setmethodType("TRADITIONAL")}
-                  />
-                  <label className="form-check-label" htmlFor="TraditionalMethod">
-                    TRADITIONAL
-                  </label>
-                </div>
-                <div className="form-check me-3">
-                  <input
-                    className="form-check-input"
-                    type="radio"
-                    id="AnonymousMethod"
-                    name="method"
-                    value="ANONYMOUS"
-                    checked={methodType === "ANONYMOUS"}
-                    onChange={() => setmethodType("ANONYMOUS")}
-                  />
-                  <label className="form-check-label" htmlFor="AnonymousMethod">
-                    ANONYMOUS
-                  </label>
-                </div>
-                <div className="form-check">
-                  <input
-                    className="form-check-input"
-                    type="radio"
-                    id="FixedPriceMethod"
-                    name="method"
-                    value="FIXED_PRICE"
-                    checked={methodType === "FIXED_PRICE"}
-                    onChange={() => setmethodType("FIXED_PRICE")}
-                  />
-                  <label className="form-check-label" htmlFor="FixedPriceMethod">
-                    FIXED PRICE
-                  </label>
+
+                  {koiFishWithStatusNew?.filter(fish => fish.id !== parseInt(fishId))
+                    .map((fish) => (
+                      <option key={fish.id} value={fish.id}>
+                        {fish.name} - Size: {fish.size}cm - Age: {fish.age} years (Available)
+                  </option>
+                ))}
+              </select>
+              </div>
+
+              <div className="form-group mb-3">
+                <label className="form-label"><strong>Method:</strong></label>
+                <div className="d-flex align-items-center">
+                  <div className="form-check me-3">
+                    <input
+                      className="form-check-input"
+                      type="radio"
+                      id="TraditionalMethod"
+                      name="method"
+                      value="TRADITIONAL"
+                      checked={methodType === "TRADITIONAL"}
+                      onChange={() => setmethodType("TRADITIONAL")}
+                    />
+                    <label className="form-check-label" htmlFor="TraditionalMethod">
+                      TRADITIONAL
+                    </label>
+                  </div>
+                  <div className="form-check me-3">
+                    <input
+                      className="form-check-input"
+                      type="radio"
+                      id="AnonymousMethod"
+                      name="method"
+                      value="ANONYMOUS"
+                      checked={methodType === "ANONYMOUS"}
+                      onChange={() => setmethodType("ANONYMOUS")}
+                    />
+                    <label className="form-check-label" htmlFor="AnonymousMethod">
+                      ANONYMOUS
+                    </label>
+                  </div>
                 </div>
               </div>
 
+              <div className="form-group mb-3">
+                <label className="form-label"><strong>Buy Out Price:</strong></label>
+                <input
+                  type="number"
+                  name="buyOut"
+                  value={buyOut}
+                  onChange={(e) => setbuyOut(e.target.value)}
+                  placeholder="Buy Out Price"
+                  className={styles.roundedInput}
+                  required
+                />
+              </div>
 
+              <div className="form-group mb-3">
+                <label className="form-label"><strong>Start Price:</strong></label>
+                <input
+                  type="number"
+                  name="startPrice"
+                  value={startPrice}
+                  onChange={(e) => setstartPrice(e.target.value)}
+                  placeholder="Start Price"
+                  className={styles.roundedInput}
+                  required
+                />
+              </div>
 
-              {/* Buy Out Price Field */}
-              <input
-                type="number"
-                name="buyOut"
-                value={buyOut}
-                onChange={(e) => setbuyOut(e.target.value)}
-                placeholder="Buy Out Price"
-                className={styles.roundedInput}
-              />
-
-              {/* Start Price Field */}
-              <input
-                type="number"
-                name="startPrice"
-                value={startPrice}
-                onChange={(e) => setstartPrice(e.target.value)}
-                placeholder="Start Price"
-                className={styles.roundedInput}
-              />
-              <button type="submit" className="btn btn-outline-dark">
+              <button type="submit" className="btn btn-outline-dark mb-3 mx-auto d-block">
                 Submit
               </button>
             </form>
@@ -650,7 +691,7 @@ function CreateRequest() {
       </Modal>
 
       <Modal show={showAddKoiFishModal}>
-        <div className="position-relative p-2 text-center text-muted bg-body border border-dashed rounded-5">
+        <div className="position-relative p-2 text-start text-muted bg-body border border-dashed rounded-5">
           <button
             type="button"
             className="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill"
@@ -677,7 +718,7 @@ function CreateRequest() {
                     {img ? (
                       <img src={URL.createObjectURL(img)} alt="upload" style={{ height: '100%', width: '100%', objectFit: 'contain' }} />
                     ) : (
-                      <img src="\logo\blankfish.webp" alt="upload" style={{ height: '100%', width: '100%', objectFit: 'contain' }} />
+                      <img src="https://cdn-icons-png.flaticon.com/512/25/25666.png" alt="upload" style={{ height: '60%', width: '100%', objectFit: 'contain' }} />
                     )}
                     <input type="file" ref={inputImgRef} onChange={handleImageChange} style={{ display: 'none' }} />
                   </div>
@@ -703,7 +744,8 @@ function CreateRequest() {
                 </div>
 
                 <div className="col-md-6">
-                  <div className="form-group mb-3">
+                  <div className="form-group">
+                    <label className="form-label"><strong>Name:</strong></label>
                     <input
                       type="text"
                       name="name"
@@ -715,7 +757,8 @@ function CreateRequest() {
                     />
                   </div>
 
-                  <div className="form-group mb-3">
+                  <div className="form-group">
+                    <label className="form-label"><strong>Sex:</strong></label>
                     <select
                       className={`form-select ${styles.roundedInput}`}
                       value={sex}
@@ -728,7 +771,8 @@ function CreateRequest() {
                     </select>
                   </div>
 
-                  <div className="form-group mb-3">
+                  <div className="form-group ">
+                    <label className="form-label"><strong>Size:</strong></label>
                     <input
                       type="number"
                       name="size"
@@ -740,7 +784,8 @@ function CreateRequest() {
                     />
                   </div>
 
-                  <div className="form-group mb-3">
+                  <div className="form-group ">
+                    <label className="form-label"><strong>Age:</strong></label>
                     <input
                       type="number"
                       name="age"
@@ -752,7 +797,8 @@ function CreateRequest() {
                     />
                   </div>
 
-                  <div className="form-group mb-3">
+                  <div className="form-group ">
+                    <label className="form-label"><strong>Description:</strong></label>
                     <textarea
                       name="description"
                       value={description}
@@ -766,13 +812,46 @@ function CreateRequest() {
                 </div>
               </div>
 
-              <button type="submit" className="btn btn-outline-dark mb-3">
+                <button type="submit" className="btn btn-outline-dark mb-3 mx-auto d-block">
                 Add Koi Fish
               </button>
             </form>
           </div>
         </div>
       </Modal>
+
+      <Modal show={showStaffDetailModal}>
+        <div className="position-relative p-2 text-start text-muted bg-body border border-dashed rounded-5">
+          <button
+            type="button"
+            className="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill"
+            aria-label="Close"
+            onClick={() => setShowStaffDetailModal(false)}
+          ></button>
+          <h1 className="text-body-emphasis text-start">Staff Detail</h1>
+          {userByUserId && (
+            <div>
+              <div>
+                <label className="form-label"><strong>Name:</strong></label>
+                <input
+                  readOnly
+                  value={userByUserId?.fullname}
+                  className={styles.roundedInput}
+                />
+              </div>
+              <div>
+                <label className="form-label"><strong>Contact:</strong></label>
+                <input
+                  readOnly
+                  value={userByUserId?.phone}
+                  className={styles.roundedInput}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      </Modal>
+
       <ToastContainer
         position="top-center"
         autoClose={5000}
