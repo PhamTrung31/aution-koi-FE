@@ -13,6 +13,7 @@ function ManageTransaction() {
   useEffect(() => {
     getTransaction(token, dispatch);
   }, []);
+  console.log(transactionList);
 
   return (
     <div className="container py-3 table">

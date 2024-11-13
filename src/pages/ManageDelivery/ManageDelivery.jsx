@@ -71,7 +71,7 @@ function ManageDelivery() {
                 <td>{delivery.fromAddress}</td>
                 <td>{delivery.toAddress}</td>
                 <td>{delivery.deliveryStatus}</td>
-                <td>{delivery.deliveryDate}</td>
+                <td>{new Date(delivery.deliveryDate).toLocaleDateString()}</td>
                 <td>{delivery.deliveryFee}</td>
                 <td>
                   <button

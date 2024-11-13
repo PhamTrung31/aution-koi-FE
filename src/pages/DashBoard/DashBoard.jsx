@@ -6,7 +6,6 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./DashBoard.modules.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faDollarSign,
   faUser,
   faTasks,
   faMoneyBill,

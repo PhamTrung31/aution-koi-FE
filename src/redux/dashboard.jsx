@@ -13,6 +13,12 @@ const dashboardSlice = createSlice ({
             boardChart: [],
             isFetching: false,
             error: false
+        },
+        getDonutChart:{
+            donutChart: [],
+            isFetching: false,
+            error: false
+
         }
     },
 
@@ -39,6 +45,17 @@ const dashboardSlice = createSlice ({
             state.getBoardChart.isFetching = false;
             state.getBoardChart.error = true;
           },
+          getDonutChartStart: (state) => {
+            state.getDonutChart.isFetching = true;
+          },
+          getDonutChartSuccess: (state, action) => {
+            state.getDonutChart.isFetching = false;
+            state.getDonutChart.donutChart = action.payload;
+          },
+          getDonutChartFailed: (state) => {
+            state.getDonutChart.isFetching = false;
+            state.getDonutChart.error = true;
+          },
     }
 })
 
@@ -48,7 +65,10 @@ export const {
     getStatCardFailed,
     getBoardChartStart,
     getBoardChartSuccess,
-    getBoardChartFailed
+    getBoardChartFailed,
+    getDonutChartStart,
+    getDonutChartSuccess,
+    getDonutChartFailed
 } = dashboardSlice.actions
 
 export default dashboardSlice.reducer
