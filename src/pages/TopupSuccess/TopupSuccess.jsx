@@ -1,16 +1,18 @@
 import { SiTicktick } from "react-icons/si";
 import { Link } from 'react-router-dom';
-import { getUserWallet } from "../../redux/apiRequest";
+import { getUserWallet, getUserProfile } from "../../redux/apiRequest";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 
 
 function TopupSuccess() {
     const user = useSelector((state) => state.auth.profile.currentUser);
+    const {token} = useSelector((state) => state.auth.login.currentToken);
+
     const dispatch = useDispatch();
 
     useEffect(() => {
-        getUserWallet(user.id, dispatch);
+        getUserProfile(token, dispatch);
     }, []);
 
     return (
@@ -18,9 +20,6 @@ function TopupSuccess() {
             <p className="fs-1 text-success"><SiTicktick /></p>
             <h3 className="display-4 fw-bold text-body-emphasis text-center">Top-Up Success</h3>
             <div className="col-lg-6 mx-auto w-25">
-                <p className="lead">Transaction ID: </p>
-                <p className="lead">Message: </p>
-                <p className="lead">Time: </p>
                 <div className="d-grid gap-2 d-sm-flex justify-content-sm-center mb-5">
                     <Link
                         type="button"

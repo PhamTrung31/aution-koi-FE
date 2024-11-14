@@ -12,6 +12,7 @@ import messageReducer from "./messageSlice";
 import deliveryReducer from "./deliverySlice";
 import transactionReducer from "./transactionSlice";
 import dashboardReducer from "./dashboard";
+import bidReducer from "./bidSlice";
 import {
   persistStore,
   persistReducer,
@@ -49,18 +50,19 @@ const persistMessageReducer = persistReducer(messagePersistConfig, messageReduce
 const store = configureStore({
   reducer: {
     auth: persistedAuthReducer,
+    wallet: persistedWalletReducer,
+    message: persistMessageReducer,
     category: categoryReducer,
     staff: staffReducer,
     user: userReducer,
     breeder: breederReducer,
     auctionrequest: auctionrequestReducer,
     auction: auctionReducer,
-    koifish: koifishReducer,
-    wallet: persistedWalletReducer,
-    message: persistMessageReducer,
+    koifish: koifishReducer,    
     delivery: deliveryReducer,
     transaction: transactionReducer,
-    dashboard: dashboardReducer
+    dashboard: dashboardReducer,
+    bid: bidReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

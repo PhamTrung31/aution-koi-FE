@@ -191,6 +191,23 @@ import {
   getDonutChartSuccess,
   getDonutChartFailed
 } from "./dashboard";
+import {
+  placeTraditionalBidStart,
+  placeTraditionalBidSuccess,
+  placeTraditionalBidFailed,
+  placeAnonymousBidStart,
+  placeAnonymousBidSuccess,
+  placeAnonymousBidFailed
+} from "./bidSlice";
+import {
+  loadWebsocketPendingMessage,
+  loadWebsocketStartMessage,
+  loadWebsocketCannotStartMessage,
+  loadWebsocketPlaceBidMessage,
+  loadWebsocketEndMessage,
+  countPendingTimeLeft,
+  countStartTimeLeft
+} from "./messageSlice";
 
 export const loginPayload = async (payload, dispatch, navigate) => {
   dispatch(loginStart());
@@ -694,12 +711,15 @@ export const getAuctionRequestForStaffToAssign = async (accessToken, staffId, di
   }
 };
 
-export const topupWalletRequest = async (payload, dispatch, navigate) => {
+export const topupWalletRequest = async (accessToken, payload, dispatch, navigate) => {
   dispatch(topupWalletStart());
   try {
     const res = await axios.post(
       `http://localhost:8081/auctionkoi/vnpay/submitOrder`,
-      payload
+      payload,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
     );
     console.log(res.data);
     dispatch(topupWalletSuccess(res.data));
@@ -1122,4 +1142,54 @@ export const getDonutChart = async (accessToken, dispatch) => {
   } catch (err) {
     dispatch(getDonutChartFailed());
   } 
+}
+
+export const placeBidTraditional = async (accessToken, bidData, userid, dispatch) => {
+  dispatch(placeTraditionalBidStart());
+  try {
+    const res = await axios.post(
+      `http://localhost:8081/auctionkoi/auctions/placebid/traditional`,
+      bidData,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+    );
+    dispatch(placeTraditionalBidSuccess(res.data.message));
+    getUserWallet(accessToken, userid, dispatch);
+  } catch (err) {
+    const error = err.response?.data || "An error occured";
+    dispatch(placeTraditionalBidFailed(error));
+  }
+}
+
+export const resetWebsocketMessage = (dispatch) => {
+  try {
+    dispatch(loadWebsocketPendingMessage(null));
+    dispatch(countPendingTimeLeft(null));
+    dispatch(loadWebsocketStartMessage(null));
+    dispatch(countStartTimeLeft(null));
+    dispatch(loadWebsocketCannotStartMessage(null));
+    dispatch(loadWebsocketPlaceBidMessage(null));
+    dispatch(loadWebsocketEndMessage(null));
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+export const placeBidAnonymous = async (accessToken, bidData, userid, dispatch) => {
+  dispatch(placeAnonymousBidStart());
+  try {
+    const res = await axios.post(
+      `http://localhost:8081/auctionkoi/auctions/placebid`,
+      bidData,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+    );
+    dispatch(placeAnonymousBidSuccess(res.data.message));
+    getUserWallet(accessToken, userid, dispatch);
+  } catch (err) {
+    const error = err.response?.data || "An error occured";
+    dispatch(placeAnonymousBidFailed(error));
+  }
 }

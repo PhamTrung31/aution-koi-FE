@@ -34,15 +34,19 @@ import DonutChart from "./pages/DashBoard/DonutChart.jsx";
 import Topup from "./pages/Topup/Topup.jsx";
 import TopupSuccess from "./pages/TopupSuccess/TopupSuccess.jsx";
 import ManageKoiFish from "./pages/ManageKoiFish/ManageKoiFish.jsx";
-import { 
-  loadWebsocketPendingMessage,
-  loadWebsocketStartMessage } from "./redux/messageSlice.jsx";
 import ManageDelivery from "./pages/ManageDelivery/ManageDelivery.jsx";
 import ManageTransaction from "./pages/ManageTransaction/ManageTransaction.jsx";
 import ManagePendingWithDrawal from "./pages/ManagePendingWithDrawal/ManagePendingWithDrawal.jsx";
 import RequestWithDrawals from "./pages/RequestWithDrawals/RequestWithDrawals.jsx";
 import AuctionPreview from "./pages/AuctionPreview/auctionPreview.jsx";
 import { Client } from "@stomp/stompjs";
+import { 
+  loadWebsocketPendingMessage,
+  loadWebsocketStartMessage,
+  loadWebsocketCannotStartMessage,
+  loadWebsocketPlaceBidMessage,
+  loadWebsocketEndMessage } from "./redux/messageSlice.jsx";
+import { getUserProfile } from "./redux/apiRequest.jsx";
 
 
 function App() {
@@ -95,11 +99,6 @@ function App() {
   }
 
   useEffect(() => {
-    console.log(CURRENT_USER_ROLE);
-    console.log(CURRENT_AUCTION_TYPE);
-  }, []);
-
-  useEffect(() => {
     const client = new Client({
       brokerURL: "ws://localhost:8081/auctionkoi/ws",
       onConnect: () => {
@@ -113,18 +112,32 @@ function App() {
 
         client.subscribe('/auctions/pending', (msg) => {
           const parsedMessage = JSON.parse(msg.body);
-          console.log(parsedMessage);
           // Lưu vào sessionStorage
           dispatch(loadWebsocketPendingMessage(JSON.parse(msg.body)));
         });
 
         client.subscribe('/auctions/start', (msg) => {
           const parsedMessage = JSON.parse(msg.body);
-          console.log(parsedMessage);
-          // Lưu vào sessionStorage
           dispatch(loadWebsocketStartMessage(parsedMessage));
-          // sessionStorage.setItem('websocketStartMessage', JSON.stringify(parsedMessage));
         });
+
+        client.subscribe('/auctions/not-start', (msg) => {
+          const parsedMessage = JSON.parse(msg.body);
+          dispatch(loadWebsocketCannotStartMessage(parsedMessage));
+          dispatch(loadWebsocketPendingMessage(null));
+        })
+
+        client.subscribe('/auctions/place-bid/traditional', (msg) => {
+          const parsedMessage = JSON.parse(msg.body);
+
+          dispatch(loadWebsocketPlaceBidMessage(parsedMessage));
+        })
+
+        client.subscribe('/auctions/end', (msg) => {
+          const parsedMessage = JSON.parse(msg.body);
+          console.log(parsedMessage);
+          dispatch(loadWebsocketEndMessage(parsedMessage));
+        })
       },
       onStompError: (frame) => {
         console.error('Broker reported error: ' + frame.headers['message']);

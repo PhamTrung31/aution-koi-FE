@@ -9,6 +9,7 @@ import { useState} from "react";
 function Topup() {
     const [money, setMoney] = useState(0);
     const user = useSelector((state) => state.auth.profile?.currentUser);
+    const {token} = useSelector((state) => state.auth.login.currentToken);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -18,7 +19,7 @@ function Topup() {
             amount: money,
             memberId: user.id,
         }
-        topupWalletRequest(body, dispatch, navigate);
+        topupWalletRequest(token, body, dispatch, navigate);
     }
 
     return (

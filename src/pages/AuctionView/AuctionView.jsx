@@ -1,9 +1,14 @@
 import "./AuctionView.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "bootstrap";
 import { Client } from "@stomp/stompjs";
+import { getUserProfile, placeBidTraditional, placeBidAnonymous } from "../../redux/apiRequest";
+import {initialTraditionalBid,
+        initialAnonymousBid} from "../../redux/bidSlice";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { countStartTimeLeft } from "../../redux/messageSlice";
 
 
@@ -24,14 +29,20 @@ function AuctionView({ auctionType }) {
 }
 
 const IncreasingAuction = () => {
-  const [highestBid, setHighestBid] = useState(3000000);
-  const [incre, setIncre] = useState(200000);
+  const currentWinner = useSelector((state) => state.message.websocketPlaceBidMessage);
+  const { currentUser } = useSelector((state) => state.auth.profile);
+  const endMessage = useSelector((state) => state.message.websocketEndMessage);
+  const startPrice = useSelector((state) => state.message.websocketStartMessage.start_price);
+  const message = useSelector((state) => state.message.websocketStartMessage);
   const [step, setStep] = useState(1);
-  const [bid, setBid] = useState(highestBid + incre * step);
+  const [highestBid, setHighestBid] = useState(currentWinner ? currentWinner.highest_price + message.increment_step : startPrice + message.increment_step);
+  const [bid, setBid] = useState(highestBid);
   const [autoBid, setAutoBid] = useState(0);
   const [maxBid, setMaxBid] = useState(0);
-  const [countdown, setCountdown] = useState();
-  const message = useSelector((state) => state.message.websocketStartMessage);
+  const { token } = useSelector((state) => state.auth.login.currentToken);
+  const { traditionalBid } = useSelector((state) => state.bid);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const [timerDays, setTimerDays] = useState("00");
   const [timerHours, setTimerHours] = useState("00");
@@ -39,16 +50,19 @@ const IncreasingAuction = () => {
   const [timerSeconds, setTimerSeconds] = useState("00");
 
   let interval = useRef();
+  const countdownDate = useRef(null);
 
   const startTimer = async () => {
     if (!message?.end_time) return;
 
-    const countdownDate = new Date(message.end_time).getTime();
+    // Đặt countdownDate ban đầu
+    countdownDate.current = new Date(message.end_time).getTime() - 7 * 60 * 60 * 1000;
 
     await new Promise((resolve) => {
       interval = setInterval(() => {
         const now = new Date().getTime();
-        const distance = countdownDate - now - (7 * 60 * 60 * 1000);
+
+        const distance = countdownDate.current - now;
 
         const days = Math.floor(distance / (1000 * 60 * 60 * 24));
         const hours = Math.floor(
@@ -60,6 +74,7 @@ const IncreasingAuction = () => {
         if (distance < 0) {
           //stop our timer
           clearInterval(interval.current);
+          resolve();
         } else {
           // update timer
           setTimerDays(days);
@@ -89,11 +104,57 @@ const IncreasingAuction = () => {
     setBid(highestBid + highestBid * 0.1);
   };
 
+  const handlePlaceBidTraditional = (e) => {
+    e.preventDefault();
+    console.log(bid);
+    const bidData = {
+      auctionId: message.auction_id,
+      userId: currentUser.id,
+      bidAmount: bid,
+      isAutoBid: false,
+      maxBidAmount: 0
+    };
+    dispatch(placeBidTraditional(token, bidData, currentUser.id, dispatch));
+  };
+
+  useEffect(() => {
+    if (traditionalBid.status != null) {
+      toast.success(traditionalBid.status);
+      dispatch(initialTraditionalBid());
+    }
+    if (traditionalBid.error != null) {
+      toast.error(traditionalBid.error.message);
+      dispatch(initialTraditionalBid());
+    }
+  }, [traditionalBid]);
+
+  useEffect(() => {
+    setHighestBid(currentWinner ? currentWinner.highest_price : startPrice);
+    if (currentWinner?.end_time) {
+      countdownDate.current = new Date(currentWinner.end_time).getTime() - 7 * 60 * 60 * 1000;
+    }
+  }, [currentWinner]);
+
+  useEffect(() => {
+    if (endMessage != null) {
+      toast.success(
+        <div>
+          <span className="fw-bold fs-5">{endMessage.user_fullname}</span> is the WINNERRRR with <b className="text-warning fs-5">{endMessage.highest_prices} $</b>
+        </div>
+      );
+      getUserProfile(token, dispatch);
+      setTimeout(() => {
+        navigate("/currentAuction");
+      }, 10000);
+    }
+
+  }, [endMessage]);
+
   return (
     <div className="container" style={{ marginBottom: "28.5px" }}>
       {message ? <main>
         <div className="py-5 text-center">
-          <h2>Auction's Time Left:</h2>
+          <h2 className="fw-bolder">Traditional auction's Time Left:</h2>
           <p className="lead mb-4 fs-1">
             <span>
               {
@@ -131,12 +192,12 @@ const IncreasingAuction = () => {
         <div className="row g-5">
           <div className="col-md-5 col-lg-4 order-md-last">
             <h4 className="d-flex justify-content-between align-items-center mb-3">
-              <span className="text-primary">Leaderboard</span>
-              <span className="badge bg-primary rounded-pill">3</span>
+              <span className="text-primary fw-bold">Highest Bid User</span>
+              {/* <span className="badge bg-primary rounded-pill">3</span> */}
             </h4>
 
             {/* Leaderboard */}
-            <ul
+            {/* <ul
               className="list-group list-group-flush mb-3 leaderboard"
               style={{ maxHeight: "320px", overflowY: "auto" }}
             >
@@ -182,13 +243,36 @@ const IncreasingAuction = () => {
                 </div>
                 <span className="text-body-secondary">500000 $</span>
               </li>
-            </ul>
+            </ul> */}
+            {
+              currentWinner?.highest_price ? (
+                <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+                  <div class="col p-4 d-flex flex-column position-static">
+                    <h3 class="mb-0">Placed Bid: <span className="fw-bolder text-danger">{Intl.NumberFormat("de-DE").format(currentWinner.highest_price)} $</span></h3>
+                    <strong class="d-inline-block mb-2 text-primary-emphasis">#{currentWinner.winner_fullname}</strong>
+                    <div class="mb-1 text-body-secondary"></div>
+                  </div>
+                  <div class="col-auto d-none d-lg-block">
+                    <img width="200" height="140" src="https://www.svgrepo.com/show/50481/winner-with-trophy.svg" alt="" />
+                  </div>
+                </div>
+              ) : (
+                <></>
+              )
+            }
+
 
             <div
               type="button"
               className="p-2 btn btn-outline-success btn-lg w-100"
             >
-              <div>
+              <div
+                onClick={(e) => {
+                  setBid(message.buy_out);
+                  console.log(message.buy_out);
+                  handlePlaceBidTraditional(e);
+                }}
+              >
                 <span className="fw-bold">Buy Out</span>: {Intl.NumberFormat("de-DE").format(message.buy_out)} $
               </div>
             </div>
@@ -199,7 +283,7 @@ const IncreasingAuction = () => {
             <div>
               <h4 className="mt-4">
                 Auction's Increment:{" "}
-                <span className="text-danger">{Intl.NumberFormat("de-DE").format(incre)}</span> $
+                <span className="text-danger">{Intl.NumberFormat("de-DE").format(message.increment_step)}</span> $
               </h4>
               <form className="needs-validation" noValidate>
                 <div className="row g-3">
@@ -218,7 +302,7 @@ const IncreasingAuction = () => {
                             onChange={(e) => {
                               setBid(e.target.value);
                             }}
-                            onClick={() => setIncre(0)}
+                          // onClick={() => setIncre(0)}
                           />
                           <label for="floatingBid">Your Bid ( $ )</label>
                         </div>
@@ -231,23 +315,25 @@ const IncreasingAuction = () => {
                           id="floatingBid"
                           value={Intl.NumberFormat("de-DE").format(step)}
                           onChange={(e) => {
-                            setStep(e.target.value);
-                            setBid(highestBid + incre * e.target.value);
+                            const value = e.target.value < 1 ? 1 : e.target.value;
+                            setStep(value);
+                            setBid(highestBid + message.increment_step * value);
                           }}
                         />
                       </div>
-                      <div className="col-md-4">
+                      {/* <div className="col-md-4">
                         <button
                           className="btn btn-danger w-100"
                           onClick={handleAutoBid}
                         >
                           Auto Bid
                         </button>
-                      </div>
+                      </div> */}
                       <hr className="my-4" />
                       <button
                         className="w-100 btn btn-success btn-lg"
                         type="submit"
+                        onClick={handlePlaceBidTraditional}
                       >
                         Continue to bid
                       </button>
@@ -349,7 +435,7 @@ const IncreasingAuction = () => {
                       }}
                     />
                     <br />
-                    <span className="fs-2 fw-bold"> Showa</span>
+                    <span className="fs-2 fw-bold">{message.fish_name}</span>
                   </div>
                 </div>
                 <div className="col-md-6">
@@ -410,7 +496,7 @@ const IncreasingAuction = () => {
                         <div class="d-flex gap-2 w-100 justify-content-between">
                           <div>
                             <h6 class="mb-0">Size</h6>
-                            <p class="mb-0 opacity-75">{message.fish_size}</p>
+                            <p class="mb-0 opacity-75">{message.fish_size} cm</p>
                           </div>
                         </div>
                       </a>
@@ -429,7 +515,7 @@ const IncreasingAuction = () => {
                         <div class="d-flex gap-2 w-100 justify-content-between">
                           <div>
                             <h6 class="mb-0">Age</h6>
-                            <p class="mb-0 opacity-75">{message.fish_age}</p>
+                            <p class="mb-0 opacity-75">{message.fish_age} years</p>
                           </div>
                         </div>
                       </a>
@@ -462,18 +548,38 @@ const IncreasingAuction = () => {
         :
         <p>Waiting for notification...</p>
       }
-
+      <ToastContainer
+        position="top-center"
+        autoClose={10000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+        transition:Flip
+      />
     </div>
   );
 };
 
 const AnonymousAuction = () => {
-  const [buyOut, setBuyOut] = useState(6000000);
-  const [startPrice, setStartPrice] = useState(3000000);
-  const [incre, setIncre] = useState(200000);
+  const currentWinner = useSelector((state) => state.message.websocketPlaceBidMessage);
+  const { currentUser } = useSelector((state) => state.auth.profile);
+  const endMessage = useSelector((state) => state.message.websocketEndMessage);
+  const startPrice = useSelector((state) => state.message.websocketStartMessage.start_price);
+  const message = useSelector((state) => state.message.websocketStartMessage);
   const [step, setStep] = useState(1);
-  const [bid, setBid] = useState(startPrice + incre * step);
+  const [highestBid, setHighestBid] = useState(currentWinner ? currentWinner.highest_price + message.increment_step : startPrice + message.increment_step);
+  const [bid, setBid] = useState(highestBid);
+  const [autoBid, setAutoBid] = useState(0);
   const [maxBid, setMaxBid] = useState(0);
+  const { token } = useSelector((state) => state.auth.login.currentToken);
+  const { anonymousBid } = useSelector((state) => state.bid);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const [timerDays, setTimerDays] = useState("00");
   const [timerHours, setTimerHours] = useState("00");
@@ -481,108 +587,277 @@ const AnonymousAuction = () => {
   const [timerSeconds, setTimerSeconds] = useState("00");
 
   let interval = useRef();
+  const countdownDate = useRef(null);
 
-  const startTimer = () => {
-    const countdownDate = new Date("10/16/2024 00:00:00").getTime();
+  const startTimer = async () => {
+    if (!message?.end_time) return;
 
-    interval = setInterval(() => {
-      const now = new Date().getTime();
-      const distance = countdownDate - now;
+    // Đặt countdownDate ban đầu
+    countdownDate.current = new Date(message.end_time).getTime() - 7 * 60 * 60 * 1000;
 
-      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-      const hours = Math.floor(
-        (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-      );
-      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+    await new Promise((resolve) => {
+      interval = setInterval(() => {
+        const now = new Date().getTime();
 
-      if (distance < 0) {
-        //stop our timer
-        clearInterval(interval.current);
-      } else {
-        // update timer
-        setTimerDays(days);
-        setTimerHours(hours);
-        setTimerMinutes(minutes);
-        setTimerSeconds(seconds);
-      }
-    }, 1000);
+        const distance = countdownDate.current - now;
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor(
+          (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+        );
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        if (distance < 0) {
+          //stop our timer
+          clearInterval(interval.current);
+          resolve();
+        } else {
+          // update timer
+          setTimerDays(days);
+          setTimerHours(hours);
+          setTimerMinutes(minutes);
+          setTimerSeconds(seconds);
+        }
+      }, 1000);
+    });
+
+    dispatch(countStartTimeLeft(0));
   };
 
   useEffect(() => {
-    startTimer();
+    if (message?.end_time) {
+      startTimer();
+    }
     return () => {
       clearInterval(interval.current);
     };
-  });
+  }, [message]);
+
+  const handleAutoBid = (e) => {
+    e.preventDefault();
+    if (autoBid === 0) setAutoBid(1);
+    else setAutoBid(0);
+    setBid(highestBid + highestBid * 0.1);
+  };
+
+  const handlePlaceBid = (e) => {
+    e.preventDefault();
+    const bidData = {
+      auctionId: message.auction_id,
+      userId: currentUser.id,
+      bidAmount: bid,
+      isAutoBid: false,
+      incrementAutobid: null,
+      maxBidAmount: null
+    };
+    placeBidAnonymous(token, bidData, currentUser.id, dispatch);
+  };
+
+  useEffect(() => {
+    if (anonymousBid.status != null) {
+      toast.success(anonymousBid.status);
+      dispatch(initialAnonymousBid());
+    }
+    if (anonymousBid.error != null) {
+      toast.error(anonymousBid.error.message);
+      dispatch(initialAnonymousBid());
+    }
+  }, [anonymousBid]);
+
+  useEffect(() => {
+    setHighestBid(currentWinner ? currentWinner.highest_price : startPrice);
+    if (currentWinner?.end_time) {
+      countdownDate.current = new Date(currentWinner.end_time).getTime() - 7 * 60 * 60 * 1000;
+    }
+  }, [currentWinner]);
+
+  useEffect(() => {
+    if (endMessage != null) {
+      toast.success(
+        <div>
+          <span className="fw-bold fs-5">{endMessage.user_fullname}</span> is the WINNERRRR with <b className="text-warning fs-5">{endMessage.highest_prices} $</b>
+        </div>
+      );
+      getUserProfile(token, dispatch);
+      setTimeout(() => {
+        navigate("/currentAuction");
+      }, 10000);
+    }
+
+  }, [endMessage]);
 
   return (
     <div className="container" style={{ marginBottom: "28.5px" }}>
-      <main>
+      {message ? <main>
         <div className="py-5 text-center">
-          <h2>Anonymous Auction's Time Left:</h2>
+          <h2 className="fw-bolder">Anonymous auction's Time Left:</h2>
           <p className="lead mb-4 fs-1">
-            {timerDays < 1 ? timerDays + " day" : timerDays + " days"}{" "}
-            {timerHours < 10 ? "0" + timerHours : timerHours}:
-            {timerMinutes < 10 ? "0" + timerMinutes : timerMinutes}:
-            {timerSeconds < 10 ? "0" + timerSeconds : timerSeconds}
+            <span>
+              {
+                timerDays == 1
+                  ? timerDays + " day"
+                  : timerDays == 0
+                    ? ""
+                    : timerDays + " days"
+              }{" "}
+              {
+                timerHours < 10
+                  ? "0" + timerHours + ":"
+                  : timerHours == 0
+                    ? ""
+                    : timerHours + ":"
+              }
+              {
+                timerMinutes < 10
+                  ? "0" + timerMinutes + ":"
+                  : timerMinutes == 0
+                    ? ""
+                    : timerMinutes + ":"
+              }
+              {
+                timerSeconds < 10
+                  ? "0" + timerSeconds
+                  : timerSeconds == 0
+                    ? ""
+                    : timerSeconds
+              }
+            </span>
           </p>
         </div>
 
         <div className="row g-5">
           <div className="col-md-5 col-lg-4 order-md-last">
-            <h4 className="mt-4 fw-bold fs-3">
-              Start Price: <span className="text-danger">{startPrice}</span> $
+            <h4 className="d-flex justify-content-between align-items-center mb-3">
+              <span className="text-danger fw-bold fs-2">Start Price: </span>
+              <span>{message.start_price} $</span>
+              {/* <span className="badge bg-primary rounded-pill">3</span> */}
             </h4>
-
             <hr className="my-4" />
 
             {/* Bid Area */}
             <div>
-              <h4 className="mt-4 fs-4">
+              <h4 className="mt-4">
                 Auction's Increment:{" "}
-                <span className="text-danger fst-italic">{incre}</span> $
+                <span className="text-danger">{Intl.NumberFormat("de-DE").format(message.increment_step)}</span> $
               </h4>
               <form className="needs-validation" noValidate>
                 <div className="row g-3">
-                  <div className="col-md-6 form-floating mt-4">
-                    <div className="form-floating">
-                      <input
-                        type="number"
-                        className="form-control rounded-3"
-                        id="floatingBid"
-                        placeholder="name@example.com"
-                        value={bid}
-                        onChange={(e) => {
-                          setBid(e.target.value);
-                        }}
-                      />
-                      <label for="floatingBid">Your Bid ( $ )</label>
-                    </div>
-                  </div>
-
-                  <div className="col-md-4">
-                    <label for="floatingBid">Step</label>
-                    <input
-                      type="number"
-                      className="form-control rounded-3"
-                      id="floatingBid"
-                      value={step}
-                      onChange={(e) => {
-                        setStep(e.target.value);
-                        setBid(startPrice + incre * e.target.value);
-                      }}
-                    />
-                  </div>
-
-                  <hr className="my-4" />
-
-                  <button
-                    className="w-100 btn btn-success btn-lg"
-                    type="submit"
-                  >
-                    Continue to bid
-                  </button>
+                  {autoBid === 0 ? (
+                    <>
+                      {" "}
+                      {/* Manual Bid */}
+                      <div className="col-md-6 form-floating mt-4">
+                        <div className="form-floating">
+                          <input
+                            type="number"
+                            className="form-control rounded-3"
+                            id="floatingBid"
+                            placeholder="name@example.com"
+                            value={bid}
+                            onChange={(e) => {
+                              setBid(e.target.value);
+                            }}
+                          // onClick={() => setIncre(0)}
+                          />
+                          <label for="floatingBid">Your Bid ( $ )</label>
+                        </div>
+                      </div>
+                      <div className="col-md-4">
+                        <label for="floatingBid">Step</label>
+                        <input
+                          type="number"
+                          className="form-control rounded-3"
+                          id="floatingBid"
+                          value={Intl.NumberFormat("de-DE").format(step)}
+                          onChange={(e) => {
+                            const value = e.target.value < 1 ? 1 : e.target.value;
+                            setStep(value);
+                            setBid(highestBid + message.increment_step * value);
+                          }}
+                        />
+                      </div>
+                      {/* <div className="col-md-4">
+                        <button
+                          className="btn btn-danger w-100"
+                          onClick={handleAutoBid}
+                        >
+                          Auto Bid
+                        </button>
+                      </div> */}
+                      <hr className="my-4" />
+                      <button
+                        className="w-100 btn btn-success btn-lg"
+                        type="submit"
+                        onClick={handlePlaceBid}
+                      >
+                        Continue to bid
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      {" "}
+                      {/* Auto Bid */}
+                      <div className="col-md-8 form-floating mt-4">
+                        <div className="form-floating">
+                          <input
+                            type="number"
+                            className="form-control rounded-3 text-secondary"
+                            id="floatingBid"
+                            placeholder="name@example.com"
+                            value={bid}
+                          />
+                          <label for="floatingBid">
+                            Your Bid ( $ ) - View Only
+                          </label>
+                        </div>
+                      </div>
+                      <div className="col-md-5">
+                        <button
+                          className="btn btn-warning w-100"
+                          onClick={handleAutoBid}
+                        >
+                          {" "}
+                          Cancel Auto Bid
+                        </button>
+                      </div>
+                      <div className="col-md-7"></div>
+                      <div className="col-md-6 form-floating">
+                        <div className="form-floating">
+                          <input
+                            type="number"
+                            className="form-control rounded-3"
+                            id="floatingInput"
+                            placeholder="name@example.com"
+                            onChange={(e) => setMaxBid(e.target.value)}
+                          />
+                          <label for="floatingInput">Maximum ( $ )</label>
+                        </div>
+                      </div>
+                      <div className="col-md-4 mt-2">
+                        <label for="form-label">Increment</label>
+                        <select
+                          className="form-select"
+                          id="form-label"
+                          required
+                          onChange={(e) =>
+                            setBid(highestBid + highestBid * e.target.value)
+                          }
+                        >
+                          <option value={0.1}>10%</option>
+                          <option value={0.2}>20%</option>
+                          <option value={0.5}>50%</option>
+                        </select>
+                      </div>
+                      <hr className="my-4" />
+                      <button
+                        className="w-100 btn btn-success btn-lg"
+                        type="submit"
+                      >
+                        Start Auto Bid
+                      </button>
+                    </>
+                  )}
                 </div>
               </form>
             </div>
@@ -597,7 +872,7 @@ const AnonymousAuction = () => {
                     className="h-100 w-100 p-5 rounded-3 koi-image shadow"
                     style={{
                       backgroundImage:
-                        "url(https://gatwickkoi.com/wp-content/uploads/2023/10/A1048-1-scaled.jpg)",
+                        `url(${message.imageUrl})`,
                       backgroundSize:
                         "50%" /* Thu nhỏ hình nền còn 50% kích thước gốc */,
                       backgroundPosition: "center", // Canh giữa ảnh
@@ -616,7 +891,7 @@ const AnonymousAuction = () => {
                       }}
                     />
                     <br />
-                    <span className="fs-2 fw-bold"> Showa</span>
+                    <span className="fs-2 fw-bold">{message.fish_name}</span>
                   </div>
                 </div>
                 <div className="col-md-6">
@@ -639,7 +914,7 @@ const AnonymousAuction = () => {
                         <div class="d-flex gap-2 w-100 justify-content-between">
                           <div>
                             <h6 class="mb-0">Variety</h6>
-                            <p class="mb-0 opacity-75">Some placeholder</p>
+                            <p class="mb-0 opacity-75">{message.fish_name}</p>
                           </div>
                         </div>
                       </a>
@@ -658,7 +933,7 @@ const AnonymousAuction = () => {
                         <div class="d-flex gap-2 w-100 justify-content-between">
                           <div>
                             <h6 class="mb-0">Sex</h6>
-                            <p class="mb-0 opacity-75">Some placeholder</p>
+                            <p class="mb-0 opacity-75">{message.fish_sex}</p>
                           </div>
                         </div>
                       </a>
@@ -677,7 +952,7 @@ const AnonymousAuction = () => {
                         <div class="d-flex gap-2 w-100 justify-content-between">
                           <div>
                             <h6 class="mb-0">Size</h6>
-                            <p class="mb-0 opacity-75">Some placeholder</p>
+                            <p class="mb-0 opacity-75">{message.fish_size} cm</p>
                           </div>
                         </div>
                       </a>
@@ -696,7 +971,7 @@ const AnonymousAuction = () => {
                         <div class="d-flex gap-2 w-100 justify-content-between">
                           <div>
                             <h6 class="mb-0">Age</h6>
-                            <p class="mb-0 opacity-75">Some placeholder</p>
+                            <p class="mb-0 opacity-75">{message.fish_age} years</p>
                           </div>
                         </div>
                       </a>
@@ -717,7 +992,7 @@ const AnonymousAuction = () => {
                     loop
                     autoPlay
                   >
-                    <source src="koi-pond-video.mp4" type="video/mp4" />
+                    <source src={message.videoUrl} type="video/mp4" />
                     Your browser does not support the video tag.
                   </video>
                 </div>
@@ -726,6 +1001,22 @@ const AnonymousAuction = () => {
           </div>
         </div>
       </main>
+        :
+        <p>Waiting for notification...</p>
+      }
+      <ToastContainer
+        position="top-center"
+        autoClose={10000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+        transition:Flip
+      />
     </div>
   );
 };

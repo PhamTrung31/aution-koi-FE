@@ -150,7 +150,7 @@ const IncreasingAuction = () => {
                         }}
                       />
                       <br />
-                      <span className="fs-2 fw-bold"> Showa</span>
+                      <span className="fs-2 fw-bold">{message.fish_name}</span>
                     </div>
                   </div>
                   <div className="col-md-6">
@@ -211,7 +211,7 @@ const IncreasingAuction = () => {
                           <div class="d-flex gap-2 w-100 justify-content-between">
                             <div>
                               <h6 class="mb-0">Size</h6>
-                              <p class="mb-0 opacity-75">{message.fish_size}</p>
+                              <p class="mb-0 opacity-75">{message.fish_size} cm</p>
                             </div>
                           </div>
                         </a>
@@ -230,7 +230,7 @@ const IncreasingAuction = () => {
                           <div class="d-flex gap-2 w-100 justify-content-between">
                             <div>
                               <h6 class="mb-0">Age</h6>
-                              <p class="mb-0 opacity-75">{message.fish_age}</p>
+                              <p class="mb-0 opacity-75">{message.fish_age} years</p>
                             </div>
                           </div>
                         </a>
@@ -269,12 +269,14 @@ const IncreasingAuction = () => {
   };
   
   const AnonymousAuction = () => {
-    const [buyOut, setBuyOut] = useState(6000000);
-    const [startPrice, setStartPrice] = useState(3000000);
+    const [highestBid, setHighestBid] = useState(3000000);
     const [incre, setIncre] = useState(200000);
     const [step, setStep] = useState(1);
-    const [bid, setBid] = useState(startPrice + incre * step);
+    const [bid, setBid] = useState(highestBid + incre * step);
+    const [autoBid, setAutoBid] = useState(0);
     const [maxBid, setMaxBid] = useState(0);
+    const [countdown, setCountdown] = useState();
+    const message = useSelector((state) => state.message.websocketPendingMessage);
   
     const [timerDays, setTimerDays] = useState("00");
     const [timerHours, setTimerHours] = useState("00");
@@ -283,112 +285,96 @@ const IncreasingAuction = () => {
   
     let interval = useRef();
   
-    const startTimer = () => {
-      const countdownDate = new Date("10/16/2024 00:00:00").getTime();
+    const startTimer = async () => {
+      if (!message?.start_time) return;
   
-      interval = setInterval(() => {
-        const now = new Date().getTime();
-        const distance = countdownDate - now;
+      const countdownDate = new Date(message.start_time).getTime();
   
-        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-        const hours = Math.floor(
-          (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-        );
-        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+      await new Promise((resolve) => {
+        interval = setInterval(() => {
+          const now = new Date().getTime();
+          const distance = countdownDate - now - (7 * 60 * 60 * 1000);
   
-        if (distance < 0) {
-          //stop our timer
-          clearInterval(interval.current);
-        } else {
-          // update timer
-          setTimerDays(days);
-          setTimerHours(hours);
-          setTimerMinutes(minutes);
-          setTimerSeconds(seconds);
-        }
-      }, 1000);
+          const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+          const hours = Math.floor(
+            (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+          );
+          const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+  
+          if (distance < 0) {
+            //stop our timer
+            clearInterval(interval.current);
+          } else {
+            // update timer
+            setTimerDays(days);
+            setTimerHours(hours);
+            setTimerMinutes(minutes);
+            setTimerSeconds(seconds);
+          }
+        }, 1000);
+      });
+  
+      dispatch(countStartTimeLeft(0));
     };
   
     useEffect(() => {
-      startTimer();
+      if (message?.start_time) {
+        startTimer();
+      }
       return () => {
         clearInterval(interval.current);
       };
-    });
+    }, [message]);
+  
+    const handleAutoBid = (e) => {
+      e.preventDefault();
+      if (autoBid === 0) setAutoBid(1);
+      else setAutoBid(0);
+      setBid(highestBid + highestBid * 0.1);
+    };
   
     return (
       <div className="container" style={{ marginBottom: "28.5px" }}>
-        <main>
-          <div className="py-5 text-center">
-            <h2>Anonymous Auction's Time Left:</h2>
-            <p className="lead mb-4 fs-1">
-              {timerDays < 1 ? timerDays + " day" : timerDays + " days"}{" "}
-              {timerHours < 10 ? "0" + timerHours : timerHours}:
-              {timerMinutes < 10 ? "0" + timerMinutes : timerMinutes}:
-              {timerSeconds < 10 ? "0" + timerSeconds : timerSeconds}
+        {message ? <main>
+          <div className="pt-5 text-center">
+            <h2 className="display-5 fw-bold">Auction will start in</h2>
+            <p className="lead mb-1 fs-1">
+              <span>
+                {
+                  timerDays == 1
+                    ? timerDays + " day"
+                    : timerDays == 0
+                      ? ""
+                      : timerDays + " days"
+                }{" "}
+                {
+                  timerHours < 10
+                    ? "0" + timerHours + ":"
+                    : timerHours == 0
+                      ? ""
+                      : timerHours + ":"
+                }
+                {
+                  timerMinutes < 10
+                    ? "0" + timerMinutes + ":"
+                    : timerMinutes == 0
+                      ? ""
+                      : timerMinutes + ":"
+                }
+                {
+                  timerSeconds < 10
+                    ? "0" + timerSeconds
+                    : timerSeconds == 0
+                      ? ""
+                      : timerSeconds
+                }
+              </span>
             </p>
           </div>
   
-          <div className="row g-5">
-            <div className="col-md-5 col-lg-4 order-md-last">
-              <h4 className="mt-4 fw-bold fs-3">
-                Start Price: <span className="text-danger">{startPrice}</span> $
-              </h4>
-  
-              <hr className="my-4" />
-  
-              {/* Bid Area */}
-              <div>
-                <h4 className="mt-4 fs-4">
-                  Auction's Increment:{" "}
-                  <span className="text-danger fst-italic">{incre}</span> $
-                </h4>
-                <form className="needs-validation" noValidate>
-                  <div className="row g-3">
-                    <div className="col-md-6 form-floating mt-4">
-                      <div className="form-floating">
-                        <input
-                          type="number"
-                          className="form-control rounded-3"
-                          id="floatingBid"
-                          placeholder="name@example.com"
-                          value={bid}
-                          onChange={(e) => {
-                            setBid(e.target.value);
-                          }}
-                        />
-                        <label for="floatingBid">Your Bid ( $ )</label>
-                      </div>
-                    </div>
-  
-                    <div className="col-md-4">
-                      <label for="floatingBid">Step</label>
-                      <input
-                        type="number"
-                        className="form-control rounded-3"
-                        id="floatingBid"
-                        value={step}
-                        onChange={(e) => {
-                          setStep(e.target.value);
-                          setBid(startPrice + incre * e.target.value);
-                        }}
-                      />
-                    </div>
-  
-                    <hr className="my-4" />
-  
-                    <button
-                      className="w-100 btn btn-success btn-lg"
-                      type="submit"
-                    >
-                      Continue to bid
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-            <div className="col-md-7 col-lg-8">
+          <div className="d-flex justify-content-center">
+            <div className="col-md-7 col-lg-8 ">
               <div className="container py-4">
                 <div className="row align-items-md-stretch mb-5">
                   <div className="col-md-6">
@@ -398,7 +384,7 @@ const IncreasingAuction = () => {
                       className="h-100 w-100 p-5 rounded-3 koi-image shadow"
                       style={{
                         backgroundImage:
-                          "url(https://gatwickkoi.com/wp-content/uploads/2023/10/A1048-1-scaled.jpg)",
+                          `url(${message.imageUrl})`,
                         backgroundSize:
                           "50%" /* Thu nhỏ hình nền còn 50% kích thước gốc */,
                         backgroundPosition: "center", // Canh giữa ảnh
@@ -417,7 +403,7 @@ const IncreasingAuction = () => {
                         }}
                       />
                       <br />
-                      <span className="fs-2 fw-bold"> Showa</span>
+                      <span className="fs-2 fw-bold">{message.fish_name}</span>
                     </div>
                   </div>
                   <div className="col-md-6">
@@ -440,7 +426,7 @@ const IncreasingAuction = () => {
                           <div class="d-flex gap-2 w-100 justify-content-between">
                             <div>
                               <h6 class="mb-0">Variety</h6>
-                              <p class="mb-0 opacity-75">Some placeholder</p>
+                              <p class="mb-0 opacity-75">{message.fish_name}</p>
                             </div>
                           </div>
                         </a>
@@ -459,7 +445,7 @@ const IncreasingAuction = () => {
                           <div class="d-flex gap-2 w-100 justify-content-between">
                             <div>
                               <h6 class="mb-0">Sex</h6>
-                              <p class="mb-0 opacity-75">Some placeholder</p>
+                              <p class="mb-0 opacity-75">{message.fish_sex}</p>
                             </div>
                           </div>
                         </a>
@@ -478,7 +464,7 @@ const IncreasingAuction = () => {
                           <div class="d-flex gap-2 w-100 justify-content-between">
                             <div>
                               <h6 class="mb-0">Size</h6>
-                              <p class="mb-0 opacity-75">Some placeholder</p>
+                              <p class="mb-0 opacity-75">{message.fish_size} cm</p>
                             </div>
                           </div>
                         </a>
@@ -497,7 +483,7 @@ const IncreasingAuction = () => {
                           <div class="d-flex gap-2 w-100 justify-content-between">
                             <div>
                               <h6 class="mb-0">Age</h6>
-                              <p class="mb-0 opacity-75">Some placeholder</p>
+                              <p class="mb-0 opacity-75">{message.fish_age} years</p>
                             </div>
                           </div>
                         </a>
@@ -518,7 +504,7 @@ const IncreasingAuction = () => {
                       loop
                       autoPlay
                     >
-                      <source src="koi-pond-video.mp4" type="video/mp4" />
+                      <source src={message.videoUrl} type="video/mp4" />
                       Your browser does not support the video tag.
                     </video>
                   </div>
@@ -527,6 +513,10 @@ const IncreasingAuction = () => {
             </div>
           </div>
         </main>
+          :
+          <p>Waiting for notification...</p>
+        }
+  
       </div>
     );
   };

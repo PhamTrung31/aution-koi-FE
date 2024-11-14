@@ -7,7 +7,13 @@ import { joinAuctionInitial } from "../../redux/auctionSlice";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { joinAuctionValidate } from "../../redux/apiRequest";
-import { countPendingTimeLeft } from "../../redux/messageSlice";
+import {countPendingTimeLeft,
+        countStartTimeLeft,
+        loadWebsocketCannotStartMessage,
+        loadWebsocketPendingMessage,
+        loadWebsocketStartMessage,
+        loadWebsocketPlaceBidMessage} from "../../redux/messageSlice";
+import { resetWebsocketMessage } from "../../redux/apiRequest";
 
 function CurrentAuction() {
     const { currentUser } = useSelector((state) => state.auth.profile);
@@ -16,6 +22,8 @@ function CurrentAuction() {
     const message = useSelector((state) => state.message.websocketPendingMessage);
     const joinValid = useSelector((state) => state.auction.joinValidate.currentStatus);
     const timeLeft = useSelector((state) => state.message.pendingTimeLeft);
+    const startError = useSelector((state) => state.message.websocketCannotStartMessage);
+    const startTimeLeft = useSelector((state) => state.message.startTimeLeft);
 
     const [timerDays, setTimerDays] = useState("0");
     const [timerHours, setTimerHours] = useState("0");
@@ -24,7 +32,6 @@ function CurrentAuction() {
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const notify = () => toast.error(error.message);
 
     let interval = useRef(null);
 
@@ -44,7 +51,7 @@ function CurrentAuction() {
                 const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
                 if (distance < 0) {
-                    clearInterval(interval);
+                    clearInterval(interval.current);
                     resolve(); // Resolve the promise when the timer reaches zero
                 } else {
                     // update timer
@@ -81,17 +88,32 @@ function CurrentAuction() {
     };
 
     useEffect(() => {
+        if (message !== null) {
+            joinAuctionValidate(token, message.auction_id, currentUser.id, dispatch);
+        }
+    }, [message]);
+
+    useEffect(() => {
         if (error !== null) {
-            notify();
+            toast.error(error.message);
             dispatch(joinAuctionInitial());
         }
     }, [error]);
 
     useEffect(() => {
-        if (message !== null) {
-            joinAuctionValidate(token, message.auction_id, currentUser.id, dispatch);
+        console.log(startError);
+        if(startError != null) {
+            toast.error(startError.message);
+            dispatch(countPendingTimeLeft(null));
+            dispatch(loadWebsocketCannotStartMessage(null));
         }
-    }, [message]);
+    }, [startError])
+
+    useEffect(() => {
+        if(startTimeLeft == 0) {
+            resetWebsocketMessage(dispatch);
+        }
+    }, [startTimeLeft])
 
     return (
         <div className="px-4 pt-5 my-5 text-center border-bottom">

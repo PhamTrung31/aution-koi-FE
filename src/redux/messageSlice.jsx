@@ -8,6 +8,9 @@ const messageSlice = createSlice ({
         pendingTimeLeft: null,
         websocketStartMessage: null,
         startTimeLeft: null,
+        websocketCannotStartMessage: null,
+        websocketPlaceBidMessage: null,
+        websocketEndMessage: null,
     },
     reducers: {
         loadWebsocketPendingMessage: (state, action) => {
@@ -15,6 +18,15 @@ const messageSlice = createSlice ({
         },
         loadWebsocketStartMessage: (state, action) => {
             state.websocketStartMessage = action.payload
+        },
+        loadWebsocketCannotStartMessage: (state, action) => {
+            state.websocketCannotStartMessage = action.payload
+        },
+        loadWebsocketPlaceBidMessage: (state, action) => {
+            state.websocketPlaceBidMessage = action.payload
+        },
+        loadWebsocketEndMessage: (state, action) => {
+            state.websocketEndMessage = action.payload
         },
         countPendingTimeLeft: (state, action) => {
             state.pendingTimeLeft = action.payload
@@ -28,6 +40,9 @@ const messageSlice = createSlice ({
 export const {
     loadWebsocketPendingMessage,
     loadWebsocketStartMessage,
+    loadWebsocketCannotStartMessage,
+    loadWebsocketPlaceBidMessage,
+    loadWebsocketEndMessage,
     countPendingTimeLeft,
     countStartTimeLeft
 } = messageSlice.actions
