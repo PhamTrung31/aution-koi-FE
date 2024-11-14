@@ -122,12 +122,7 @@ function CreateRequest() {
       dispatch(clearError());
     }
   }, [error]);
-  useEffect(() => {
-    if (addKoiFishError) {
-      toast.error(addKoiFishError.message);
-      dispatch(clearError());
-    }
-  }, [addKoiFishError]);
+
   const handleSendRequest = async (e) => {
     e.preventDefault();
     const RequestData = {

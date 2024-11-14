@@ -168,7 +168,10 @@ import {
   getAuctionFailed,
   joinValidateStart,
   joinValidateSuccess,
-  joinValidateFailed
+  joinValidateFailed,
+  getPastAuctionStart,
+  getPastAuctionSuccess,
+  getPastAuctionFailed
 } from "./auctionSlice";
 import {
   getUserWalletStart,
@@ -1145,3 +1148,19 @@ export const getDonutChart = async (accessToken, dispatch) => {
     dispatch(getDonutChartFailed());
   } 
 }
+
+export const getPastAuction = async (accessToken, dispatch) => {
+  dispatch(getPastAuctionStart());
+  try {
+    const res = await axios.get(
+      `http://localhost:8081/auctionkoi/auctions/view-past-auction`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+    dispatch(getPastAuctionSuccess(res.data.result));
+  } catch (err) {
+    dispatch(getPastAuctionFailed(err.response?.data));
+  }
+}
+ 
