@@ -42,7 +42,7 @@ const auctionrequestSlice = createSlice({
     deleteauctionrequest: {
       deleteauctionrequests: [],
       isFetching: false,
-      error: false,
+      error: null,
     },
     updateauctionrequests: {
       updateauctionrequests: [],
@@ -82,7 +82,7 @@ const auctionrequestSlice = createSlice({
     setTime: {
       setTimes: [],
       isFetching: false,
-      error: false,
+      error: null,
     },
   },
   reducers: {
@@ -178,9 +178,9 @@ const auctionrequestSlice = createSlice({
         (request) => request.id !== action.payload.id
       );
     },
-    deleteAuctionRequestFailed: (state) => {
+    deleteAuctionRequestFailed: (state,action) => {
       state.deleteauctionrequest.isFetching = false;
-      state.deleteauctionrequest.error = true;
+      state.deleteauctionrequest.error = action.payload;
     },
     updateAuctionRequestStart: (state) => {
       state.updateauctionrequests.isFetching = true;
@@ -314,9 +314,13 @@ const auctionrequestSlice = createSlice({
             : auctionrequest
       );
     },
-    setTimeFailed: (state) => {
+    setTimeFailed: (state, action) => {
       state.setTime.isFetching = false;
-      state.setTime.error = true;
+      state.setTime.error = action.payload;
+    },
+    clearError: (state) => {
+      state.deleteauctionrequest.error = null;
+      state.setTime.error = null;
     },
   },
 });
@@ -369,5 +373,6 @@ export const {
   setTimeStart,
   setTimeSuccess,
   setTimeFailed,
+  clearError,
 } = auctionrequestSlice.actions;
 export default auctionrequestSlice.reducer;

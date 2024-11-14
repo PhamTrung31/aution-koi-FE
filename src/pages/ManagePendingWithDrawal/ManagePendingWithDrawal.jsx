@@ -61,13 +61,13 @@ function ManagePendingWithDrawal() {
         <td>{withdrawal.amount}</td>
         <td>
           <button
-            className={styles.actionBtn + " btn btn-dark"}
+            className={styles.actionBtn + " btn-dark"}
             onClick={() => handleApprove(withdrawal.id)}
           >
             <FontAwesomeIcon icon={faCheck} />
           </button>
           <button
-            className={styles.actionBtn + " btn btn-dark"}
+            className={styles.actionBtn + "  btn-dark"}
             onClick={() => handleReject(withdrawal.id)}
           >
             <FontAwesomeIcon icon={faXmark} />

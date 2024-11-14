@@ -11,7 +11,7 @@ const userSlice = createSlice({
     adduser: {
       addUsers: [],
       isFetching: false,
-      error: false,
+      error: null,
     },
     deleteusers: {
       deleteusers: [],
@@ -21,7 +21,7 @@ const userSlice = createSlice({
     updateusers: {
       updateusers: [],
       isFetching: false,
-      error: false,
+      error: null,
     },
     banusers: {
       banusers: [],
@@ -37,6 +37,11 @@ const userSlice = createSlice({
       success: null,
       error: null,
       isFetching: false,
+    },
+    getUserByUserId: {
+      user: null,
+      isFetching: false,
+      error: null,
     },
   },
   reducers: {
@@ -59,9 +64,9 @@ const userSlice = createSlice({
       state.adduser.isFetching = false;
       state.adduser.addUsers.push(action.payload);
     },
-    addUserFailed: (state) => {
+    addUserFailed: (state, action) => {
       state.adduser.isFetching = false;
-      state.adduser.error = true;
+      state.adduser.error = action.payload;
     },
     deleteUserStart: (state) => {
       state.deleteusers.isFetching = true;
@@ -83,9 +88,9 @@ const userSlice = createSlice({
         (user) => (user.id === action.payload.id ? action.payload : user)
       );
     },
-    updateUserFailed: (state) => {
+    updateUserFailed: (state, action) => {
       state.updateusers.isFetching = false;
-      state.updateusers.error = true;
+      state.updateusers.error = action.payload;
     },
     banUserStart: (state) => {
       state.banusers.isFetching = true;
@@ -120,7 +125,22 @@ const userSlice = createSlice({
     changeAvatarFailed: (state, action) => {
        state.changeAvatar.isFetching = false,
        state.changeAvatar.error = action.payload 
-    }
+    },
+    clearErrors: (state) => {
+      state.adduser.error = null;
+      state.updateusers.error = null;
+    },
+    getUserByUserIdStart: (state) => {
+      state.getUserByUserId.isFetching = true;
+    },
+    getUserByUserIdSuccess: (state, action) => {
+      state.getUserByUserId.isFetching = false;
+      state.getUserByUserId.user = action.payload;
+    },
+    getUserByUserIdFailed: (state, action) => {
+      state.getUserByUserId.isFetching = false;
+      state.getUserByUserId.error = action.payload;
+    },
   },
 });
 export const {
@@ -144,7 +164,11 @@ export const {
   unbanUserFailed,
   changeAvatarStart,
   changeAvatarSuccess,
-  changeAvatarFailed
+  changeAvatarFailed,
+  clearErrors,
+  getUserByUserIdStart,
+  getUserByUserIdSuccess,
+  getUserByUserIdFailed,
 } = userSlice.actions;
 
 export default userSlice.reducer;

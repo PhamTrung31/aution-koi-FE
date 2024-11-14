@@ -41,30 +41,29 @@ function RequestWithDrawals() {
 
   return (
     <div className="container py-3 table">
-      <h2 className="mb-5 text-center">Manage Auction Request</h2>
+      <h2 className="text-center">Manage Request</h2>
+      <button
+        className={styles.buttonkoi + " btn btn-dark mb-4"}
+        onClick={() => setShowAddModal(true)}
+      >
+        Create
+      </button>
       <table class="table table-light table-bordered border border-dark shadow p-3 mb-5 rounded-4">
         <tr className="table-dark">
           <th>ID</th>
-          <th>Breeder</th>
           <th>Amount</th>
           <th>Status</th>
         </tr>
         {withdrawalsList?.map((withdrawals) => (
           <tr key={withdrawals.id}>
             <td>{withdrawals.id}</td>
-            <td>{withdrawals.user}</td>
             <td>{withdrawals.amount}</td>
             <td>{withdrawals.paymentStatus}</td>
           </tr>
         ))}
       </table>
 
-      <button
-        className={styles.buttonkoi + " btn btn-outline-dark"}
-        onClick={() => setShowAddModal(true)}
-      >
-        Create New Withdrawal Request
-      </button>
+
 
       <Modal show={showAddModal}>
         <div class="position-relative p-2 text-center text-muted bg-body border border-dashed rounded-5">
@@ -83,6 +82,7 @@ function RequestWithDrawals() {
                 onChange={(e) => setAmount(e.target.value)}
                 placeholder="Amount"
                 className={styles.roundedInput}
+                required
               />
 
               <button type="submit" className="btn btn-outline-dark">

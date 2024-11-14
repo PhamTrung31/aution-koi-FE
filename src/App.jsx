@@ -39,6 +39,7 @@ import ManageTransaction from "./pages/ManageTransaction/ManageTransaction.jsx";
 import ManagePendingWithDrawal from "./pages/ManagePendingWithDrawal/ManagePendingWithDrawal.jsx";
 import RequestWithDrawals from "./pages/RequestWithDrawals/RequestWithDrawals.jsx";
 import AuctionPreview from "./pages/AuctionPreview/auctionPreview.jsx";
+import ViewFish from "./pages/ViewFishDetail/ViewFish.jsx";
 import { Client } from "@stomp/stompjs";
 import { 
   loadWebsocketPendingMessage,
@@ -165,6 +166,7 @@ function App() {
             <Route path="/register" element={<PublicElement><Register /></PublicElement>} />
             <Route path="/profile" element={<PublicElement><Profile userRole={CURRENT_USER_ROLE} /></PublicElement>} />
             <Route path="/uploadImage" element={<PublicElement><FirebaseImageUpload /></PublicElement>} />
+            <Route path="/viewFish" element={<PublicElement><ViewFish /></PublicElement>} />
 
             <Route path="/currentAuction" element={<MemberElement><CurrentAuction /></MemberElement>} />
             <Route path="/auctionView" element={<MemberElement><AuctionView auctionType={CURRENT_AUCTION_TYPE} /></MemberElement>} />

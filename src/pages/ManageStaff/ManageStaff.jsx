@@ -5,6 +5,7 @@ import {
   faXmark,
   faLock,
   faLockOpen,
+  faSearch,
 } from "@fortawesome/free-solid-svg-icons";
 import { useDispatch, useSelector } from "react-redux";
 import styles from "./ManageStaff.module.css";
@@ -16,6 +17,10 @@ import {
   banStaff,
   unbanStaff
 } from "../../redux/apiRequest";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { clearErrors } from "../../redux/staffSlice";
+
 
 const Modal = ({ show, onClose, children }) => {
   if (!show) {
@@ -39,6 +44,8 @@ function ManageStaff() {
     (state) => state.auth.login?.currentToken.token
   );
   const staffList = useSelector((state) => state.staff.staffs?.allStaffs);
+  const addStaffError = useSelector((state) => state.staff.addstaffs.error);
+  const updateStaffError = useSelector((state) => state.staff.updatestaffs.error);
   const dispatch = useDispatch();
   console.log(token);
 
@@ -46,6 +53,21 @@ function ManageStaff() {
     getAllStaffs(token, dispatch);
     console.log(staffList);
   }, []);
+  useEffect(() => {
+    const errors = [addStaffError, updateStaffError];
+  
+    errors.forEach(errorArray => {
+      if (Array.isArray(errorArray)) {
+        errorArray.forEach(err => {
+          if (err.error) {
+            toast.error(err.error);
+          }
+        });
+        dispatch(clearErrors());
+      }
+    });
+  }, [addStaffError, updateStaffError]);
+  
   const handleBanStaff = async (id) => {
     if (window.confirm("Are you sure you want to ban this staff?")) {
       await banStaff(dispatch, id, token);
@@ -111,11 +133,37 @@ function ManageStaff() {
     }
   };
 
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredStaffList = staffList?.filter((staff) =>
+    staff.fullname.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div>
       <div className="container py-3 table">
-        <h2 className="mb-5 text-center">Manage Staff </h2>
-        <table class="table table-light table-bordered border border-dark shadow p-3 mb-5 rounded-4">
+        <h2 className="text-center">Manage Staff </h2>
+          <div className="position-relative w-25">
+            <input
+              type="text"
+              className="form-control pe-5"
+              placeholder="Search by name..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <FontAwesomeIcon 
+              icon={faSearch} 
+              className="position-absolute top-50 end-0 translate-middle-y me-2 text-muted"
+            />
+          </div>
+          <button
+            className={styles.buttonkoi + " btn btn-dark"}
+            onClick={() => setShowAddModal(true)}
+          >
+            Create Staff
+          </button>
+
+        <table className="table table-light table-bordered border border-dark shadow p-3 mb-5 rounded-4">
           <tr className="table-dark">
             <th>ID</th>
             <th>Name</th>
@@ -124,7 +172,7 @@ function ManageStaff() {
             <th>Create Date</th>
             <th>Action</th>
           </tr>
-          {staffList?.map((staff) => {
+          {filteredStaffList?.map((staff) => {
             return (
               <tr key={staff.id}>
                 <td>{staff.id}</td>
@@ -161,15 +209,9 @@ function ManageStaff() {
           })}
         </table>
       </div>
-      <button
-        className={styles.buttonkoi + " btn btn-outline-dark"}
-        onClick={() => setShowAddModal(true)}
-      >
-        Create New Staff
-      </button>
-
+      
       <Modal show={showAddModal}>
-        <div class="position-relative p-2 text-center text-muted bg-body border border-dashed rounded-5">
+        <div class="position-relative p-2 text-start text-muted bg-body border border-dashed rounded-5">
           <button
             type="button"
             class="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill"
@@ -179,42 +221,52 @@ function ManageStaff() {
           <h1 class="text-body-emphasis">Add New Staff</h1>
           <div>
             <form onSubmit={handleAddStaff}>
+            <label className="form-label"><strong>UserName:</strong></label>
               <input
                 type="text"
                 name="name"
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="Name"
                 className={styles.roundedInput}
+                required
               />
+              <label className="form-label"><strong>Password:</strong></label>
               <input
                 type="password"
                 name="password"
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
                 className={styles.roundedInput}
+                required
               />
+              <label className="form-label"><strong>Fullname:</strong></label>
               <input
                 type="text"
                 name="fullname"
                 onChange={(e) => setFullname(e.target.value)}
                 placeholder="fullname"
                 className={styles.roundedInput}
+                required
               />
+              <label className="form-label"><strong>Phone:</strong></label>
               <input
                 type="text"
                 name="phone"
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="Phone"
                 className={styles.roundedInput}
+                required
               />
+              <label className="form-label"><strong>Address:</strong></label>
               <input
                 type="text"
                 name="address"
                 onChange={(e) => setAddress(e.target.value)}
                 placeholder="Address"
                 className={styles.roundedInput}
+                required
               />
-              <button type="submit" className="btn btn-outline-dark">
+              <button type="submit" className="btn btn-outline-dark mx-auto d-block">
                 Submit
               </button>
             </form>
@@ -223,7 +275,7 @@ function ManageStaff() {
       </Modal>
 
       <Modal show={showEditModal}>
-        <div class="position-relative p-2 text-center text-muted bg-body border border-dashed rounded-5">
+        <div class="position-relative p-2 text-start text-muted bg-body border border-dashed rounded-5">
           <button
             type="button"
             class="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill"
@@ -233,6 +285,7 @@ function ManageStaff() {
           <h1 class="text-body-emphasis">Edit Staff</h1>
           <div className={styles.formContainer}>
             <form onSubmit={handleUpdateStaff}>
+            <label className="form-label"><strong>UserName:</strong></label>
               <input
                 type="text"
                 name="username"
@@ -240,7 +293,10 @@ function ManageStaff() {
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="UserName"
                 className={styles.roundedInput}
+                required
+                readOnly
               />
+              <label className="form-label"><strong>Password:</strong></label>  
               <input
                 type="password"
                 name="password"
@@ -248,7 +304,9 @@ function ManageStaff() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
                 className={styles.roundedInput}
+                required
               />
+              <label className="form-label"><strong>Fullname:</strong></label>
               <input
                 type="text"
                 name="fullname"
@@ -256,7 +314,9 @@ function ManageStaff() {
                 onChange={(e) => setFullname(e.target.value)}
                 placeholder="fullname"
                 className={styles.roundedInput}
+                required
               />
+              <label className="form-label"><strong>Phone:</strong></label>
               <input
                 type="text"
                 name="phone"
@@ -264,8 +324,9 @@ function ManageStaff() {
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="Phone"
                 className={styles.roundedInput}
+                required
               />
-
+              <label className="form-label"><strong>Address:</strong></label>
               <input
                 type="text"
                 name="address"
@@ -273,14 +334,28 @@ function ManageStaff() {
                 onChange={(e) => setAddress(e.target.value)}
                 placeholder="Address"
                 className={styles.roundedInput}
+                required
               />
-              <button type="submit" className="btn btn-outline-dark">
+              <button type="submit" className="btn btn-outline-dark mx-auto d-block">
                 Submit
               </button>
             </form>
           </div>
         </div>
       </Modal>
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition:Bounce
+      />  
     </div>
   );
 }
